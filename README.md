@@ -93,7 +93,7 @@ Cualquier persona interesada puede:
   </a> |
    <a href="https://www.facebook.com/Riccijandro/">
         facebook
-  </a>
+  </a> |
    <a href="wa.me/+593983185069">
     ✉️ whatsapp
   </a> |
