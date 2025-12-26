@@ -100,9 +100,7 @@ Cualquier persona interesada puede:
   
 </p>
 
-**Nombre:** Richard Rodríguez  
-**Rol:** Desarrollador de software  
-**Enfoque:**  
+
 - Desarrollo web con Laravel  
 - Arquitectura de sistemas  
 - Buenas prácticas de programación  
