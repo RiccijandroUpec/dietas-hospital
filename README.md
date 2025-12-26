@@ -90,7 +90,7 @@ Cualquier persona interesada puede:
   </a> |
   <a href="mailto:richardrodriguez271@gmail.com">
     ✉️ Correo
-  </a>
+  </a> |
    <a href="https://www.facebook.com/Riccijandro/">
         facebook
   </a>
