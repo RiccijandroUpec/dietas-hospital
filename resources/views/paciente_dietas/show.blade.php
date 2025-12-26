@@ -9,7 +9,7 @@
 
                 <div class="mb-4">
                     <strong>Paciente:</strong>
-                    <div>{{ optional($item->paciente)->nombre }} {{ optional($item->paciente)->apellido }} ({{ optional($item->paciente)->cedula }})</div>
+                    <div>{{ optional($item->paciente)->nombre }} {{ optional($item->paciente)->apellido }} ({{ optional($item->paciente)->cedula }}) </div>
                 </div>
 
                 <div class="mb-4">
