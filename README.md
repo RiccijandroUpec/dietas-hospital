@@ -9,11 +9,11 @@
 
 ## Acerca de Laravel
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Laravel es un framework para aplicaciones web con una sintaxis expresiva y elegante. Creemos que el desarrollo debe ser una experiencia agradable y creativa para que resulte verdaderamente satisfactoria. Laravel elimina las dificultades del desarrollo al facilitar tareas comunes que se utilizan en muchos proyectos web
 
-# 🏥 Sistema de Gestión [Nombre del Sistema]
+# 🏥 Sistema de Gestión DIETAS HOSPITALARIAS PARA EL HOSPITAL SN VICENTE DE PAUL 
 
-Este proyecto es un **sistema de gestión desarrollado con Laravel**, orientado a facilitar la administración de información, procesos y reportes dentro de un entorno institucional (por ejemplo: hospitalario, académico o administrativo).
+Este proyecto es un **sistema de gestión desarrollado con Laravel**, orientado a facilitar la administración de información, procesos y reportes dentro del hospital para le distribucion de dietas hospitalarias
 
 El sistema ha sido diseñado siguiendo buenas prácticas de desarrollo de software, priorizando la **organización del código**, la **escalabilidad**, la **seguridad de los datos** y la **usabilidad**.
 
@@ -76,6 +76,23 @@ Cualquier persona interesada puede:
 ---
 
 ## 👨‍💻 Programador / Autor
+<h2>👨‍💻 Programador / Autor</h2>
+
+<p><strong>Nombre:</strong> Richard Rodríguez</p>
+<p><strong>Rol:</strong> Desarrollador de software</p>
+<p><strong>Enfoque:</strong> Desarrollo web, Open Source e integración responsable de Inteligencia Artificial</p>
+
+<p>
+  <a href="https://github.com/tu-usuario" target="_blank">
+    🐙 GitHub
+  </a> |
+  <a href="https://www.linkedin.com/in/tu-perfil" target="_blank">
+    💼 LinkedIn
+  </a> |
+  <a href="mailto:tucorreo@gmail.com">
+    ✉️ Correo
+  </a>
+</p>
 
 **Nombre:** Richard Rodríguez  
 **Rol:** Desarrollador de software  
@@ -102,6 +119,4 @@ Este sistema está en constante mejora y evolución.
 Las contribuciones, sugerencias y observaciones son bienvenidas.
 
 
-## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
