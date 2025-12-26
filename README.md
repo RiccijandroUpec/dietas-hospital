@@ -75,7 +75,6 @@ Cualquier persona interesada puede:
 
 ---
 
-## 👨‍💻 Programador / Autor
 <h2>👨‍💻 Programador / Autor</h2>
 
 <p><strong>Nombre:</strong> Richard Rodríguez</p>
@@ -83,15 +82,19 @@ Cualquier persona interesada puede:
 <p><strong>Enfoque:</strong> Desarrollo web, Open Source e integración responsable de Inteligencia Artificial</p>
 
 <p>
-  <a href="https://github.com/tu-usuario" target="_blank">
+  <a href="https://github.com/RiccijandroUpec" target="_blank">
     🐙 GitHub
   </a> |
-  <a href="https://www.linkedin.com/in/tu-perfil" target="_blank">
+  <a href="https://www.linkedin.com/in/riccijandro/" target="_blank">
     💼 LinkedIn
   </a> |
-  <a href="mailto:tucorreo@gmail.com">
+  <a href="mailto:richardrodriguez271@gmail.com">
     ✉️ Correo
   </a>
+   <a href="https://www.facebook.com/Riccijandro/">
+        facebook
+  </a>
+  
 </p>
 
 **Nombre:** Richard Rodríguez  
