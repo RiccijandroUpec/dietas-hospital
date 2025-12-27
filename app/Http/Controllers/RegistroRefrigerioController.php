@@ -6,6 +6,7 @@ use App\Models\RegistroRefrigerio;
 use App\Models\Paciente;
 use App\Models\Refrigerio;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class RegistroRefrigerioController extends Controller
 {
@@ -40,8 +41,25 @@ class RegistroRefrigerioController extends Controller
             });
         }
 
+        // Totales del filtro aplicado (agrupando por paciente + fecha + momento)
+        $fullSet = (clone $query)->get();
+        $agrupados = $fullSet->groupBy(function ($item) {
+            return $item->paciente_id.'|'.$item->fecha.'|'.$item->momento;
+        });
+        $primeros = $agrupados->map->first();
+
+        $totales = [
+            'registros' => $agrupados->count(),
+            'pacientes_unicos' => $primeros->pluck('paciente_id')->unique()->count(),
+            'momentos' => [
+                'mañana' => $primeros->where('momento', 'mañana')->count(),
+                'tarde' => $primeros->where('momento', 'tarde')->count(),
+                'noche' => $primeros->where('momento', 'noche')->count(),
+            ],
+        ];
+
         $registros = $query->paginate(10)->appends(request()->query());
-        return view('registro_refrigerios.index', compact('registros'));
+        return view('registro_refrigerios.index', compact('registros','totales'));
     }
 
     /**
@@ -73,19 +91,27 @@ class RegistroRefrigerioController extends Controller
         if ($paciente->estado !== 'hospitalizado') {
             return back()->with('error', 'Solo pacientes hospitalizados pueden recibir refrigerios.')->withInput();
         }
+        $refrigerioIds = array_unique($validated['refrigerio_ids']);
 
-        // Crear un registro por cada refrigerio seleccionado
-        foreach ($validated['refrigerio_ids'] as $refrigerio_id) {
-            RegistroRefrigerio::create([
-                'paciente_id' => $validated['paciente_id'],
-                'refrigerio_id' => $refrigerio_id,
-                'fecha' => $validated['fecha'],
-                'momento' => $validated['momento'],
-                'observacion' => $validated['observacion'],
-                'created_by' => auth()->id(),
-                'updated_by' => auth()->id(),
-            ]);
-        }
+        DB::transaction(function () use ($validated, $refrigerioIds) {
+            // Reemplazar cualquier set previo del mismo paciente/fecha/momento
+            RegistroRefrigerio::where('paciente_id', $validated['paciente_id'])
+                ->whereDate('fecha', $validated['fecha'])
+                ->where('momento', $validated['momento'])
+                ->delete();
+
+            foreach ($refrigerioIds as $refrigerio_id) {
+                RegistroRefrigerio::create([
+                    'paciente_id' => $validated['paciente_id'],
+                    'refrigerio_id' => $refrigerio_id,
+                    'fecha' => $validated['fecha'],
+                    'momento' => $validated['momento'],
+                    'observacion' => $validated['observacion'],
+                    'created_by' => auth()->id(),
+                    'updated_by' => auth()->id(),
+                ]);
+            }
+        });
         
         return redirect()->route('registro-refrigerios.index')->with('success', 'Refrigerio(s) registrado(s) exitosamente.');
     }
@@ -119,7 +145,17 @@ class RegistroRefrigerioController extends Controller
         $pacientes = Paciente::where('estado', 'hospitalizado')->orderBy('nombre')->get();
         $refrigerios = Refrigerio::orderBy('nombre')->get();
         $momentos = ['mañana', 'tarde', 'noche'];
-        return view('registro_refrigerios.edit', compact('registroRefrigerio', 'pacientes', 'refrigerios', 'momentos'));
+
+        // Refrigerios ya asignados al mismo paciente/fecha/momento
+        $refrigeriosSeleccionados = RegistroRefrigerio::where('paciente_id', $registroRefrigerio->paciente_id)
+            ->whereDate('fecha', $registroRefrigerio->fecha)
+            ->where('momento', $registroRefrigerio->momento)
+            ->pluck('refrigerio_id')
+            ->unique()
+            ->values()
+            ->toArray();
+
+        return view('registro_refrigerios.edit', compact('registroRefrigerio', 'pacientes', 'refrigerios', 'momentos', 'refrigeriosSeleccionados'));
     }
 
     /**
@@ -129,15 +165,31 @@ class RegistroRefrigerioController extends Controller
     {
         $validated = $request->validate([
             'paciente_id' => 'required|exists:pacientes,id',
-            'refrigerio_id' => 'required|exists:refrigerios,id',
+            'refrigerio_ids' => 'required|array|min:1',
+            'refrigerio_ids.*' => 'exists:refrigerios,id',
             'fecha' => 'required|date',
             'momento' => 'required|in:mañana,tarde,noche',
             'observacion' => 'nullable|string',
         ]);
-        
-        $validated['updated_by'] = auth()->id();
-        
-        $registroRefrigerio->update($validated);
+
+        // Reemplazar todos los registros de ese paciente/fecha/momento con la nueva selección
+        RegistroRefrigerio::where('paciente_id', $validated['paciente_id'])
+            ->whereDate('fecha', $validated['fecha'])
+            ->where('momento', $validated['momento'])
+            ->delete();
+
+        foreach ($validated['refrigerio_ids'] as $refrigerioId) {
+            RegistroRefrigerio::create([
+                'paciente_id' => $validated['paciente_id'],
+                'refrigerio_id' => $refrigerioId,
+                'fecha' => $validated['fecha'],
+                'momento' => $validated['momento'],
+                'observacion' => $validated['observacion'],
+                'created_by' => $registroRefrigerio->created_by ?? auth()->id(),
+                'updated_by' => auth()->id(),
+            ]);
+        }
+
         return redirect()->route('registro-refrigerios.index')->with('success', 'Registro actualizado correctamente.');
     }
 
@@ -163,4 +215,40 @@ class RegistroRefrigerioController extends Controller
             ->latest()->paginate(15);
         return view('registro_refrigerios.reporte', compact('total','hoy','porMomento','registros'));
     }
-}
+
+    public function dashboard(Request $request)
+    {
+        $fecha = $request->input('fecha', now()->format('Y-m-d'));
+        $momento = $request->input('momento', 'mañana');
+        $servicioId = $request->input('servicio_id');
+
+        $query = RegistroRefrigerio::with(['paciente.servicio', 'paciente.cama', 'refrigerio'])
+            ->where('fecha', $fecha)
+            ->where('momento', $momento);
+
+        if ($servicioId) {
+            $query->whereHas('paciente', function($q) use ($servicioId) {
+                $q->where('servicio_id', $servicioId);
+            });
+        }
+
+        $registros = $query->get();
+
+        // Totales agrupados (paciente + fecha + momento)
+        $agrupados = $registros->groupBy(function ($item) {
+            return $item->paciente_id.'|'.$item->fecha.'|'.$item->momento;
+        });
+        $primeros = $agrupados->map->first();
+
+        $totales = [
+            'registros' => $agrupados->count(),
+            'pacientes_unicos' => $primeros->pluck('paciente_id')->unique()->count(),
+            'refrigerios_total' => $registros->count(),
+            'servicios' => $primeros->groupBy(fn($r) => optional(optional($r->paciente)->servicio)->nombre ?? 'Sin servicio')->map->count(),
+        ];
+
+        $servicios = \App\Models\Servicio::orderBy('nombre')->get();
+        $momentoLabels = ['mañana' => 'Mañana', 'tarde' => 'Tarde', 'noche' => 'Noche'];
+
+        return view('registro_refrigerios.dashboard', compact('registros', 'fecha', 'momento', 'servicios', 'totales', 'momentoLabels'));
+    }}

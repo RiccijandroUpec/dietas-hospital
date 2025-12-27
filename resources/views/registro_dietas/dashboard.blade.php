@@ -9,7 +9,10 @@
                 <h1 class="text-3xl font-bold text-gray-900">📊 Dashboard de Comidas del Día</h1>
                 <p class="text-gray-600 mt-1">Selecciona el tipo de comida y visualiza todo detallado y contabilizado</p>
             </div>
-            <a href="{{ route('registro-dietas.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg">Volver a Registros</a>
+            <div class="flex gap-2">
+                <a href="{{ route('registro-dietas.dialisis') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">🏥 Diálisis</a>
+                <a href="{{ route('registro-dietas.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg">Volver a Registros</a>
+            </div>
         </div>
 
         <!-- Filtros -->
@@ -73,6 +76,464 @@
                 <p class="text-3xl font-bold text-slate-900">{{ $totales['vajilla_descartable'] }}</p>
             </div>
         </div>
+
+        @php
+                $servSel = $servicios->firstWhere('id', request('servicio_id'));
+                $tipoLabels = ['desayuno' => 'Desayuno', 'almuerzo' => 'Almuerzo', 'merienda' => 'Merienda'];
+        @endphp
+
+        <!-- Hoja de Preparación General -->
+        <div id="prep-sheet-general" class="bg-white rounded-lg shadow-md p-6 mb-6 prep-sheet">
+            <div class="flex items-start justify-between mb-4">
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-800">🧾 Hoja de preparación general</h2>
+                    <p class="text-sm text-gray-600">Resumen global de todas las dietas a preparar</p>
+                    <div class="mt-2 text-xs text-gray-500">
+                        <span class="inline-block mr-3"><strong>Fecha:</strong> {{ \Carbon\Carbon::parse($fecha)->locale('es')->translatedFormat('l, d \d\e F \d\e Y') }}</span>
+                        <span class="inline-block mr-3"><strong>Comida:</strong> {{ $tipoLabels[$tipo] ?? $tipo }}</span>
+                        <span class="inline-block"><strong>Servicio:</strong> {{ optional($servSel)->nombre ?? 'Todos' }}</span>
+                        <span class="inline-block ml-3 text-gray-400">(NPO excluido)</span>
+                    </div>
+                </div>
+                @if(auth()->user()->role !== 'usuario')
+                    <button onclick="printSheet('prep-sheet-general')" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg">🖨️ Imprimir General</button>
+                @endif
+            </div>
+
+            @php
+                // Construir items (dieta + vajilla) y excluir NPO
+                $prepItems = collect($registros)->flatMap(function($r) {
+                    return collect($r->dietas)->map(function($d) use ($r) {
+                        $nombre = strtolower($d->nombre ?? '');
+                        $esNpo = str_contains($nombre, 'npo') || str_contains($nombre, 'n.p.o') || str_contains($nombre, 'nada por via oral') || str_contains($nombre, 'nada por vía oral');
+                        return [
+                            'dieta' => $d->nombre,
+                            'tipo' => optional($d->tipo)->nombre,
+                            'subtipos' => $d->subtipos->pluck('nombre')->join(', '),
+                            'vajilla' => $r->vajilla,
+                            'observaciones' => $r->observaciones,
+                            'es_tardia' => $r->es_tardia,
+                            'npo' => $esNpo,
+                        ];
+                    });
+                })->filter(fn($i) => !$i['npo']);
+
+                // Agrupar por dieta y contar total/por vajilla
+                $prepResumen = $prepItems->groupBy('dieta')->map(function($grupo) {
+                    $first = $grupo->first();
+                    
+                    // Observaciones por tipo de vajilla
+                    $obsNormal = $grupo->where('vajilla', 'normal')->pluck('observaciones')->filter()->map(fn($t) => trim($t))->filter()->countBy();
+                    $obsDesc = $grupo->where('vajilla', 'descartable')->pluck('observaciones')->filter()->map(fn($t) => trim($t))->filter()->countBy();
+                    
+                    $obsNormalList = $obsNormal->map(function($cnt, $txt) { return ['txt' => $txt, 'cnt' => $cnt]; })->values();
+                    $obsDescList = $obsDesc->map(function($cnt, $txt) { return ['txt' => $txt, 'cnt' => $cnt]; })->values();
+                    
+                    return [
+                        'total' => $grupo->count(),
+                        'normal' => $grupo->where('vajilla', 'normal')->count(),
+                        'descartable' => $grupo->where('vajilla', 'descartable')->count(),
+                        'tardias' => $grupo->filter(fn($i) => $i['es_tardia'])->count(),
+                        'obs_normal' => $obsNormalList,
+                        'obs_descartable' => $obsDescList,
+                    ];
+                })->sortByDesc('total');
+            @endphp
+
+            @if($prepResumen->count() > 0)
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Dieta</th>
+                                <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Total</th>
+                                <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase"><span class="text-xl">🍽️</span> Normal</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Obs. Normal</th>
+                                <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase"><span class="text-xl">📦</span> Descartable</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Obs. Descartable</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            @foreach($prepResumen as $nombre => $info)
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-3 text-sm font-medium text-gray-900">{{ $nombre }}</td>
+                                    <td class="px-6 py-3 text-center text-sm font-semibold text-gray-900">{{ $info['total'] }}</td>
+                                    <td class="px-6 py-3 text-center text-sm text-gray-800">{{ $info['normal'] }}</td>
+                                    <td class="px-6 py-3 text-xs text-gray-700 max-w-sm">
+                                        @if(!empty($info['obs_normal']) && count($info['obs_normal']) > 0)
+                                            <div class="flex flex-wrap gap-1">
+                                                @foreach($info['obs_normal'] as $obs)
+                                                    <span class="inline-flex items-center rounded-full px-2 py-0.5 bg-blue-100 text-blue-800 text-sm obs-badge">{{ $obs['txt'] }} <span class="ml-1 bg-white/70 text-gray-700 rounded px-1">{{ $obs['cnt'] }}</span></span>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            —
+                                        @endif
+                                    </td>
+                                    <td class="px-6 py-3 text-center text-sm text-gray-800">{{ $info['descartable'] }}</td>
+                                    <td class="px-6 py-3 text-xs text-gray-700 max-w-sm">
+                                        @if(!empty($info['obs_descartable']) && count($info['obs_descartable']) > 0)
+                                            <div class="flex flex-wrap gap-1">
+                                                @foreach($info['obs_descartable'] as $obs)
+                                                    <span class="inline-flex items-center rounded-full px-2 py-0.5 bg-amber-100 text-amber-800 text-sm obs-badge">{{ $obs['txt'] }} <span class="ml-1 bg-white/70 text-gray-700 rounded px-1">{{ $obs['cnt'] }}</span></span>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            —
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                    @php
+                        $prepTotal = $prepResumen->reduce(fn($carry, $info) => $carry + ($info['total'] ?? 0), 0);
+                        $prepNormal = $prepResumen->reduce(fn($c, $i) => $c + ($i['normal'] ?? 0), 0);
+                        $prepDesc = $prepResumen->reduce(fn($c, $i) => $c + ($i['descartable'] ?? 0), 0);
+                    @endphp
+                    <div class="text-right text-sm text-gray-800 mt-2">
+                        Total dietas a preparar: <span class="font-semibold">{{ $prepTotal }}</span>
+                        <span class="ml-3 text-xs text-gray-600">(🍽️ {{ $prepNormal }} · 📦 {{ $prepDesc }})</span>
+                    </div>
+                </div>
+            @else
+                <div class="text-gray-600">No hay dietas para preparar en los filtros seleccionados.</div>
+            @endif
+        </div>
+
+        <!-- Hoja de Preparación por Servicios -->
+        <div id="prep-sheet-services" class="bg-white rounded-lg shadow-md p-6 mb-6 prep-sheet">
+            <div class="flex items-start justify-between mb-4">
+                <div>
+                    <h2 class="text-lg font-semibold text-gray-800">🏥 Hoja de preparación por servicios</h2>
+                    <p class="text-sm text-gray-600">Desglose de dietas organizadas por área/piso</p>
+                    <div class="mt-2 text-xs text-gray-500">
+                        <span class="inline-block mr-3"><strong>Fecha:</strong> {{ \Carbon\Carbon::parse($fecha)->locale('es')->translatedFormat('l, d \d\e F \d\e Y') }}</span>
+                        <span class="inline-block mr-3"><strong>Comida:</strong> {{ $tipoLabels[$tipo] ?? $tipo }}</span>
+                        <span class="inline-block ml-3 text-gray-400">(NPO excluido)</span>
+                    </div>
+                </div>
+                @if(auth()->user()->role !== 'usuario')
+                    <button onclick="printSheet('prep-sheet-services')" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg">🖨️ Imprimir por Servicios</button>
+                @endif
+            </div>
+
+            @php
+                // Resumen por servicio (para organizar entregas)
+                $prepPorServicio = collect($registros)
+                    ->groupBy(fn($r) => optional(optional($r->paciente)->servicio)->nombre ?? 'Sin servicio')
+                    ->map(function($regs) {
+                        $items = collect($regs)->flatMap(function($r) {
+                            return collect($r->dietas)->map(function($d) use ($r) {
+                                $nombre = strtolower($d->nombre ?? '');
+                                $esNpo = str_contains($nombre, 'npo') || str_contains($nombre, 'n.p.o') || str_contains($nombre, 'nada por via oral') || str_contains($nombre, 'nada por vía oral');
+                                return [
+                                    'dieta' => $d->nombre,
+                                    'tipo' => optional($d->tipo)->nombre,
+                                    'subtipos' => $d->subtipos->pluck('nombre')->join(', '),
+                                    'vajilla' => $r->vajilla,
+                                    'observaciones' => $r->observaciones,
+                                    'es_tardia' => $r->es_tardia,
+                                    'npo' => $esNpo,
+                                ];
+                            });
+                        })->filter(fn($i) => !$i['npo']);
+
+                        $resumen = $items->groupBy('dieta')->map(function($grupo) {
+                            $first = $grupo->first();
+                            
+                            // Observaciones por tipo de vajilla
+                            $obsNormal = $grupo->where('vajilla', 'normal')->pluck('observaciones')->filter()->map(fn($t) => trim($t))->filter()->countBy();
+                            $obsDesc = $grupo->where('vajilla', 'descartable')->pluck('observaciones')->filter()->map(fn($t) => trim($t))->filter()->countBy();
+                            
+                            $obsNormalList = $obsNormal->map(function($cnt, $txt) { return ['txt' => $txt, 'cnt' => $cnt]; })->values();
+                            $obsDescList = $obsDesc->map(function($cnt, $txt) { return ['txt' => $txt, 'cnt' => $cnt]; })->values();
+                            
+                            return [
+                                'total' => $grupo->count(),
+                                'normal' => $grupo->where('vajilla', 'normal')->count(),
+                                'descartable' => $grupo->where('vajilla', 'descartable')->count(),
+                                'tardias' => $grupo->filter(fn($i) => $i['es_tardia'])->count(),
+                                'obs_normal' => $obsNormalList,
+                                'obs_descartable' => $obsDescList,
+                            ];
+                        })->sortByDesc('total');
+
+                        return $resumen;
+                    })
+                    ->filter(fn($resumen) => $resumen->count() > 0);
+            @endphp
+            
+            @if($prepPorServicio->count() > 0)
+                <div>
+                    @foreach($prepPorServicio as $servicioNombre => $resumen)
+                        <div class="mb-5">
+                            <h4 class="text-sm font-semibold text-gray-700 mb-2">{{ $servicioNombre }}</h4>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Dieta</th>
+                                            <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Total</th>
+                                            <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase"><span class="text-xl">🍽️</span> Normal</th>
+                                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Obs. Normal</th>
+                                            <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase"><span class="text-xl">📦</span> Descartable</th>
+                                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Obs. Descartable</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200">
+                                        @foreach($resumen as $nombre => $info)
+                                            <tr class="hover:bg-gray-50">
+                                                <td class="px-6 py-3 text-sm font-medium text-gray-900">{{ $nombre }}</td>
+                                                <td class="px-6 py-3 text-center text-sm font-semibold text-gray-900">{{ $info['total'] }}</td>
+                                                <td class="px-6 py-3 text-center text-sm text-gray-800">{{ $info['normal'] }}</td>
+                                                <td class="px-6 py-3 text-xs text-gray-700 max-w-sm">
+                                                    @if(!empty($info['obs_normal']) && count($info['obs_normal']) > 0)
+                                                        <div class="flex flex-wrap gap-1">
+                                                            @foreach($info['obs_normal'] as $obs)
+                                                                <span class="inline-flex items-center rounded-full px-2 py-0.5 bg-blue-100 text-blue-800 text-sm obs-badge">{{ $obs['txt'] }} <span class="ml-1 bg-white/70 text-gray-700 rounded px-1">{{ $obs['cnt'] }}</span></span>
+                                                            @endforeach
+                                                        </div>
+                                                    @else
+                                                        —
+                                                    @endif
+                                                </td>
+                                                <td class="px-6 py-3 text-center text-sm text-gray-800">{{ $info['descartable'] }}</td>
+                                                <td class="px-6 py-3 text-xs text-gray-700 max-w-sm">
+                                                    @if(!empty($info['obs_descartable']) && count($info['obs_descartable']) > 0)
+                                                        <div class="flex flex-wrap gap-1">
+                                                            @foreach($info['obs_descartable'] as $obs)
+                                                                <span class="inline-flex items-center rounded-full px-2 py-0.5 bg-amber-100 text-amber-800 text-sm obs-badge">{{ $obs['txt'] }} <span class="ml-1 bg-white/70 text-gray-700 rounded px-1">{{ $obs['cnt'] }}</span></span>
+                                                            @endforeach
+                                                        </div>
+                                                    @else
+                                                        —
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                                @php
+                                    $servTotal = $resumen->reduce(fn($carry, $info) => $carry + ($info['total'] ?? 0), 0);
+                                    $servNormal = $resumen->reduce(fn($c, $i) => $c + ($i['normal'] ?? 0), 0);
+                                    $servDesc = $resumen->reduce(fn($c, $i) => $c + ($i['descartable'] ?? 0), 0);
+                                @endphp
+                                <div class="text-right text-sm text-gray-800 mt-2">
+                                    Total dietas en {{ $servicioNombre }}: <span class="font-semibold">{{ $servTotal }}</span>
+                                    <span class="ml-3 text-xs text-gray-600">(🍽️ {{ $servNormal }} · 📦 {{ $servDesc }})</span>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="text-gray-600">No hay servicios para mostrar.</div>
+            @endif
+        </div>
+
+        <script>
+        function printSheet(sheetId) {
+            const sheet = document.getElementById(sheetId);
+            const original = document.body.innerHTML;
+            const printContent = sheet.innerHTML;
+            document.body.innerHTML = '<div class="prep-sheet" style="padding: 20px;">' + printContent + '</div>';
+            window.print();
+            document.body.innerHTML = original;
+            window.location.reload();
+        }
+
+        function printSheet(sheetId) {
+            const sheet = document.getElementById(sheetId);
+            const original = document.body.innerHTML;
+            const printContent = sheet.innerHTML;
+            
+            // Crear fecha y hora actual
+            const ahora = new Date();
+            const fechaHora = ahora.toLocaleString('es-ES', { 
+                year: 'numeric', 
+                month: '2-digit', 
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            document.body.innerHTML = `
+                <div class="prep-sheet">
+                    <div style="text-align: right; font-size: 0.85rem; color: #6b7280; margin-bottom: 1rem;">
+                        Impreso: ${fechaHora}
+                    </div>
+                    ${printContent}
+                    <div style="margin-top: 2rem; padding-top: 1rem; border-top: 2px solid #e5e7eb; text-align: center; font-size: 0.85rem; color: #9ca3af;">
+                        Sistema de Gestión de Dietas Hospitalarias
+                    </div>
+                </div>
+            `;
+            
+            window.print();
+            document.body.innerHTML = original;
+            window.location.reload();
+        }
+        </script>
+
+        <style>
+        /* Pantalla: aumentar legibilidad en la hoja de preparación */
+        .prep-sheet h2 { font-size: 1.75rem; }
+        .prep-sheet table th, .prep-sheet table td { font-size: 1rem; }
+        .prep-sheet .obs-badge { font-size: 0.95rem; padding: 4px 8px; }
+        .prep-sheet { page-break-after: always; }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            
+            .prep-sheet, .prep-sheet * {
+                visibility: visible;
+            }
+            
+            .prep-sheet {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                padding: 30px;
+                box-shadow: none !important;
+                border: none !important;
+                background: white !important;
+            }
+            
+            /* Encabezados y títulos */
+            .prep-sheet h2 {
+                font-size: 2rem;
+                font-weight: bold;
+                margin-bottom: 0.75rem;
+                color: #1f2937;
+                border-bottom: 3px solid #4f46e5;
+                padding-bottom: 0.5rem;
+            }
+            
+            .prep-sheet h3, .prep-sheet h4 {
+                font-size: 1.25rem;
+                font-weight: 600;
+                margin-top: 1.5rem;
+                margin-bottom: 0.75rem;
+                color: #374151;
+            }
+            
+            .prep-sheet p {
+                font-size: 0.95rem;
+                color: #4b5563;
+                margin-bottom: 0.5rem;
+            }
+            
+            /* Tablas */
+            .prep-sheet table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 1rem;
+                font-size: 1.05rem;
+                page-break-inside: auto;
+            }
+            
+            .prep-sheet thead {
+                background: linear-gradient(to right, #eef2ff, #e0e7ff) !important;
+                border-bottom: 2px solid #4f46e5;
+            }
+            
+            .prep-sheet th {
+                font-size: 0.95rem;
+                padding: 14px 10px;
+                text-align: left;
+                font-weight: 700;
+                color: #3730a3;
+                border: 1px solid #c7d2fe;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+            
+            .prep-sheet td {
+                padding: 10px;
+                border: 1px solid #cbd5e1;
+                color: #1f2937;
+                vertical-align: top;
+                font-size: 0.95rem;
+            }
+            
+            .prep-sheet tbody tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
+            
+            .prep-sheet tbody tr:nth-child(even) {
+                background-color: #f9fafb !important;
+            }
+            
+            /* Badges de dietas */
+            .prep-sheet .bg-rose-100,
+            .prep-sheet .bg-sky-100,
+            .prep-sheet .bg-green-100,
+            .prep-sheet .bg-amber-100,
+            .prep-sheet .bg-cyan-100,
+            .prep-sheet .bg-emerald-100,
+            .prep-sheet .bg-indigo-100,
+            .prep-sheet .bg-gray-200 {
+                background-color: #e0e7ff !important;
+                color: #3730a3 !important;
+                padding: 4px 8px;
+                border-radius: 6px;
+                font-weight: 600;
+                font-size: 0.85rem;
+                display: inline-block;
+                border: 1px solid #c7d2fe;
+                margin: 2px;
+            }
+            
+            /* Badges de observaciones */
+            .obs-badge {
+                background-color: #fef3c7 !important;
+                color: #78350f !important;
+                padding: 4px 8px;
+                border-radius: 6px;
+                font-weight: 600;
+                font-size: 0.85rem;
+                border: 1px solid #fde68a;
+            }
+            
+            /* Totales */
+            .prep-sheet .text-right {
+                text-align: right;
+                font-weight: 700;
+                font-size: 1.1rem;
+                margin-top: 0.75rem;
+                padding-top: 0.5rem;
+                border-top: 2px solid #cbd5e1;
+                color: #1f2937;
+            }
+            
+            /* Ocultar botones y elementos innecesarios */
+            button, a, .shadow-md {
+                display: none !important;
+            }
+            
+            /* Manejo de saltos de página */
+            .service-block {
+                page-break-after: always;
+            }
+            
+            /* Forzar impresión en color */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+        }
+
+        @page {
+            size: letter;
+            margin: 1.5cm;
+        }
+        </style>
 
         <!-- Tabla Detallada -->
         <div class="bg-white rounded-lg shadow-md overflow-hidden mb-6">

@@ -18,6 +18,7 @@ class RegistroDieta extends Model
         'vajilla',
         'fecha',
         'observaciones',
+        'es_tardia',
         'created_by',
         'updated_by',
     ];

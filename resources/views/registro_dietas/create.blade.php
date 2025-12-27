@@ -36,31 +36,47 @@
 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">🥗 Dietas</label>
-                                    @if($tipos->count() > 0)
+                                    @php
+                                        $todasLasDietas = \App\Models\Dieta::whereNotNull('tipo_dieta_id')->get();
+                                        $hayDietas = $todasLasDietas->count() > 0;
+                                    @endphp
+                                    
+                                    @if($hayDietas)
                                         <div class="space-y-4">
                                             @foreach($tipos as $tipo)
-                                                <div class="border border-gray-200 rounded-lg p-3 bg-gray-50">
-                                                    <h3 class="font-semibold text-sm text-gray-800 mb-2">{{ $tipo->nombre }}</h3>
-                                                    @foreach($tipo->subtipos as $subtipo)
-                                                        @if($subtipo->dietas->count() > 0)
-                                                            <div class="mb-3">
-                                                                <h4 class="text-xs font-medium text-gray-600 mb-2">{{ $subtipo->nombre }}</h4>
-                                                                <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
-                                                                    @foreach($subtipo->dietas as $d)
-                                                                        <label class="inline-flex items-center p-2 bg-white rounded border border-gray-300 hover:border-blue-500 hover:bg-blue-50 cursor-pointer transition">
-                                                                            <input type="checkbox" name="dieta_id[]" value="{{ $d->id }}" class="form-checkbox text-blue-600" @if(is_array(old('dieta_id')) && in_array($d->id, old('dieta_id'))) checked @endif>
-                                                                            <span class="ml-2 text-sm font-medium text-gray-700">{{ $d->nombre }}</span>
-                                                                        </label>
-                                                                    @endforeach
-                                                                </div>
-                                                            </div>
-                                                        @endif
-                                                    @endforeach
-                                                </div>
+                                                @php
+                                                    // Obtener dietas de este tipo (solo las que tienen tipo_dieta_id)
+                                                    $todasDietasTipo = \App\Models\Dieta::where('tipo_dieta_id', $tipo->id)->get();
+                                                @endphp
+                                                
+                                                @if($todasDietasTipo->count() > 0)
+                                                    <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                                                        <h3 class="font-semibold text-sm text-gray-800 mb-3">
+                                                            <span class="bg-blue-100 text-blue-800 rounded px-2 py-1 inline-block">{{ $tipo->nombre }}</span>
+                                                        </h3>
+                                                        
+                                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                            @foreach($todasDietasTipo as $dieta)
+                                                                <label class="inline-flex items-start p-3 bg-white rounded border border-gray-300 hover:border-blue-500 hover:bg-blue-50 cursor-pointer transition">
+                                                                    <input type="checkbox" name="dieta_id[]" value="{{ $dieta->id }}" class="form-checkbox text-blue-600 mt-1" @if(is_array(old('dieta_id')) && in_array($dieta->id, old('dieta_id'))) checked @endif>
+                                                                    <div class="ml-2">
+                                                                        <span class="block text-sm font-medium text-gray-700">{{ $dieta->nombre }}</span>
+                                                                        @if($dieta->subtipos->count() > 0)
+                                                                            <span class="block text-xs text-gray-500">{{ $dieta->subtipos->pluck('nombre')->join(', ') }}</span>
+                                                                        @endif
+                                                                    </div>
+                                                                </label>
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
+                                                @endif
                                             @endforeach
                                         </div>
                                     @else
-                                        <div class="text-gray-500 p-3">No hay dietas disponibles</div>
+                                        <div class="text-gray-500 p-3 border border-gray-200 rounded bg-yellow-50">
+                                            <p class="text-sm">⚠️ No hay dietas disponibles. Primero debes crear tipos, subtipos y dietas.</p>
+                                            <a href="{{ route('tipos-dieta.index') }}" class="text-blue-600 hover:underline text-sm">Ir a gestionar tipos de dieta →</a>
+                                        </div>
                                     @endif
                                     @error('dieta_id')<div class="text-red-600 text-sm mt-1">⚠️ {{ $message }}</div>@enderror
                                 </div>
@@ -103,6 +119,14 @@
                                     <div class="text-xs text-gray-500 mt-1">Máximo 500 caracteres</div>
                                 </div>
 
+                                <div>
+                                    <label class="inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" name="es_tardia" value="1" class="form-checkbox h-5 w-5 text-red-600 rounded border-gray-300" @checked(old('es_tardia'))>
+                                        <span class="ml-2 text-sm font-medium text-gray-700">🔴 Marcar como dieta tardía</span>
+                                    </label>
+                                    <p class="text-xs text-gray-500 mt-1 ml-7">Para pacientes que ingresan después del registro inicial</p>
+                                </div>
+
                                 <div class="flex gap-2 pt-4">
                                     <button type="submit" class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md font-medium transition">✓ Guardar Registro</button>
                                     <a href="{{ route('registro-dietas.index') }}" class="px-6 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-md font-medium transition">✕ Cancelar</a>
@@ -138,17 +162,32 @@ window.PACIENTES_LIST = [
     @endforeach
 ];
 window.DIETAS_LIST = [
-    @foreach($tipos as $tipo)
-        @foreach($tipo->subtipos as $subtipo)
-            @foreach($subtipo->dietas as $d)
-                {id: {{ $d->id }}, nombre: @json($d->nombre)},
-            @endforeach
-        @endforeach
+    @php
+        $todasDietas = \App\Models\Dieta::all();
+    @endphp
+    @foreach($todasDietas as $d)
+        {id: {{ $d->id }}, nombre: @json($d->nombre)},
     @endforeach
 ];
 
-// Preseleccionar paciente si viene en URL
+// Solo permitir un checkbox seleccionado a la vez
 document.addEventListener('DOMContentLoaded', function() {
+    const checkboxes = document.querySelectorAll('input[name="dieta_id[]"]');
+    
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            if (this.checked) {
+                // Deseleccionar todos los demás checkboxes
+                checkboxes.forEach(cb => {
+                    if (cb !== this) {
+                        cb.checked = false;
+                    }
+                });
+            }
+        });
+    });
+
+    // Preseleccionar paciente si viene en URL
     const urlParams = new URLSearchParams(window.location.search);
     const pacienteId = urlParams.get('paciente_id');
     

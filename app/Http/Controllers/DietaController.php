@@ -30,7 +30,9 @@ class DietaController extends Controller
         if (Auth::user() && Auth::user()->role !== 'admin') {
             return redirect()->route('dietas.index')->with('error', 'No tienes permiso para crear dietas.');
         }
-        return view('dietas.create');
+        $tipos = \App\Models\TipoDieta::orderBy('nombre')->get();
+        $subtipos = \App\Models\SubtipoDieta::orderBy('nombre')->get();
+        return view('dietas.create', compact('tipos', 'subtipos'));
     }
 
     public function store(Request $request)
@@ -39,11 +41,23 @@ class DietaController extends Controller
             return redirect()->route('dietas.index')->with('error', 'No tienes permiso para crear dietas.');
         }
         $data = $request->validate([
+            'tipo_dieta_id' => 'nullable|exists:tipos_dieta,id',
+            'subtipo_dieta_id' => 'nullable|array',
+            'subtipo_dieta_id.*' => 'exists:subtipos_dieta,id',
             'nombre' => 'required|string|max:255',
             'descripcion' => 'nullable|string',
         ]);
 
-        Dieta::create($data);
+        $subtipos = $data['subtipo_dieta_id'] ?? [];
+        unset($data['subtipo_dieta_id']);
+        
+        $dieta = Dieta::create($data);
+        
+        // Guardar los subtipos si se proporcionan
+        if (!empty($subtipos)) {
+            $dieta->subtipos()->attach($subtipos);
+        }
+        
         return redirect()->route('dietas.index')->with('success', 'Dieta creada.');
     }
 
@@ -52,7 +66,9 @@ class DietaController extends Controller
         if (Auth::user() && Auth::user()->role !== 'admin') {
             return redirect()->route('dietas.index')->with('error', 'No tienes permiso para editar dietas.');
         }
-        return view('dietas.edit', compact('dieta'));
+        $tipos = \App\Models\TipoDieta::orderBy('nombre')->get();
+        $subtipos = \App\Models\SubtipoDieta::orderBy('nombre')->get();
+        return view('dietas.edit', compact('dieta', 'tipos', 'subtipos'));
     }
 
     public function update(Request $request, Dieta $dieta)
@@ -61,11 +77,19 @@ class DietaController extends Controller
             return redirect()->route('dietas.index')->with('error', 'No tienes permiso para actualizar dietas.');
         }
         $data = $request->validate([
+            'tipo_dieta_id' => 'nullable|exists:tipos_dieta,id',
+            'subtipo_dieta_id' => 'nullable|array',
+            'subtipo_dieta_id.*' => 'exists:subtipos_dieta,id',
             'nombre' => 'required|string|max:255',
             'descripcion' => 'nullable|string',
         ]);
 
+        $subtipos = $data['subtipo_dieta_id'] ?? [];
+        unset($data['subtipo_dieta_id']);
+        
         $dieta->update($data);
+        $dieta->subtipos()->sync($subtipos);
+        
         return redirect()->route('dietas.index')->with('success', 'Dieta actualizada.');
     }
 

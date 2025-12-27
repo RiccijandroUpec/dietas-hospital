@@ -1,3 +1,34 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@layer components {
+    /* Botones primarios */
+    .btn-primary {
+        @apply px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow transition-colors duration-150;
+    }
+    
+    .btn-success {
+        @apply px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg shadow transition-colors duration-150;
+    }
+    
+    .btn-danger {
+        @apply px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg shadow transition-colors duration-150;
+    }
+    
+    .btn-warning {
+        @apply px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white font-medium rounded-lg shadow transition-colors duration-150;
+    }
+    
+    .btn-info {
+        @apply px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg shadow transition-colors duration-150;
+    }
+    
+    /* Botones secundarios */
+    .btn-secondary {
+        @apply px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium rounded-lg shadow-sm transition-colors duration-150;
+    }
+    
+    .btn-light {
+        @apply px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 font-medium rounded-lg border border-gray-300 shadow-sm transition-colors duration-150;
+    }
+}

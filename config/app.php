@@ -78,11 +78,11 @@ return [
     |
     */
 
-    'locale' => env('APP_LOCALE', 'en'),
+    'locale' => env('APP_LOCALE', 'es'),
 
     'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
 
-    'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
+    'faker_locale' => env('APP_FAKER_LOCALE', 'es_ES'),
 
     /*
     |--------------------------------------------------------------------------
@@ -121,6 +121,37 @@ return [
     'maintenance' => [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Developer / Author Information
+    |--------------------------------------------------------------------------
+    |
+    | Configuration used by the site footer to display programmer details and
+    | social links. You can override these via environment variables.
+    |
+    */
+
+    'developer' => [
+        'name' => env('DEV_NAME', 'Nombre del Programador'),
+        'title' => env('DEV_TITLE', 'Desarrollador de Software'),
+        'company' => env('DEV_COMPANY', 'Empresa / Freelance'),
+        'email' => env('DEV_EMAIL', 'correo@ejemplo.com'),
+        'phone' => env('DEV_PHONE', '+00 000 000 000'),
+        'website' => env('DEV_WEBSITE', 'https://tu-sitio.com'),
+        'location' => env('DEV_LOCATION', 'Ciudad, País'),
+        'social' => [
+            'github' => env('DEV_GITHUB', 'https://github.com/usuario'),
+            'linkedin' => env('DEV_LINKEDIN', 'https://www.linkedin.com/in/usuario'),
+            'twitter' => env('DEV_TWITTER', 'https://twitter.com/usuario'),
+            'instagram' => env('DEV_INSTAGRAM', 'https://instagram.com/usuario'),
+            'facebook' => env('DEV_FACEBOOK', 'https://facebook.com/usuario'),
+            'whatsapp' => env('DEV_WHATSAPP', 'https://wa.me/0000000000'),
+        ],
+        'stack' => [
+            'Laravel', 'PHP', 'MySQL', 'Tailwind CSS', 'Alpine.js', 'Vite'
+        ],
     ],
 
 ];

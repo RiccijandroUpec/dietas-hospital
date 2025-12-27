@@ -26,14 +26,13 @@
                         </select>
                     </div>
                     <div class="mb-4">
-                        <label class="block text-sm font-semibold text-gray-700 mb-3">🥤 Refrigerio</label>
+                        <label class="block text-sm font-semibold text-gray-700 mb-3">🥤 Refrigerios</label>
                         <div class="space-y-2 bg-gray-50 p-4 rounded-lg border">
                             @foreach($refrigerios as $r)
                                 <label class="flex items-center cursor-pointer hover:bg-white p-2 rounded transition">
-                                    <input type="radio" name="refrigerio_id" value="{{ $r->id }}" 
+                                    <input type="checkbox" name="refrigerio_ids[]" value="{{ $r->id }}" 
                                         class="w-4 h-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
-                                        @if(old('refrigerio_id', $registroRefrigerio->refrigerio_id) == $r->id) checked @endif
-                                        required>
+                                        @if(in_array($r->id, (array)old('refrigerio_ids', $refrigeriosSeleccionados ?? [$registroRefrigerio->refrigerio_id]))) checked @endif>
                                     <span class="ml-3 text-gray-900">{{ $r->nombre }}</span>
                                     @if($r->descripcion)
                                         <span class="ml-2 text-xs text-gray-500">({{ Str::limit($r->descripcion, 50) }})</span>
@@ -41,6 +40,8 @@
                                 </label>
                             @endforeach
                         </div>
+                        @error('refrigerio_ids')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
+                        @error('refrigerio_ids.*')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div>

@@ -11,9 +11,20 @@ class ServicioController extends Controller
     {
         $this->middleware('auth');
         $this->middleware(function ($request, $next) {
-            if (!auth()->user() || auth()->user()->role !== 'admin') {
+            $user = auth()->user();
+            if (!$user) {
                 abort(403);
             }
+
+            // Usuarios pueden ver (index/show); solo admin crea/edita/borra.
+            $viewActions = ['index', 'show'];
+            $action = $request->route()->getActionMethod();
+            $isViewAction = in_array($action, $viewActions, true);
+
+            if ($user->role !== 'admin' && !$isViewAction) {
+                abort(403);
+            }
+
             return $next($request);
         });
     }

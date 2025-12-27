@@ -24,6 +24,6 @@ class SubtipoDieta extends Model
 
     public function dietas()
     {
-        return $this->hasMany(Dieta::class, 'subtipo_dieta_id');
+        return $this->belongsToMany(Dieta::class, 'dieta_subtipo_dieta');
     }
 }

@@ -4,8 +4,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const results = document.getElementById('buscador_paciente_results');
     const selectPaciente = document.getElementById('paciente_select');
     const condicionBox = document.getElementById('condicion_paciente_box');
-    const dietaSelect = document.getElementById('dieta_select');
-    const dietaOptions = window.DIETAS_LIST || [];
 
     input.addEventListener('input', function () {
         const val = input.value.trim().toLowerCase();
@@ -33,32 +31,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     return c;
                 }).join(', ') : '—';
                 condicionBox.innerHTML = `<span class='text-xs text-gray-700'>Condición: <b>${label}</b></span>`;
-                // Selección automática de dieta
-                if (cond.includes('diabetico') && cond.includes('hiposodico')) {
-                    autoSelectDieta(['diabetico', 'hiposodico']);
-                } else if (cond.includes('diabetico')) {
-                    autoSelectDieta(['diabetico']);
-                } else if (cond.includes('hiposodico')) {
-                    autoSelectDieta(['hiposodico']);
-                } else {
-                    dietaSelect.value = '';
-                }
             };
             results.appendChild(div);
         });
     });
-
-    function autoSelectDieta(condiciones) {
-        let found = null;
-        for (let d of dietaOptions) {
-            let nombre = d.nombre.toLowerCase();
-            if (condiciones.length === 2 && nombre.includes('diabetico') && nombre.includes('hiposodico')) {
-                found = d.id; break;
-            }
-            if (condiciones.length === 1 && nombre.includes(condiciones[0])) {
-                found = d.id; break;
-            }
-        }
-        if (found) dietaSelect.value = found;
-    }
 });

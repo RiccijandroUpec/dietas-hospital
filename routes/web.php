@@ -31,8 +31,8 @@ Route::resource('dietas', App\Http\Controllers\DietaController::class);
 
 // Tipos y Subtipos de Dieta
 Route::middleware('auth')->group(function () {
-    Route::resource('tipos-dieta', App\Http\Controllers\TipoDietaController::class);
-    Route::resource('subtipos-dieta', App\Http\Controllers\SubtipoDietaController::class);
+    Route::resource('tipos-dieta', App\Http\Controllers\TipoDietaController::class)->parameters(['tipos-dieta' => 'tipo_dieta']);
+    Route::resource('subtipos-dieta', App\Http\Controllers\SubtipoDietaController::class)->parameters(['subtipos-dieta' => 'subtipo_dieta']);
 });
 
 // Refrigerios CRUD
@@ -46,11 +46,13 @@ Route::resource('paciente-dietas', App\Http\Controllers\PacienteDietaController:
 Route::middleware('auth')->group(function () {
     Route::get('registro-dietas/reporte', [App\Http\Controllers\RegistroDietaController::class, 'reporte'])->name('registro-dietas.reporte');
     Route::get('registro-dietas/dashboard', [App\Http\Controllers\RegistroDietaController::class, 'dashboard'])->name('registro-dietas.dashboard');
+    Route::get('registro-dietas/dialisis', [App\Http\Controllers\RegistroDietaController::class, 'dialisis'])->name('registro-dietas.dialisis');
     Route::resource('registro-dietas', App\Http\Controllers\RegistroDietaController::class);
 });
 
 // Registro de refrigerios
 Route::middleware('auth')->group(function () {
+    Route::get('registro-refrigerios/dashboard', [App\Http\Controllers\RegistroRefrigerioController::class, 'dashboard'])->name('registro-refrigerios.dashboard');
     Route::get('registro-refrigerios/reporte', [App\Http\Controllers\RegistroRefrigerioController::class, 'reporte'])->name('registro-refrigerios.reporte');
     Route::resource('registro-refrigerios', App\Http\Controllers\RegistroRefrigerioController::class);
 });

@@ -12,8 +12,11 @@
                         <p class="text-gray-600 text-sm mt-1">Gestión de registros dietéticos de pacientes</p>
                     </div>
                     <div class="flex gap-2">
+                        <a href="{{ route('registro-dietas.dashboard') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition">
+                            📊 Dashboard
+                        </a>
                         <a href="{{ route('registro-dietas.reporte') }}" class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition">
-                            📊 Reporte
+                            📄 Reporte
                         </a>
                         @if(auth()->user()->role !== 'usuario')
                             <a href="{{ route('registro-dietas.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition">
@@ -98,6 +101,9 @@
                                             {{ optional($r->paciente)->nombre }} {{ optional($r->paciente)->apellido }}
                                             @if($r->paciente)
                                                 <div class="text-xs text-gray-500">{{ $r->paciente->cedula }}</div>
+                                            @endif
+                                            @if($r->es_tardia)
+                                                <span class="inline-block mt-1 px-2 py-0.5 bg-red-100 text-red-700 rounded text-xs font-semibold">🔴 TARDÍA</span>
                                             @endif
                                         </td>
                                         <td class="px-4 py-3">

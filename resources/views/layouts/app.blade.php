@@ -13,6 +13,9 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @if(config('services.adsense.enabled') && config('services.adsense.client'))
+            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ config('services.adsense.client') }}" crossorigin="anonymous"></script>
+        @endif
         <style>
             /* Forzar que el texto blanco se muestre en negro */
             .text-white, .dark .text-white {
@@ -35,6 +38,30 @@
             .inline-flex.px-4.py-2:hover,
             .inline-flex.px-2.py-1:hover {
                 background-color: #091a33 !important;
+            }
+
+            /* Mejora de responsividad global */
+            @media (max-width: 640px) {
+                /* Compactar tablas en móviles */
+                .overflow-x-auto table,
+                .overflow-x-auto .min-w-full,
+                .overflow-x-auto .table-auto,
+                .overflow-x-auto .w-full {
+                    font-size: 0.9rem;
+                }
+                .overflow-x-auto th,
+                .overflow-x-auto td {
+                    padding: 0.5rem 0.75rem !important;
+                }
+                /* Encabezados y tarjetas */
+                header .py-6 { padding-top: 1rem; padding-bottom: 1rem; }
+                h1, h2 { font-size: 1.25rem; }
+                h3 { font-size: 1.125rem; }
+                .sm\:rounded-lg { border-radius: 0.5rem; }
+                /* Grids apiladas */
+                .grid { gap: 0.75rem; }
+                .px-6 { padding-left: 1rem; padding-right: 1rem; }
+                .lg\:px-8 { padding-left: 1rem; padding-right: 1rem; }
             }
         </style>
     </head>
@@ -59,6 +86,8 @@
                     @yield('content')
                 @endisset
             </main>
+            <!-- Global Footer -->
+            @include('components.footer')
         </div>
         {{-- Scripts adicionales inyectados desde las vistas --}}
         @stack('scripts')

@@ -9,10 +9,12 @@
                 <h1 class="text-3xl font-bold text-gray-900">🏥 Servicios Hospitalarios</h1>
                 <p class="text-gray-600 mt-1">Gestión de servicios y departamentos</p>
             </div>
-            <a href="{{ route('servicios.create') }}" class="inline-flex items-center px-6 py-2 bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-700 hover:to-sky-800 text-white rounded-lg shadow-md transition-all duration-200 transform hover:scale-105">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                Crear Servicio
-            </a>
+            @if(auth()->user()->role === 'admin')
+                <a href="{{ route('servicios.create') }}" class="inline-flex items-center px-6 py-2 bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-700 hover:to-sky-800 text-white rounded-lg shadow-md transition-all duration-200 transform hover:scale-105">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Crear Servicio
+                </a>
+            @endif
         </div>
 
         <!-- Mensajes -->
@@ -33,7 +35,9 @@
                                 <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">🏥 Nombre del Servicio</th>
                                 <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Descripción</th>
                                 <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700">ID</th>
-                                <th class="px-6 py-4 text-right text-sm font-semibold text-gray-700">Acciones</th>
+                                @if(auth()->user()->role === 'admin')
+                                    <th class="px-6 py-4 text-right text-sm font-semibold text-gray-700">Acciones</th>
+                                @endif
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
@@ -57,12 +61,14 @@
                                     <td class="px-6 py-4 text-right">
                                         <div class="flex justify-end gap-2">
                                             <a href="{{ route('servicios.show', $servicio) }}" class="px-4 py-2 bg-indigo-100 text-indigo-700 hover:bg-indigo-200 rounded-lg font-medium text-sm transition">👁️ Ver</a>
-                                            <a href="{{ route('servicios.edit', $servicio) }}" class="px-4 py-2 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-lg font-medium text-sm transition">✏️ Editar</a>
-                                            <form action="{{ route('servicios.destroy', $servicio) }}" method="POST" class="inline" onsubmit="return confirm('¿Eliminar este servicio?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="px-4 py-2 bg-red-100 text-red-700 hover:bg-red-200 rounded-lg font-medium text-sm transition">🗑️ Eliminar</button>
-                                            </form>
+                                            @if(auth()->user()->role === 'admin')
+                                                <a href="{{ route('servicios.edit', $servicio) }}" class="px-4 py-2 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-lg font-medium text-sm transition">✏️ Editar</a>
+                                                <form action="{{ route('servicios.destroy', $servicio) }}" method="POST" class="inline" onsubmit="return confirm('¿Eliminar este servicio?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="px-4 py-2 bg-red-100 text-red-700 hover:bg-red-200 rounded-lg font-medium text-sm transition">🗑️ Eliminar</button>
+                                                </form>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>
@@ -82,9 +88,11 @@
                 <div class="text-6xl mb-4">🏥</div>
                 <h3 class="text-lg font-semibold text-gray-800 mb-2">No hay servicios registrados</h3>
                 <p class="text-gray-600 mb-6">Comienza creando el primer servicio hospitalario</p>
-                <a href="{{ route('servicios.create') }}" class="inline-block px-6 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700 transition font-medium">
-                    ➕ Crear Servicio
-                </a>
+                @if(auth()->user()->role === 'admin')
+                    <a href="{{ route('servicios.create') }}" class="inline-block px-6 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700 transition font-medium">
+                        ➕ Crear Servicio
+                    </a>
+                @endif
             </div>
         @endif
     </div>

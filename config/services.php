@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'adsense' => [
+        'client' => env('ADSENSE_CLIENT'),
+        'enabled' => (bool) env('ADSENSE_ENABLED', false),
+    ],
+
 ];

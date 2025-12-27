@@ -11,7 +11,6 @@ class Dieta extends Model
 
     protected $fillable = [
         'tipo_dieta_id',
-        'subtipo_dieta_id',
         'nombre',
         'descripcion',
     ];
@@ -21,9 +20,9 @@ class Dieta extends Model
         return $this->belongsTo(TipoDieta::class, 'tipo_dieta_id');
     }
 
-    public function subtipo()
+    public function subtipos()
     {
-        return $this->belongsTo(SubtipoDieta::class, 'subtipo_dieta_id');
+        return $this->belongsToMany(SubtipoDieta::class, 'dieta_subtipo_dieta');
     }
 
     public function registros()

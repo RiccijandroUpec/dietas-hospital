@@ -37,13 +37,13 @@ class SubtipoDietaController extends Controller
         return redirect()->route('subtipos-dieta.index')->with('success', 'Subtipo de dieta creado exitosamente.');
     }
 
-    public function edit(SubtipoDieta $subtipos_dieta)
+    public function edit(SubtipoDieta $subtipo_dieta)
     {
         $tipos = TipoDieta::orderBy('nombre')->get();
-        return view('subtipos_dieta.edit', ['subtipo' => $subtipos_dieta, 'tipos' => $tipos]);
+        return view('subtipos_dieta.edit', ['subtipo' => $subtipo_dieta, 'tipos' => $tipos]);
     }
 
-    public function update(Request $request, SubtipoDieta $subtipos_dieta)
+    public function update(Request $request, SubtipoDieta $subtipo_dieta)
     {
         $data = $request->validate([
             'tipo_dieta_id' => 'required|exists:tipos_dieta,id',
@@ -51,17 +51,17 @@ class SubtipoDietaController extends Controller
             'descripcion' => 'nullable|string|max:1000',
         ]);
 
-        $subtipos_dieta->update($data);
+        $subtipo_dieta->update($data);
         return redirect()->route('subtipos-dieta.index')->with('success', 'Subtipo de dieta actualizado.');
     }
 
-    public function destroy(SubtipoDieta $subtipos_dieta)
+    public function destroy(SubtipoDieta $subtipo_dieta)
     {
-        if ($subtipos_dieta->dietas()->count() > 0) {
+        if ($subtipo_dieta->dietas()->count() > 0) {
             return back()->withErrors(['error' => 'No se puede eliminar el subtipo porque tiene dietas asociadas.']);
         }
         
-        $subtipos_dieta->delete();
+        $subtipo_dieta->delete();
         return redirect()->route('subtipos-dieta.index')->with('success', 'Subtipo de dieta eliminado.');
     }
 }

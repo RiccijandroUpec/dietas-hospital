@@ -37,14 +37,6 @@
                                 Registro de dietas
                             </span>
                         </x-nav-link>
-                           <x-nav-link :href="route('registro-dietas.dashboard')" :active="request()->routeIs('registro-dietas.dashboard')">
-                               <span class="inline-flex items-center">
-                                   <svg class="{{ request()->routeIs('registro-dietas.dashboard') ? 'h-5 w-5 me-2 text-indigo-600' : 'h-5 w-5 me-2 text-gray-500' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
-                                   </svg>
-                                   Dashboard de dietas
-                               </span>
-                           </x-nav-link>
                         <x-nav-link :href="route('registro-refrigerios.index')" :active="request()->routeIs('registro-refrigerios.*')">
                             <span class="inline-flex items-center">
                                 <svg class="{{ request()->routeIs('registro-refrigerios.*') ? 'h-5 w-5 me-2 text-orange-700' : 'h-5 w-5 me-2 text-gray-500' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -58,20 +50,22 @@
                         <x-nav-link :href="route('usuarios.index')" :active="request()->routeIs('usuarios.*')">
                                 Usuarios
                         </x-nav-link>
-                        <x-nav-link :href="route('servicios.index')" :active="request()->routeIs('servicios.*')">
-                            <span class="inline-flex items-center">
-                                <svg class="{{ request()->routeIs('servicios.*') ? 'h-5 w-5 me-2 text-sky-600' : 'h-5 w-5 me-2 text-gray-500' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4h16v4H4V4zm0 6h16v10H4V10z" />
-                                </svg>
-                                Servicios
-                            </span>
-                        </x-nav-link>
                         <x-nav-link :href="route('camas.index')" :active="request()->routeIs('camas.*')">
                             <span class="inline-flex items-center">
                                 <svg class="{{ request()->routeIs('camas.*') ? 'h-5 w-5 me-2 text-violet-600' : 'h-5 w-5 me-2 text-gray-500' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18v7H3v-7zm3-3h6v3H6V7z" />
                                 </svg>
                                 Camas
+                            </span>
+                        </x-nav-link>
+                    @endif
+                    @if(auth()->check() && (auth()->user()->role === 'admin' || auth()->user()->role === 'usuario'))
+                        <x-nav-link :href="route('servicios.index')" :active="request()->routeIs('servicios.*')">
+                            <span class="inline-flex items-center">
+                                <svg class="{{ request()->routeIs('servicios.*') ? 'h-5 w-5 me-2 text-sky-600' : 'h-5 w-5 me-2 text-gray-500' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4h16v4H4V4zm0 6h16v10H4V10z" />
+                                </svg>
+                                Servicios
                             </span>
                         </x-nav-link>
                     @endif

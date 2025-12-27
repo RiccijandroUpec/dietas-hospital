@@ -44,7 +44,7 @@ class UsuarioController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'role' => 'required|string|in:admin,nutricionista,enfermer@,usuario',
+            'role' => 'required|string|in:admin,nutricionista,enfermero,enfermer@,usuario',
         ]);
 
         $data['password'] = bcrypt('123456');
@@ -81,7 +81,7 @@ class UsuarioController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,'.$usuario->id,
-            'role' => 'required|string|in:admin,nutricionista,enfermer@,usuario',
+            'role' => 'required|string|in:admin,nutricionista,enfermero,enfermer@,usuario',
         ]);
 
         $usuario->update($data);

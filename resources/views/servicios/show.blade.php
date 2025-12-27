@@ -70,11 +70,13 @@
 
         <!-- Botones de Acción -->
         <div class="flex gap-2">
-            <a href="{{ route('servicios.edit', $servicio) }}" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition">✏️ Editar Servicio</a>
-            <form action="{{ route('servicios.destroy', $servicio) }}" method="POST" onsubmit="return confirm('¿Eliminar este servicio?')">
-                @csrf @method('DELETE')
-                <button type="submit" class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition">🗑️ Eliminar</button>
-            </form>
+            @if(auth()->user()->role === 'admin')
+                <a href="{{ route('servicios.edit', $servicio) }}" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition">✏️ Editar Servicio</a>
+                <form action="{{ route('servicios.destroy', $servicio) }}" method="POST" onsubmit="return confirm('¿Eliminar este servicio?')">
+                    @csrf @method('DELETE')
+                    <button type="submit" class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition">🗑️ Eliminar</button>
+                </form>
+            @endif
             <a href="{{ route('servicios.index') }}" class="px-6 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-lg font-medium transition">← Volver</a>
         </div>
     </div>
