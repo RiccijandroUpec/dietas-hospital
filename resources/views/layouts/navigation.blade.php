@@ -37,6 +37,14 @@
                                 Registro de dietas
                             </span>
                         </x-nav-link>
+                           <x-nav-link :href="route('registro-dietas.dashboard')" :active="request()->routeIs('registro-dietas.dashboard')">
+                               <span class="inline-flex items-center">
+                                   <svg class="{{ request()->routeIs('registro-dietas.dashboard') ? 'h-5 w-5 me-2 text-indigo-600' : 'h-5 w-5 me-2 text-gray-500' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+                                   </svg>
+                                   Dashboard de dietas
+                               </span>
+                           </x-nav-link>
                         <x-nav-link :href="route('registro-refrigerios.index')" :active="request()->routeIs('registro-refrigerios.*')">
                             <span class="inline-flex items-center">
                                 <svg class="{{ request()->routeIs('registro-refrigerios.*') ? 'h-5 w-5 me-2 text-orange-700' : 'h-5 w-5 me-2 text-gray-500' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -64,6 +72,16 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18v7H3v-7zm3-3h6v3H6V7z" />
                                 </svg>
                                 Camas
+                            </span>
+                        </x-nav-link>
+                    @endif
+                    @if(auth()->check() && (auth()->user()->role === 'admin' || auth()->user()->role === 'nutricionista'))
+                        <x-nav-link :href="route('tipos-dieta.index')" :active="request()->routeIs('tipos-dieta.*') || request()->routeIs('subtipos-dieta.*')">
+                            <span class="inline-flex items-center">
+                                <svg class="{{ request()->routeIs('tipos-dieta.*') || request()->routeIs('subtipos-dieta.*') ? 'h-5 w-5 me-2 text-amber-600' : 'h-5 w-5 me-2 text-gray-500' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                                </svg>
+                                Config. Dietas
                             </span>
                         </x-nav-link>
                     @endif
@@ -144,6 +162,14 @@
                             {{ __('Registro de dietas') }}
                         </span>
                     </x-responsive-nav-link>
+                           <x-responsive-nav-link :href="route('registro-dietas.dashboard')" :active="request()->routeIs('registro-dietas.dashboard')">
+                               <span class="inline-flex items-center">
+                                   <svg class="{{ request()->routeIs('registro-dietas.dashboard') ? 'h-5 w-5 me-2 text-indigo-600' : 'h-5 w-5 me-2 text-gray-500' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+                                   </svg>
+                                   {{ __('Dashboard de dietas') }}
+                               </span>
+                           </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('refrigerios.index')" :active="request()->routeIs('refrigerios.*')">
                         <span class="inline-flex items-center">
                             <svg class="{{ request()->routeIs('refrigerios.*') ? 'h-5 w-5 me-2 text-orange-600' : 'h-5 w-5 me-2 text-gray-500' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -181,6 +207,16 @@
                             {{ __('Camas') }}
                         </span>
                     </x-responsive-nav-link>
+            @endif
+            @if(auth()->check() && (auth()->user()->role === 'admin' || auth()->user()->role === 'nutricionista'))
+                <x-responsive-nav-link :href="route('tipos-dieta.index')" :active="request()->routeIs('tipos-dieta.*') || request()->routeIs('subtipos-dieta.*')">
+                    <span class="inline-flex items-center">
+                        <svg class="{{ request()->routeIs('tipos-dieta.*') || request()->routeIs('subtipos-dieta.*') ? 'h-5 w-5 me-2 text-amber-600' : 'h-5 w-5 me-2 text-gray-500' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                        </svg>
+                        {{ __('Config. Dietas') }}
+                    </span>
+                </x-responsive-nav-link>
             @endif
         </div>
 

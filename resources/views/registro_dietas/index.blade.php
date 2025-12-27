@@ -82,6 +82,7 @@
                                 <tr>
                                     <th class="px-4 py-3 text-left font-semibold text-gray-700">Paciente</th>
                                     <th class="px-4 py-3 text-left font-semibold text-gray-700">Tipo Comida</th>
+                                    <th class="px-4 py-3 text-left font-semibold text-gray-700">Presentación</th>
                                     <th class="px-4 py-3 text-left font-semibold text-gray-700">Dietas</th>
                                     <th class="px-4 py-3 text-left font-semibold text-gray-700">Fecha</th>
                                     <th class="px-4 py-3 text-left font-semibold text-gray-700">Observaciones</th>
@@ -111,6 +112,14 @@
                                             <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold {{ $tipo[1] }}">
                                                 {{ $tipo[0] }}
                                             </span>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            @php
+                                                $v = $r->vajilla;
+                                                $cls = $v === 'descartable' ? 'bg-gray-100 text-gray-800' : 'bg-green-100 text-green-800';
+                                                $label = $v === 'descartable' ? 'Descartable' : 'Vajilla normal';
+                                            @endphp
+                                            <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold {{ $cls }}">{{ $label }}</span>
                                         </td>
                                         <td class="px-4 py-3">
                                             <div class="flex flex-wrap gap-1">

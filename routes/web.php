@@ -29,6 +29,12 @@ Route::get('dietas/search', [App\Http\Controllers\DietaController::class, 'searc
 // Dietas CRUD (index/show public; other actions protected in controller)
 Route::resource('dietas', App\Http\Controllers\DietaController::class);
 
+// Tipos y Subtipos de Dieta
+Route::middleware('auth')->group(function () {
+    Route::resource('tipos-dieta', App\Http\Controllers\TipoDietaController::class);
+    Route::resource('subtipos-dieta', App\Http\Controllers\SubtipoDietaController::class);
+});
+
 // Refrigerios CRUD
 Route::middleware('auth')->group(function () {
     Route::resource('refrigerios', App\Http\Controllers\RefrigerioController::class);
@@ -39,6 +45,7 @@ Route::resource('paciente-dietas', App\Http\Controllers\PacienteDietaController:
 // Registro de dietas
 Route::middleware('auth')->group(function () {
     Route::get('registro-dietas/reporte', [App\Http\Controllers\RegistroDietaController::class, 'reporte'])->name('registro-dietas.reporte');
+    Route::get('registro-dietas/dashboard', [App\Http\Controllers\RegistroDietaController::class, 'dashboard'])->name('registro-dietas.dashboard');
     Route::resource('registro-dietas', App\Http\Controllers\RegistroDietaController::class);
 });
 

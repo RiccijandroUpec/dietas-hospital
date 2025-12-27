@@ -15,6 +15,7 @@ class RegistroDieta extends Model
         'paciente_id',
         'dieta_id',
         'tipo_comida',
+        'vajilla',
         'fecha',
         'observaciones',
         'created_by',

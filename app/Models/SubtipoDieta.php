@@ -5,13 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Dieta extends Model
+class SubtipoDieta extends Model
 {
     use HasFactory;
 
+    protected $table = 'subtipos_dieta';
+
     protected $fillable = [
         'tipo_dieta_id',
-        'subtipo_dieta_id',
         'nombre',
         'descripcion',
     ];
@@ -21,13 +22,8 @@ class Dieta extends Model
         return $this->belongsTo(TipoDieta::class, 'tipo_dieta_id');
     }
 
-    public function subtipo()
+    public function dietas()
     {
-        return $this->belongsTo(SubtipoDieta::class, 'subtipo_dieta_id');
-    }
-
-    public function registros()
-    {
-        return $this->belongsToMany(RegistroDieta::class, 'paciente_dietas', 'dieta_id', 'registro_dieta_id');
+        return $this->hasMany(Dieta::class, 'subtipo_dieta_id');
     }
 }

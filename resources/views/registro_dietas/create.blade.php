@@ -36,13 +36,27 @@
 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">🥗 Dietas</label>
-                                    @if($dietas->count() > 0)
-                                        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 p-3 bg-gray-50 rounded-md border border-gray-200">
-                                            @foreach($dietas as $d)
-                                                <label class="inline-flex items-center p-2 bg-white rounded border border-gray-300 hover:border-blue-500 hover:bg-blue-50 cursor-pointer transition">
-                                                    <input type="checkbox" name="dieta_id[]" value="{{ $d->id }}" class="form-checkbox text-blue-600" @if(is_array(old('dieta_id')) && in_array($d->id, old('dieta_id'))) checked @endif>
-                                                    <span class="ml-2 text-sm font-medium text-gray-700">{{ $d->nombre }}</span>
-                                                </label>
+                                    @if($tipos->count() > 0)
+                                        <div class="space-y-4">
+                                            @foreach($tipos as $tipo)
+                                                <div class="border border-gray-200 rounded-lg p-3 bg-gray-50">
+                                                    <h3 class="font-semibold text-sm text-gray-800 mb-2">{{ $tipo->nombre }}</h3>
+                                                    @foreach($tipo->subtipos as $subtipo)
+                                                        @if($subtipo->dietas->count() > 0)
+                                                            <div class="mb-3">
+                                                                <h4 class="text-xs font-medium text-gray-600 mb-2">{{ $subtipo->nombre }}</h4>
+                                                                <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                                                                    @foreach($subtipo->dietas as $d)
+                                                                        <label class="inline-flex items-center p-2 bg-white rounded border border-gray-300 hover:border-blue-500 hover:bg-blue-50 cursor-pointer transition">
+                                                                            <input type="checkbox" name="dieta_id[]" value="{{ $d->id }}" class="form-checkbox text-blue-600" @if(is_array(old('dieta_id')) && in_array($d->id, old('dieta_id'))) checked @endif>
+                                                                            <span class="ml-2 text-sm font-medium text-gray-700">{{ $d->nombre }}</span>
+                                                                        </label>
+                                                                    @endforeach
+                                                                </div>
+                                                            </div>
+                                                        @endif
+                                                    @endforeach
+                                                </div>
                                             @endforeach
                                         </div>
                                     @else
@@ -60,6 +74,21 @@
                                         <option value="merienda" @if(old('tipo_comida') == 'merienda') selected @endif>Merienda</option>
                                     </select>
                                     @error('tipo_comida')<div class="text-red-600 text-sm mt-1">⚠️ {{ $message }}</div>@enderror
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">🧁 Presentación</label>
+                                    <div class="mt-1 flex items-center gap-4">
+                                        <label class="inline-flex items-center">
+                                            <input type="radio" name="vajilla" value="normal" class="form-radio text-indigo-600" @checked(old('vajilla','normal')==='normal')>
+                                            <span class="ml-2 text-sm text-gray-700">Vajilla normal</span>
+                                        </label>
+                                        <label class="inline-flex items-center">
+                                            <input type="radio" name="vajilla" value="descartable" class="form-radio text-indigo-600" @checked(old('vajilla')==='descartable')>
+                                            <span class="ml-2 text-sm text-gray-700">Descartable</span>
+                                        </label>
+                                    </div>
+                                    @error('vajilla')<div class="text-red-600 text-sm mt-1">⚠️ {{ $message }}</div>@enderror
                                 </div>
 
                                 <div>
@@ -109,8 +138,12 @@ window.PACIENTES_LIST = [
     @endforeach
 ];
 window.DIETAS_LIST = [
-    @foreach($dietas as $d)
-        {id: {{ $d->id }}, nombre: @json($d->nombre)},
+    @foreach($tipos as $tipo)
+        @foreach($tipo->subtipos as $subtipo)
+            @foreach($subtipo->dietas as $d)
+                {id: {{ $d->id }}, nombre: @json($d->nombre)},
+            @endforeach
+        @endforeach
     @endforeach
 ];
 

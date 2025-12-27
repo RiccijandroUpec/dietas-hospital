@@ -72,11 +72,75 @@ class RegistroDietaController extends Controller
         return view('registro_dietas.index', compact('registros'));
     }
 
+    public function dashboard(Request $request)
+    {
+        $fecha = $request->input('fecha', now()->toDateString());
+        $tipo = $request->input('tipo_comida', 'desayuno');
+        $servicioId = $request->input('servicio_id');
+
+        $query = RegistroDieta::with(['paciente.servicio','paciente.cama','dietas.tipo','dietas.subtipo','createdBy','updatedBy'])
+            ->whereDate('fecha', $fecha)
+            ->where('tipo_comida', $tipo);
+
+        if ($servicioId) {
+            $query->whereHas('paciente', function ($q) use ($servicioId) {
+                $q->where('servicio_id', $servicioId);
+            });
+        }
+
+        $registros = $query->orderBy('paciente_id')->get();
+
+        // Excluir NPO (Nada por vía oral) de los totales de dietas
+        $todasDietas = $registros->pluck('dietas')->flatten();
+        $dietasFiltradas = $todasDietas->filter(function ($d) {
+            $n = strtolower($d->nombre ?? '');
+            return !(
+                str_contains($n, 'npo') ||
+                str_contains($n, 'n.p.o') ||
+                str_contains($n, 'nada por via oral') ||
+                str_contains($n, 'nada por vía oral')
+            );
+        });
+        $dietasNpo = $todasDietas->filter(function ($d) {
+            $n = strtolower($d->nombre ?? '');
+            return (
+                str_contains($n, 'npo') ||
+                str_contains($n, 'n.p.o') ||
+                str_contains($n, 'nada por via oral') ||
+                str_contains($n, 'nada por vía oral')
+            );
+        });
+
+        $totales = [
+            'registros' => $registros->count(),
+            'pacientes_unicos' => $registros->pluck('paciente_id')->unique()->count(),
+            'dietas_total' => $dietasFiltradas->count(),
+            'dietas_por_nombre' => $dietasFiltradas->groupBy('nombre')->map->count()->sortDesc(),
+            'dietas_npo' => $dietasNpo->count(),
+            // Conteo de pacientes por servicio (usar countBy para colecciones de strings)
+            'servicios' => $registros
+                ->map(fn($r) => optional($r->paciente->servicio)->nombre)
+                ->filter()
+                ->countBy()
+                ->sortDesc(),
+            // Conteo por tipo de vajilla
+            'vajilla_descartable' => $registros->where('vajilla', 'descartable')->count(),
+            'vajilla_normal' => $registros->where('vajilla', 'normal')->count(),
+            // Conteo por tipo y subtipo de dieta
+            'dietas_por_tipo' => $dietasFiltradas->groupBy(fn($d) => optional($d->tipo)->nombre ?? 'Sin tipo')->map->count()->sortDesc(),
+            'dietas_por_subtipo' => $dietasFiltradas->groupBy(fn($d) => optional($d->subtipo)->nombre ?? 'Sin subtipo')->map->count()->sortDesc(),
+        ];
+
+        $servicios = Servicio::orderBy('nombre')->get();
+
+        return view('registro_dietas.dashboard', compact('registros','totales','fecha','tipo','servicios'));
+    }
+
     public function create()
     {
         $pacientes = Paciente::where('estado', 'hospitalizado')->orderBy('nombre')->get();
-        $dietas = Dieta::orderBy('nombre')->get();
-        return view('registro_dietas.create', compact('pacientes', 'dietas'));
+        $tipos = \App\Models\TipoDieta::with(['subtipos.dietas'])->orderBy('nombre')->get();
+        return view('registro_dietas.create', compact('pacientes', 'tipos'));
     }
 
     public function store(Request $request)
@@ -86,6 +150,7 @@ class RegistroDietaController extends Controller
             'dieta_id' => 'required|array|min:1',
             'dieta_id.*' => 'required|exists:dietas,id',
             'tipo_comida' => 'required|in:desayuno,almuerzo,merienda',
+            'vajilla' => 'required|in:descartable,normal',
             'fecha' => 'required|date',
             'observaciones' => 'nullable|string',
         ]);
@@ -110,6 +175,7 @@ class RegistroDietaController extends Controller
         $registro = \App\Models\RegistroDieta::create([
             'paciente_id' => $data['paciente_id'],
             'tipo_comida' => $data['tipo_comida'],
+            'vajilla' => $data['vajilla'],
             'fecha' => $data['fecha'],
             'observaciones' => $data['observaciones'] ?? null,
             'created_by' => \Auth::id(),
@@ -127,16 +193,18 @@ class RegistroDietaController extends Controller
     public function edit(RegistroDieta $registro_dieta)
     {
         $pacientes = Paciente::orderBy('nombre')->get();
-        $dietas = Dieta::orderBy('nombre')->get();
-        return view('registro_dietas.edit', compact('registro_dieta', 'pacientes', 'dietas'));
+        $tipos = \App\Models\TipoDieta::with(['subtipos.dietas'])->orderBy('nombre')->get();
+        return view('registro_dietas.edit', compact('registro_dieta', 'pacientes', 'tipos'));
     }
 
     public function update(Request $request, RegistroDieta $registro_dieta)
     {
         $data = $request->validate([
             'paciente_id' => 'required|exists:pacientes,id',
-            'dieta_id' => 'required|exists:dietas,id',
+            'dieta_id' => 'required|array|min:1',
+            'dieta_id.*' => 'required|exists:dietas,id',
             'tipo_comida' => 'required|in:desayuno,almuerzo,merienda',
+            'vajilla' => 'required|in:descartable,normal',
             'fecha' => 'required|date',
             'observaciones' => 'nullable|string',
         ]);
@@ -153,6 +221,7 @@ class RegistroDietaController extends Controller
         $registro_dieta->update([
             'paciente_id' => $data['paciente_id'],
             'tipo_comida' => $data['tipo_comida'],
+            'vajilla' => $data['vajilla'],
             'fecha' => $data['fecha'],
             'observaciones' => $data['observaciones'] ?? null,
             'updated_by' => \Auth::id(),

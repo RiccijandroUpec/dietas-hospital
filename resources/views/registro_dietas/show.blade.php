@@ -51,7 +51,7 @@
                 </div>
 
                 <!-- Información General -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 pb-6 border-b border-gray-200">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 pb-6 border-b border-gray-200">
                     <div>
                         <h3 class="text-sm font-semibold text-gray-600 mb-2">🍽️ Tipo de Comida</h3>
                         @php 
@@ -71,6 +71,15 @@
                     <div>
                         <h3 class="text-sm font-semibold text-gray-600 mb-2">⏰ Hace</h3>
                         <p class="text-gray-900 font-semibold">{{ \Carbon\Carbon::parse($registro->fecha)->diffForHumans() }}</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-600 mb-2">🧁 Presentación</h3>
+                        @php
+                            $v = $registro->vajilla;
+                            $c = $v === 'descartable' ? 'gray' : 'green';
+                            $label = $v === 'descartable' ? 'Descartable' : 'Vajilla normal';
+                        @endphp
+                        <span class="inline-block bg-{{ $c }}-100 text-{{ $c }}-800 rounded-full px-3 py-1 text-xs font-semibold">{{ $label }}</span>
                     </div>
                 </div>
 
