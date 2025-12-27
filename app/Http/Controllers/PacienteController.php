@@ -21,6 +21,32 @@ class PacienteController extends Controller
         return view('pacientes.index', compact('pacientes'));
     }
 
+    public function reporte(Request $request)
+    {
+        $estado = $request->input('estado');
+        $servicio_id = $request->input('servicio_id');
+
+        $query = Paciente::with(['servicio', 'cama', 'createdBy', 'updatedBy']);
+
+        if ($estado) {
+            $query->where('estado', $estado);
+        }
+        if ($servicio_id) {
+            $query->where('servicio_id', $servicio_id);
+        }
+
+        $pacientes = $query->orderBy('nombre')->paginate(25);
+        $servicios = Servicio::orderBy('nombre')->get();
+
+        // Contar pacientes por estado
+        $totales = [
+            'hospitalizado' => Paciente::where('estado', 'hospitalizado')->count(),
+            'alta' => Paciente::where('estado', 'alta')->count(),
+        ];
+
+        return view('pacientes.reporte', compact('pacientes', 'servicios', 'totales'));
+    }
+
     // Devuelve camas disponibles para un servicio (no asignadas a pacientes)
     public function availableCamas($servicioId)
     {
@@ -76,6 +102,7 @@ class PacienteController extends Controller
             'nombre' => 'required|string|max:255',
             'apellido' => 'required|string|max:255',
             'cedula' => 'required|string|max:100|unique:pacientes,cedula',
+            'estado' => 'required|in:hospitalizado,alta',
             'edad' => 'nullable|integer|min:0',
             'condicion' => 'nullable|array',
             'condicion.*' => 'in:normal,diabetico,hiposodico',
@@ -133,6 +160,7 @@ class PacienteController extends Controller
             'nombre' => 'required|string|max:255',
             'apellido' => 'required|string|max:255',
             'cedula' => 'required|string|max:100|unique:pacientes,cedula,' . $paciente->id,
+            'estado' => 'required|in:hospitalizado,alta',
             'edad' => 'nullable|integer|min:0',
             'condicion' => 'nullable|array',
             'condicion.*' => 'in:normal,diabetico,hiposodico',

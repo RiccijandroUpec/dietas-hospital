@@ -13,6 +13,7 @@ class Paciente extends Model
         'nombre',
         'apellido',
         'cedula',
+        'estado',
         'edad',
         'condicion',
         'servicio_id',

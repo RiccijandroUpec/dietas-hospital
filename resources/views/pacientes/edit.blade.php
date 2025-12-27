@@ -28,6 +28,15 @@
                         </div>
 
                         <div>
+                            <label class="block text-sm font-medium text-gray-700">Estado</label>
+                            <select name="estado" class="mt-1 block w-full border-gray-300 rounded-md">
+                                <option value="hospitalizado" @if(old('estado', $paciente->estado) == 'hospitalizado') selected @endif>Hospitalizado</option>
+                                <option value="alta" @if(old('estado', $paciente->estado) == 'alta') selected @endif>Alta</option>
+                            </select>
+                            @error('estado')<div class="text-red-600 text-sm mt-1">{{ $message }}</div>@enderror
+                        </div>
+
+                        <div>
                             <label class="block text-sm font-medium text-gray-700">Edad</label>
                             <input type="number" name="edad" value="{{ old('edad', $paciente->edad) }}" class="mt-1 block w-full border-gray-300 rounded-md">
                         </div>

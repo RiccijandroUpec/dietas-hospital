@@ -9,7 +9,10 @@ Route::get('/', function () {
 });
 
 // Pacientes resource
-Route::resource('pacientes', App\Http\Controllers\PacienteController::class)->middleware('auth');
+Route::middleware('auth')->group(function () {
+    Route::get('pacientes/reporte', [App\Http\Controllers\PacienteController::class, 'reporte'])->name('pacientes.reporte');
+    Route::resource('pacientes', App\Http\Controllers\PacienteController::class);
+});
 
 // Endpoint para camas disponibles por servicio (AJAX)
 Route::get('servicios/{servicio}/camas-available', [App\Http\Controllers\PacienteController::class, 'availableCamas'])->middleware('auth');
@@ -25,8 +28,10 @@ Route::resource('dietas', App\Http\Controllers\DietaController::class);
 // PacienteDietas (simple registro paciente-dieta)
 Route::resource('paciente-dietas', App\Http\Controllers\PacienteDietaController::class)->middleware('auth');
 // Registro de dietas
-Route::resource('registro-dietas', App\Http\Controllers\RegistroDietaController::class)->middleware('auth');
-Route::get('registro-dietas/reporte', [App\Http\Controllers\RegistroDietaController::class, 'reporte'])->name('registro-dietas.reporte')->middleware('auth');
+Route::middleware('auth')->group(function () {
+    Route::get('registro-dietas/reporte', [App\Http\Controllers\RegistroDietaController::class, 'reporte'])->name('registro-dietas.reporte');
+    Route::resource('registro-dietas', App\Http\Controllers\RegistroDietaController::class);
+});
 
 Route::get('/dashboard', function () {
     return view('dashboard');

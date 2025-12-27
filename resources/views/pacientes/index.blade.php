@@ -8,6 +8,7 @@
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="font-semibold text-xl text-gray-800">Pacientes</h2>
                     <div class="flex gap-2">
+                        <a href="{{ route('pacientes.reporte') }}" class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md">Reporte</a>
                         @if(auth()->check() && auth()->user()->role !== 'usuario')
                             <a href="{{ route('pacientes.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md">Nuevo Paciente</a>
                         @endif
@@ -31,6 +32,7 @@
                                 <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
                                 <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">Apellido</th>
                                 <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">Cédula</th>
+                                <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">Estado</th>
                                 <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">Edad</th>
                                 <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">Condición</th>
                                 <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">Servicio</th>
@@ -46,6 +48,13 @@
                                 <td class="px-3 py-2 whitespace-normal break-words">{{ $paciente->nombre }}</td>
                                 <td class="px-3 py-2 whitespace-normal break-words">{{ $paciente->apellido }}</td>
                                 <td class="px-3 py-2 whitespace-normal break-words">{{ $paciente->cedula }}</td>
+                                <td class="px-3 py-2 whitespace-normal break-words">
+                                    @if($paciente->estado === 'hospitalizado')
+                                        <span class="inline-block bg-blue-100 text-blue-800 rounded px-2 py-1 text-xs font-semibold">Hospitalizado</span>
+                                    @else
+                                        <span class="inline-block bg-green-100 text-green-800 rounded px-2 py-1 text-xs font-semibold">Alta</span>
+                                    @endif
+                                </td>
                                 <td class="px-3 py-2 whitespace-normal break-words">{{ $paciente->edad }}</td>
                                 <td class="px-3 py-2 whitespace-normal break-words">
                                     @php
