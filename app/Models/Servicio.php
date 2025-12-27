@@ -9,7 +9,7 @@ class Servicio extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nombre'];
+    protected $fillable = ['nombre', 'descripcion'];
 
     public function pacientes()
     {

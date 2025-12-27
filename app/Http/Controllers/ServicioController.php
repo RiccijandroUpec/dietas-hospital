@@ -33,10 +33,16 @@ class ServicioController extends Controller
     {
         $data = $request->validate([
             'nombre' => 'required|string|max:255|unique:servicios,nombre',
+            'descripcion' => 'nullable|string|max:1000',
         ]);
 
         Servicio::create($data);
         return redirect()->route('servicios.index')->with('success', 'Servicio creado.');
+    }
+
+    public function show(Servicio $servicio)
+    {
+        return view('servicios.show', compact('servicio'));
     }
 
     public function edit(Servicio $servicio)
@@ -48,6 +54,7 @@ class ServicioController extends Controller
     {
         $data = $request->validate([
             'nombre' => 'required|string|max:255|unique:servicios,nombre,' . $servicio->id,
+            'descripcion' => 'nullable|string|max:1000',
         ]);
 
         $servicio->update($data);

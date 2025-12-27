@@ -5,39 +5,44 @@
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}">
+                    <a href="{{ route('dashboard') }}" title="Ir al panel" aria-label="Ir al panel">
                         <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
                     </a>
                 </div>
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                            Panel principal
-                    </x-nav-link>
                     <x-nav-link :href="route('dietas.index')" :active="request()->routeIs('dietas.*')">
                         <span class="inline-flex items-center">
-                            <svg class="h-5 w-5 me-2 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                            <svg class="{{ request()->routeIs('dietas.*') ? 'h-5 w-5 me-2 text-blue-600' : 'h-5 w-5 me-2 text-gray-500' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 2h6a2 2 0 012 2v2h2a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h2V4a2 2 0 012-2zm0 6h6" />
                             </svg>
-                                Dietas
+                            Dietas
                         </span>
                     </x-nav-link>
                     @if(auth()->check())
                         <x-nav-link :href="route('pacientes.index')" :active="request()->routeIs('pacientes.*')">
                             <span class="inline-flex items-center">
-                                <svg class="h-5 w-5 me-2 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7a4 4 0 118 0 4 4 0 01-8 0zm0 6a6 6 0 00-6 6h12a6 6 0 00-6-6z" />
+                                <svg class="{{ request()->routeIs('pacientes.*') ? 'h-5 w-5 me-2 text-emerald-600' : 'h-5 w-5 me-2 text-gray-500' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5V9l-2-2-3 3V4a2 2 0 00-2-2H9a2 2 0 00-2 2v6L4 7 2 9v11h5a3 3 0 006 0 3 3 0 006 0z" />
                                 </svg>
-                                    Pacientes
+                                Pacientes
                             </span>
                         </x-nav-link>
                         <x-nav-link :href="route('registro-dietas.index')" :active="request()->routeIs('registro-dietas.*')">
                             <span class="inline-flex items-center">
-                                <svg class="h-5 w-5 me-2 text-pink-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                <svg class="{{ request()->routeIs('registro-dietas.*') ? 'h-5 w-5 me-2 text-pink-600' : 'h-5 w-5 me-2 text-gray-500' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7 4h10a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2z" />
                                 </svg>
-                                    Registro de dietas
+                                Registro de dietas
+                            </span>
+                        </x-nav-link>
+                        <x-nav-link :href="route('registro-refrigerios.index')" :active="request()->routeIs('registro-refrigerios.*')">
+                            <span class="inline-flex items-center">
+                                <svg class="{{ request()->routeIs('registro-refrigerios.*') ? 'h-5 w-5 me-2 text-orange-700' : 'h-5 w-5 me-2 text-gray-500' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7 4h10a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2z" />
+                                </svg>
+                                Registro de refrigerios
                             </span>
                         </x-nav-link>
                     @endif
@@ -47,18 +52,18 @@
                         </x-nav-link>
                         <x-nav-link :href="route('servicios.index')" :active="request()->routeIs('servicios.*')">
                             <span class="inline-flex items-center">
-                                <svg class="h-5 w-5 me-2 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h18M3 12h18M3 17h18" />
+                                <svg class="{{ request()->routeIs('servicios.*') ? 'h-5 w-5 me-2 text-sky-600' : 'h-5 w-5 me-2 text-gray-500' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4h16v4H4V4zm0 6h16v10H4V10z" />
                                 </svg>
-                                    Servicios
+                                Servicios
                             </span>
                         </x-nav-link>
                         <x-nav-link :href="route('camas.index')" :active="request()->routeIs('camas.*')">
                             <span class="inline-flex items-center">
-                                <svg class="h-5 w-5 me-2 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h16M4 17h16" />
+                                <svg class="{{ request()->routeIs('camas.*') ? 'h-5 w-5 me-2 text-violet-600' : 'h-5 w-5 me-2 text-gray-500' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18v7H3v-7zm3-3h6v3H6V7z" />
                                 </svg>
-                                    Camas
+                                Camas
                             </span>
                         </x-nav-link>
                     @endif
@@ -114,13 +119,10 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
                 <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('dietas.index')" :active="request()->routeIs('dietas.*')">
                     <span class="inline-flex items-center">
-                        <svg class="h-5 w-5 me-2 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                        <svg class="{{ request()->routeIs('dietas.*') ? 'h-5 w-5 me-2 text-blue-600' : 'h-5 w-5 me-2 text-gray-500' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 2h6a2 2 0 012 2v2h2a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h2V4a2 2 0 012-2zm0 6h6" />
                         </svg>
                         {{ __('Dietas') }}
                     </span>
@@ -128,13 +130,36 @@
                 @if(auth()->check())
                     <x-responsive-nav-link :href="route('pacientes.index')" :active="request()->routeIs('pacientes.*')">
                         <span class="inline-flex items-center">
-                            <svg class="h-5 w-5 me-2 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7a4 4 0 118 0 4 4 0 01-8 0zm0 6a6 6 0 00-6 6h12a6 6 0 00-6-6z" />
+                            <svg class="{{ request()->routeIs('pacientes.*') ? 'h-5 w-5 me-2 text-emerald-600' : 'h-5 w-5 me-2 text-gray-500' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5V9l-2-2-3 3V4a2 2 0 00-2-2H9a2 2 0 00-2 2v6L4 7 2 9v11h5a3 3 0 006 0 3 3 0 006 0z" />
                             </svg>
                             {{ __('Pacientes') }}
                         </span>
                     </x-responsive-nav-link>
-                    <!-- Registro Dietas responsive link removed -->
+                    <x-responsive-nav-link :href="route('registro-dietas.index')" :active="request()->routeIs('registro-dietas.*')">
+                        <span class="inline-flex items-center">
+                            <svg class="{{ request()->routeIs('registro-dietas.*') ? 'h-5 w-5 me-2 text-pink-600' : 'h-5 w-5 me-2 text-gray-500' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7 4h10a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2z" />
+                            </svg>
+                            {{ __('Registro de dietas') }}
+                        </span>
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('refrigerios.index')" :active="request()->routeIs('refrigerios.*')">
+                        <span class="inline-flex items-center">
+                            <svg class="{{ request()->routeIs('refrigerios.*') ? 'h-5 w-5 me-2 text-orange-600' : 'h-5 w-5 me-2 text-gray-500' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h10M7 11h10M7 15h10" />
+                            </svg>
+                            {{ __('Refrigerios') }}
+                        </span>
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('registro-refrigerios.index')" :active="request()->routeIs('registro-refrigerios.*')">
+                        <span class="inline-flex items-center">
+                            <svg class="{{ request()->routeIs('registro-refrigerios.*') ? 'h-5 w-5 me-2 text-orange-700' : 'h-5 w-5 me-2 text-gray-500' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7 4h10a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2z" />
+                            </svg>
+                            {{ __('Registro de refrigerios') }}
+                        </span>
+                    </x-responsive-nav-link>
                 @endif
             @if(auth()->check() && auth()->user()->role === 'admin')
                 <x-responsive-nav-link :href="route('usuarios.index')" :active="request()->routeIs('usuarios.*')">
@@ -142,16 +167,16 @@
                 </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('servicios.index')" :active="request()->routeIs('servicios.*')">
                         <span class="inline-flex items-center">
-                            <svg class="h-5 w-5 me-2 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h18M3 12h18M3 17h18" />
+                            <svg class="{{ request()->routeIs('servicios.*') ? 'h-5 w-5 me-2 text-sky-600' : 'h-5 w-5 me-2 text-gray-500' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4h16v4H4V4zm0 6h16v10H4V10z" />
                             </svg>
                             {{ __('Servicios') }}
                         </span>
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('camas.index')" :active="request()->routeIs('camas.*')">
                         <span class="inline-flex items-center">
-                            <svg class="h-5 w-5 me-2 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h16M4 17h16" />
+                            <svg class="{{ request()->routeIs('camas.*') ? 'h-5 w-5 me-2 text-violet-600' : 'h-5 w-5 me-2 text-gray-500' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18v7H3v-7zm3-3h6v3H6V7z" />
                             </svg>
                             {{ __('Camas') }}
                         </span>

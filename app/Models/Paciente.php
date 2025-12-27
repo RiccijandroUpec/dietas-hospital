@@ -32,6 +32,11 @@ class Paciente extends Model
         return $this->belongsTo(Cama::class);
     }
 
+    public function registrosRefrigerio()
+    {
+        return $this->hasMany(RegistroRefrigerio::class);
+    }
+
     public function createdBy()
     {
         return $this->belongsTo(\App\Models\User::class, 'created_by');

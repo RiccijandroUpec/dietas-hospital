@@ -86,6 +86,7 @@
                                     <th class="px-4 py-3 text-left font-semibold text-gray-700">Fecha</th>
                                     <th class="px-4 py-3 text-left font-semibold text-gray-700">Observaciones</th>
                                     <th class="px-4 py-3 text-left font-semibold text-gray-700 text-xs">Registrado por</th>
+                                    <th class="px-4 py-3 text-left font-semibold text-gray-700 text-xs">Actualizado por</th>
                                     <th class="px-4 py-3 text-center font-semibold text-gray-700">Acciones</th>
                                 </tr>
                             </thead>
@@ -114,7 +115,24 @@
                                         <td class="px-4 py-3">
                                             <div class="flex flex-wrap gap-1">
                                                 @foreach($r->dietas as $dieta)
-                                                    <span class="inline-block bg-indigo-100 text-indigo-800 rounded-full px-2 py-1 text-xs font-medium">{{ $dieta->nombre }}</span>
+                                                    @php
+                                                        $n = strtolower($dieta->nombre ?? '');
+                                                        $cls = 'bg-indigo-100 text-indigo-800';
+                                                        if (str_contains($n, 'diab')) {
+                                                            $cls = 'bg-rose-100 text-rose-800';
+                                                        } elseif (str_contains($n, 'hiposod') || str_contains($n, 'sodio')) {
+                                                            $cls = 'bg-sky-100 text-sky-800';
+                                                        } elseif (str_contains($n, 'normal')) {
+                                                            $cls = 'bg-green-100 text-green-800';
+                                                        } elseif (str_contains($n, 'bland')) {
+                                                            $cls = 'bg-amber-100 text-amber-800';
+                                                        } elseif (str_contains($n, 'líquid') || str_contains($n, 'liquid')) {
+                                                            $cls = 'bg-cyan-100 text-cyan-800';
+                                                        } elseif (str_contains($n, 'veget')) {
+                                                            $cls = 'bg-emerald-100 text-emerald-800';
+                                                        }
+                                                    @endphp
+                                                    <span class="inline-block rounded-full px-2 py-1 text-xs font-medium {{ $cls }}">{{ $dieta->nombre }}</span>
                                                 @endforeach
                                             </div>
                                         </td>
@@ -125,22 +143,25 @@
                                             {{ $r->observaciones ?? '–' }}
                                         </td>
                                         <td class="px-4 py-3 text-xs text-gray-500">
-                                            <div>{{ optional($r->createdBy)->name }}</div>
+                                            <div>{{ optional($r->createdBy)->name ?? '—' }}</div>
                                             <div class="text-gray-400">{{ $r->created_at->format('d/m/Y') }}</div>
                                         </td>
+                                        <td class="px-4 py-3 text-xs text-gray-500">
+                                            <div>{{ optional($r->updatedBy)->name ?? '—' }}</div>
+                                            <div class="text-gray-400">{{ $r->updated_at->format('d/m/Y') }}</div>
+                                        </td>
                                         <td class="px-4 py-3 text-center">
-                                            @if(auth()->user()->role !== 'usuario')
-                                                <div class="flex justify-center gap-2">
+                                            <div class="flex justify-center gap-2">
+                                                <a href="{{ route('registro-dietas.show', $r) }}" class="px-3 py-1 bg-indigo-100 text-indigo-700 hover:bg-indigo-200 rounded text-xs font-medium transition">👁️ Ver</a>
+                                                @if(auth()->user()->role !== 'usuario')
                                                     <a href="{{ route('registro-dietas.edit', $r) }}" class="px-3 py-1 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded text-xs font-medium transition">✏️ Editar</a>
                                                     <form action="{{ route('registro-dietas.destroy', $r) }}" method="POST" class="inline-block" onsubmit="return confirm('¿Eliminar este registro?')">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" class="px-3 py-1 bg-red-100 text-red-700 hover:bg-red-200 rounded text-xs font-medium transition">🗑️ Eliminar</button>
                                                     </form>
-                                                </div>
-                                            @else
-                                                <span class="text-gray-400 text-xs">Solo lectura</span>
-                                            @endif
+                                                @endif
+                                            </div>
                                         </td>
                                     </tr>
                                 @endforeach

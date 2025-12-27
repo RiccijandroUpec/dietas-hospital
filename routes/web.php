@@ -11,6 +11,7 @@ Route::get('/', function () {
 // Pacientes resource
 Route::middleware('auth')->group(function () {
     Route::get('pacientes/reporte', [App\Http\Controllers\PacienteController::class, 'reporte'])->name('pacientes.reporte');
+    Route::get('pacientes/search', [App\Http\Controllers\PacienteController::class, 'search'])->name('pacientes.search');
     Route::resource('pacientes', App\Http\Controllers\PacienteController::class);
 });
 
@@ -23,14 +24,28 @@ Route::get('pacientes/check-cedula', [App\Http\Controllers\PacienteController::c
 // Servicios and Camas (admin)
 Route::resource('servicios', App\Http\Controllers\ServicioController::class)->middleware('auth');
 Route::resource('camas', App\Http\Controllers\CamaController::class)->middleware('auth');
+// Dietas live search (public) - MUST be before resource to match correctly
+Route::get('dietas/search', [App\Http\Controllers\DietaController::class, 'search'])->name('dietas.search');
 // Dietas CRUD (index/show public; other actions protected in controller)
 Route::resource('dietas', App\Http\Controllers\DietaController::class);
+
+// Refrigerios CRUD
+Route::middleware('auth')->group(function () {
+    Route::resource('refrigerios', App\Http\Controllers\RefrigerioController::class);
+});
+
 // PacienteDietas (simple registro paciente-dieta)
 Route::resource('paciente-dietas', App\Http\Controllers\PacienteDietaController::class)->middleware('auth');
 // Registro de dietas
 Route::middleware('auth')->group(function () {
     Route::get('registro-dietas/reporte', [App\Http\Controllers\RegistroDietaController::class, 'reporte'])->name('registro-dietas.reporte');
     Route::resource('registro-dietas', App\Http\Controllers\RegistroDietaController::class);
+});
+
+// Registro de refrigerios
+Route::middleware('auth')->group(function () {
+    Route::get('registro-refrigerios/reporte', [App\Http\Controllers\RegistroRefrigerioController::class, 'reporte'])->name('registro-refrigerios.reporte');
+    Route::resource('registro-refrigerios', App\Http\Controllers\RegistroRefrigerioController::class);
 });
 
 Route::get('/dashboard', function () {

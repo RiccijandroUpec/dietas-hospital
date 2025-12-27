@@ -48,18 +48,33 @@ class RegistroDietaController extends Controller
         return view('registro_dietas.reporte', compact('registros', 'totales', 'servicios'));
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $registros = RegistroDieta::with(['paciente', 'dietas', 'servicio', 'cama', 'createdBy', 'updatedBy'])
-            ->orderByDesc('created_at')
-            ->paginate(25);
+        $query = RegistroDieta::with(['paciente', 'dietas', 'servicio', 'cama', 'createdBy', 'updatedBy'])
+            ->orderByDesc('created_at');
 
+        // Filtros
+        if ($search = $request->input('search')) {
+            $query->whereHas('paciente', function ($q) use ($search) {
+                $q->where('nombre', 'like', "%{$search}%")
+                  ->orWhere('apellido', 'like', "%{$search}%")
+                  ->orWhere('cedula', 'like', "%{$search}%");
+            });
+        }
+        if ($tipo = $request->input('tipo_comida')) {
+            $query->where('tipo_comida', $tipo);
+        }
+        if ($fecha = $request->input('fecha')) {
+            $query->whereDate('fecha', $fecha);
+        }
+
+        $registros = $query->paginate(25)->appends($request->query());
         return view('registro_dietas.index', compact('registros'));
     }
 
     public function create()
     {
-        $pacientes = Paciente::orderBy('nombre')->get();
+        $pacientes = Paciente::where('estado', 'hospitalizado')->orderBy('nombre')->get();
         $dietas = Dieta::orderBy('nombre')->get();
         return view('registro_dietas.create', compact('pacientes', 'dietas'));
     }
@@ -74,6 +89,13 @@ class RegistroDietaController extends Controller
             'fecha' => 'required|date',
             'observaciones' => 'nullable|string',
         ]);
+
+        // Validar que el paciente esté hospitalizado
+        $paciente = Paciente::find($data['paciente_id']);
+        if (!$paciente || $paciente->estado !== 'hospitalizado') {
+            return back()->withErrors(['paciente_id' => 'El paciente debe estar hospitalizado para registrar una dieta.'])->withInput();
+        }
+
         $data['created_by'] = Auth::id();
         $data['updated_by'] = Auth::id();
 

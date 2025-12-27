@@ -2,82 +2,108 @@
 
 @section('content')
 <div class="py-6">
-    <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
+    <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
             <div class="p-6 bg-white border-b border-gray-200">
-                <h2 class="font-semibold text-xl text-gray-800 mb-4">Crear Paciente</h2>
+                <h2 class="font-semibold text-2xl text-gray-800 mb-2">👤 Crear Nuevo Paciente</h2>
+                <p class="text-gray-600 text-sm mb-6">Registro de un nuevo paciente en el sistema</p>
+
+                @if(session('error'))
+                    <div class="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-md flex items-start">
+                        <span class="mr-3">⚠️</span>
+                        <span>{{ session('error') }}</span>
+                    </div>
+                @endif
 
                 <form action="{{ route('pacientes.store') }}" method="POST">
                     @csrf
 
-                    @if(session('error'))
-                        <div class="mb-4 p-3 bg-red-100 text-red-800 rounded">{{ session('error') }}</div>
-                    @endif
-
-                    <div class="grid grid-cols-1 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Nombre -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700">Nombre</label>
-                            <input type="text" name="nombre" value="{{ old('nombre') }}" class="mt-1 block w-full border-gray-300 rounded-md">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">👤 Nombre</label>
+                            <input type="text" name="nombre" value="{{ old('nombre') }}" placeholder="Ej: Juan" class="w-full border-gray-300 rounded-md" required>
+                            @error('nombre')<div class="text-red-600 text-sm mt-1">⚠️ {{ $message }}</div>@enderror
                         </div>
 
+                        <!-- Apellido -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700">Apellido</label>
-                            <input type="text" name="apellido" value="{{ old('apellido') }}" class="mt-1 block w-full border-gray-300 rounded-md">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">👤 Apellido</label>
+                            <input type="text" name="apellido" value="{{ old('apellido') }}" placeholder="Ej: Pérez" class="w-full border-gray-300 rounded-md" required>
+                            @error('apellido')<div class="text-red-600 text-sm mt-1">⚠️ {{ $message }}</div>@enderror
                         </div>
 
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Cédula</label>
-                            <input id="cedula_input" type="text" name="cedula" value="{{ old('cedula') }}" class="mt-1 block w-full border-gray-300 rounded-md">
+                        <!-- Cédula -->
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">🆔 Cédula</label>
+                            <input id="cedula_input" type="text" name="cedula" value="{{ old('cedula') }}" placeholder="Ej: 12345678" class="w-full border-gray-300 rounded-md font-mono" required>
                             <div id="cedula_feedback" class="text-sm mt-1"></div>
+                            @error('cedula')<div class="text-red-600 text-sm mt-1">⚠️ {{ $message }}</div>@enderror
                         </div>
 
+                        <!-- Estado -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700">Estado</label>
-                            <select name="estado" class="mt-1 block w-full border-gray-300 rounded-md">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">🏥 Estado</label>
+                            <select name="estado" class="w-full border-gray-300 rounded-md">
                                 <option value="hospitalizado" @if(old('estado', 'hospitalizado') == 'hospitalizado') selected @endif>Hospitalizado</option>
                                 <option value="alta" @if(old('estado') == 'alta') selected @endif>Alta</option>
                             </select>
-                            @error('estado')<div class="text-red-600 text-sm mt-1">{{ $message }}</div>@enderror
+                            @error('estado')<div class="text-red-600 text-sm mt-1">⚠️ {{ $message }}</div>@enderror
                         </div>
 
+                        <!-- Edad -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700">Edad</label>
-                            <input type="number" name="edad" value="{{ old('edad') }}" class="mt-1 block w-full border-gray-300 rounded-md">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">🎂 Edad</label>
+                            <input type="number" name="edad" value="{{ old('edad') }}" placeholder="Ej: 45" class="w-full border-gray-300 rounded-md" min="0" max="150">
+                            @error('edad')<div class="text-red-600 text-sm mt-1">⚠️ {{ $message }}</div>@enderror
                         </div>
 
+                        <!-- Servicio -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700">Condición</label>
-                            @php $oldCond = old('condicion', []); @endphp
-                            <div class="mt-1 space-x-4">
-                                <label><input type="checkbox" name="condicion[]" value="normal" @if(in_array('normal', (array)$oldCond)) checked @endif> Normal</label>
-                                <label><input type="checkbox" name="condicion[]" value="diabetico" @if(in_array('diabetico', (array)$oldCond)) checked @endif> Diabético</label>
-                                <label><input type="checkbox" name="condicion[]" value="hiposodico" @if(in_array('hiposodico', (array)$oldCond)) checked @endif> Hiposódico</label>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Servicio</label>
-                            <select id="servicio_select" name="servicio_id" class="mt-1 block w-full border-gray-300 rounded-md">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">🏢 Servicio</label>
+                            <select id="servicio_select" name="servicio_id" class="w-full border-gray-300 rounded-md">
                                 <option value="">-- Seleccione --</option>
                                 @foreach($servicios as $servicio)
                                     <option value="{{ $servicio->id }}" @if(old('servicio_id') == $servicio->id) selected @endif>{{ $servicio->nombre }}</option>
                                 @endforeach
                             </select>
-                            @error('servicio_id')<div class="text-red-600 text-sm mt-1">{{ $message }}</div>@enderror
+                            @error('servicio_id')<div class="text-red-600 text-sm mt-1">⚠️ {{ $message }}</div>@enderror
                         </div>
 
+                        <!-- Cama -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700">Cama</label>
-                            <select id="cama_select" name="cama_id" class="mt-1 block w-full border-gray-300 rounded-md" disabled>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">🛏️ Cama</label>
+                            <select id="cama_select" name="cama_id" class="w-full border-gray-300 rounded-md" disabled>
                                 <option value="">-- Seleccione servicio primero --</option>
                             </select>
-                            @error('cama_id')<div class="text-red-600 text-sm mt-1">{{ $message }}</div>@enderror
+                            @error('cama_id')<div class="text-red-600 text-sm mt-1">⚠️ {{ $message }}</div>@enderror
                         </div>
 
-                        <div class="pt-4">
-                            <button id="submit_btn" type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md">Guardar</button>
-                            <a href="{{ route('pacientes.index') }}" class="ml-2 text-gray-600">Cancelar</a>
+                        <!-- Condición -->
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">⚕️ Condición Médica</label>
+                            @php $oldCond = old('condicion', []); @endphp
+                            <div class="grid grid-cols-3 gap-3 p-3 bg-gray-50 rounded-md border border-gray-200">
+                                <label class="inline-flex items-center p-2 bg-white rounded border border-gray-300 hover:border-blue-500 cursor-pointer transition">
+                                    <input type="checkbox" name="condicion[]" value="normal" @if(in_array('normal', (array)$oldCond)) checked @endif>
+                                    <span class="ml-2 text-sm font-medium">Normal</span>
+                                </label>
+                                <label class="inline-flex items-center p-2 bg-white rounded border border-gray-300 hover:border-blue-500 cursor-pointer transition">
+                                    <input type="checkbox" name="condicion[]" value="diabetico" @if(in_array('diabetico', (array)$oldCond)) checked @endif>
+                                    <span class="ml-2 text-sm font-medium">Diabético</span>
+                                </label>
+                                <label class="inline-flex items-center p-2 bg-white rounded border border-gray-300 hover:border-blue-500 cursor-pointer transition">
+                                    <input type="checkbox" name="condicion[]" value="hiposodico" @if(in_array('hiposodico', (array)$oldCond)) checked @endif>
+                                    <span class="ml-2 text-sm font-medium">Hiposódico</span>
+                                </label>
+                            </div>
+                            @error('condicion')<div class="text-red-600 text-sm mt-1">⚠️ {{ $message }}</div>@enderror
                         </div>
+                    </div>
+
+                    <div class="flex gap-2 pt-6">
+                        <button id="submit_btn" type="submit" class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md font-medium transition">✓ Guardar Paciente</button>
+                        <a href="{{ route('pacientes.index') }}" class="px-6 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-md font-medium transition">✕ Cancelar</a>
                     </div>
                 </form>
 

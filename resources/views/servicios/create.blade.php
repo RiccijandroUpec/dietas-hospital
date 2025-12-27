@@ -2,35 +2,66 @@
 
 @section('content')
 <div class="py-6">
-    <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
-        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-            <div class="p-6 bg-white border-b border-gray-200">
-                <h2 class="font-semibold text-xl text-gray-800 mb-4 flex items-center gap-2">
-                    <svg class="h-5 w-5 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                    </svg>
-                    Crear Servicio
-                </h2>
+    <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="mb-6 flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">➕ Crear Nuevo Servicio</h1>
+                <p class="text-gray-600 mt-1">Agrega un nuevo servicio hospitalario</p>
+            </div>
+            <a href="{{ route('servicios.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition">
+                ← Volver
+            </a>
+        </div>
 
+        <!-- Formulario -->
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="p-8">
                 <form action="{{ route('servicios.store') }}" method="POST">
                     @csrf
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Nombre</label>
-                        <input type="text" name="nombre" value="{{ old('nombre') }}" class="mt-1 block w-full border-gray-300 rounded-md">
-                        @error('nombre')<div class="text-red-600 text-sm mt-1">{{ $message }}</div>@enderror
+                    
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Nombre del Servicio</label>
+                        <input 
+                            type="text" 
+                            name="nombre" 
+                            value="{{ old('nombre') }}" 
+                            placeholder="Ej: Cardiología, Neurocirugía, Pediatría..."
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition"
+                            required
+                        >
+                        @error('nombre')
+                            <div class="text-red-600 text-sm mt-2 flex items-center gap-1">
+                                <span>⚠️</span>
+                                <span>{{ $message }}</span>
+                            </div>
+                        @enderror
                     </div>
 
-                    <div class="pt-4">
-                        <button type="submit" class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md">
-                            <svg class="h-4 w-4 me-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                            </svg>
-                            Guardar
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Descripción (opcional)</label>
+                        <textarea 
+                            name="descripcion" 
+                            placeholder="Descripción del servicio, especialidades, etc..."
+                            rows="4"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition"
+                        >{{ old('descripcion') }}</textarea>
+                        @error('descripcion')
+                            <div class="text-red-600 text-sm mt-2 flex items-center gap-1">
+                                <span>⚠️</span>
+                                <span>{{ $message }}</span>
+                            </div>
+                        @enderror
+                    </div>
+                    <div class="flex gap-3 pt-4 border-t border-gray-200">
+                        <button type="submit" class="px-6 py-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-lg font-medium transition-all duration-200 transform hover:scale-105">
+                            ✓ Guardar Servicio
                         </button>
-                        <a href="{{ route('servicios.index') }}" class="ml-2 text-gray-600">Cancelar</a>
+                        <a href="{{ route('servicios.index') }}" class="px-6 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-lg font-medium transition">
+                            ✕ Cancelar
+                        </a>
                     </div>
                 </form>
-
             </div>
         </div>
     </div>

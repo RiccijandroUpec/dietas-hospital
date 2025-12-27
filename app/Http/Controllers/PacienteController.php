@@ -87,6 +87,52 @@ class PacienteController extends Controller
         return response()->json(['exists' => false]);
     }
 
+    // Búsqueda AJAX por nombre o cédula
+    public function search(Request $request)
+    {
+        $q = trim((string) $request->query('q'));
+        $limit = (int) ($request->query('limit', 50));
+        $limit = $limit > 0 && $limit <= 50 ? $limit : 50;
+
+        $query = Paciente::query()->with(['servicio', 'cama'])->select('*');
+        if ($q !== '') {
+            $query->where(function ($sub) use ($q) {
+                $sub->where('nombre', 'like', "%$q%")
+                    ->orWhere('apellido', 'like', "%$q%")
+                    ->orWhere('cedula', 'like', "%$q%");
+            });
+        }
+
+        // Por defecto prioriza hospitalizados
+        $query->orderByRaw("estado='hospitalizado' DESC")->orderBy('nombre');
+
+        $results = $query->limit($limit)->get();
+        
+        return response()->json([
+            'pacientes' => $results->map(function ($p) {
+                return [
+                    'id' => $p->id,
+                    'nombre' => $p->nombre,
+                    'apellido' => $p->apellido,
+                    'cedula' => $p->cedula,
+                    'estado' => $p->estado,
+                    'edad' => $p->edad,
+                    'condicion' => $p->condicion,
+                    'servicio' => $p->servicio ? $p->servicio->nombre : null,
+                    'cama' => $p->cama ? $p->cama->codigo : null,
+                    'edit_url' => auth()->user()->role !== 'usuario' ? route('pacientes.edit', $p) : null,
+                    'delete_url' => auth()->user()->role !== 'usuario' ? route('pacientes.destroy', $p) : null,
+                ];
+            })
+        ]);
+    }
+
+    public function show(Paciente $paciente)
+    {
+        $paciente->load(['servicio', 'cama', 'createdBy', 'updatedBy']);
+        return view('pacientes.show', compact('paciente'));
+    }
+
     public function store(Request $request)
     {
         if (Auth::user() && Auth::user()->role === 'usuario') {

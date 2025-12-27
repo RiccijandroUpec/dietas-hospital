@@ -60,5 +60,7 @@
                 @endisset
             </main>
         </div>
+        {{-- Scripts adicionales inyectados desde las vistas --}}
+        @stack('scripts')
     </body>
 </html>

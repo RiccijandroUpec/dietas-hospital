@@ -77,4 +77,29 @@ class DietaController extends Controller
         $dieta->delete();
         return redirect()->route('dietas.index')->with('success', 'Dieta eliminada.');
     }
+
+    // Live search endpoint
+    public function search(Request $request)
+    {
+        $q = $request->query('q');
+        $dietas = Dieta::query()
+            ->when($q, function ($query) use ($q) {
+                $query->where('nombre', 'like', "%{$q}%")
+                      ->orWhere('descripcion', 'like', "%{$q}%");
+            })
+            ->orderBy('nombre')
+            ->limit(50)
+            ->get()
+            ->map(function ($d) {
+                return [
+                    'id' => $d->id,
+                    'nombre' => $d->nombre,
+                    'descripcion' => $d->descripcion,
+                    'show_url' => route('dietas.show', $d),
+                    'edit_url' => (Auth::check() && Auth::user()->role === 'admin') ? route('dietas.edit', $d) : null,
+                ];
+            });
+
+        return response()->json($dietas);
+    }
 }
