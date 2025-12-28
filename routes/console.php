@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use App\Models\Cama;
+use Illuminate\Support\Facades\DB;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
@@ -52,3 +53,23 @@ Artisan::command('camas:normalize-codigos', function () {
 
     $this->info("Camas actualizadas: {$updated}; omitidas: {$skipped}");
 })->purpose('Normaliza códigos de camas removiendo ceros a la izquierda');
+
+Artisan::command('camas:delete-all {--force}', function () {
+    $this->warn('Advertencia: Esta acción eliminará TODAS las camas y cualquier registro relacionado en cascada (por FK).');
+    $this->warn('Esto afectará el entorno actual y no es reversible.');
+
+    if (!$this->option('force')) {
+        if (!$this->confirm('¿Deseas continuar?')) {
+            $this->info('Operación cancelada.');
+            return;
+        }
+    }
+
+    $total = Cama::count();
+    DB::transaction(function () {
+        // Usamos delete() para evitar problemas de TRUNCATE con FKs
+        Cama::query()->delete();
+    });
+
+    $this->info("Camas eliminadas: {$total}");
+})->purpose('Elimina todas las camas (y dependencias en cascada)');

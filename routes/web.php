@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UsuarioController;
+use Illuminate\Support\Facades\Artisan;
 
 Route::get('/', function () {
     return view('welcome');
@@ -73,3 +74,16 @@ Route::middleware(['auth'])->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+// Operación administrativa: eliminar todas las camas en el entorno actual
+Route::get('/ops/camas/delete-all', function () {
+    $user = auth()->user();
+    if (!$user || $user->role !== 'admin') {
+        abort(403);
+    }
+    Artisan::call('camas:delete-all', ['--force' => true]);
+    return response()->json([
+        'status' => 'ok',
+        'message' => 'Todas las camas eliminadas (acción en cascada aplicada)'
+    ]);
+})->middleware('auth');
