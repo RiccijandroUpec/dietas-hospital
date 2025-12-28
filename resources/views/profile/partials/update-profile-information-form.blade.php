@@ -42,7 +42,7 @@
                 class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" 
                 value="{{ old('email', $user->email) }}" 
                 required 
-                autocomplete="username"
+                autocomplete="email"
             />
             @error('email')
                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>

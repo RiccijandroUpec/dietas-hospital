@@ -132,6 +132,8 @@
                                 name="password" 
                                 class="w-full px-4 py-3 border border-yellow-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-200"
                                 placeholder="Dejar en blanco para mantener la contraseña actual"
+                                inputmode="password"
+                                autocomplete="new-password"
                             />
                             @error('password')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
