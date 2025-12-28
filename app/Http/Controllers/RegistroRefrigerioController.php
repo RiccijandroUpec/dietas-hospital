@@ -67,7 +67,11 @@ class RegistroRefrigerioController extends Controller
      */
     public function create()
     {
-        $pacientes = Paciente::where('estado', 'hospitalizado')->orderBy('nombre')->get();
+        $query = Paciente::query();
+        if (\Schema::hasColumn('pacientes', 'estado')) {
+            $query->where('estado', 'hospitalizado');
+        }
+        $pacientes = $query->orderBy('nombre')->get();
         $refrigerios = Refrigerio::orderBy('nombre')->get();
         $momentos = ['mañana', 'tarde', 'noche'];
         return view('registro_refrigerios.create', compact('pacientes', 'refrigerios', 'momentos'));
@@ -88,7 +92,7 @@ class RegistroRefrigerioController extends Controller
         ]);
 
         $paciente = Paciente::findOrFail($validated['paciente_id']);
-        if ($paciente->estado !== 'hospitalizado') {
+        if (\Schema::hasColumn('pacientes', 'estado') && $paciente->estado !== 'hospitalizado') {
             return back()->with('error', 'Solo pacientes hospitalizados pueden recibir refrigerios.')->withInput();
         }
         $refrigerioIds = array_unique($validated['refrigerio_ids']);
@@ -142,7 +146,11 @@ class RegistroRefrigerioController extends Controller
      */
     public function edit(RegistroRefrigerio $registroRefrigerio)
     {
-        $pacientes = Paciente::where('estado', 'hospitalizado')->orderBy('nombre')->get();
+        $query = Paciente::query();
+        if (\Schema::hasColumn('pacientes', 'estado')) {
+            $query->where('estado', 'hospitalizado');
+        }
+        $pacientes = $query->orderBy('nombre')->get();
         $refrigerios = Refrigerio::orderBy('nombre')->get();
         $momentos = ['mañana', 'tarde', 'noche'];
 

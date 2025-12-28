@@ -172,7 +172,11 @@ class RegistroDietaController extends Controller
 
     public function create()
     {
-        $pacientes = Paciente::where('estado', 'hospitalizado')->orderBy('nombre')->get();
+        $query = Paciente::query();
+        if (\Schema::hasColumn('pacientes', 'estado')) {
+            $query->where('estado', 'hospitalizado');
+        }
+        $pacientes = $query->orderBy('nombre')->get();
         $tipos = \App\Models\TipoDieta::with(['subtipos.dietas'])->orderBy('nombre')->get();
         return view('registro_dietas.create', compact('pacientes', 'tipos'));
     }
@@ -190,9 +194,9 @@ class RegistroDietaController extends Controller
             'es_tardia' => 'nullable|boolean',
         ]);
 
-        // Validar que el paciente esté hospitalizado
+        // Validar que el paciente esté hospitalizado (si la columna existe)
         $paciente = Paciente::find($data['paciente_id']);
-        if (!$paciente || $paciente->estado !== 'hospitalizado') {
+        if (!$paciente || (\Schema::hasColumn('pacientes', 'estado') && $paciente->estado !== 'hospitalizado')) {
             return back()->withErrors(['paciente_id' => 'El paciente debe estar hospitalizado para registrar una dieta.'])->withInput();
         }
 

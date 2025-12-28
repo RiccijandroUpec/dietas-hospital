@@ -28,7 +28,7 @@ class PacienteController extends Controller
 
         $query = Paciente::with(['servicio', 'cama', 'createdBy', 'updatedBy']);
 
-        if ($estado) {
+        if ($estado && \Schema::hasColumn('pacientes', 'estado')) {
             $query->where('estado', $estado);
         }
         if ($servicio_id) {
@@ -38,11 +38,16 @@ class PacienteController extends Controller
         $pacientes = $query->orderBy('nombre')->paginate(25);
         $servicios = Servicio::orderBy('nombre')->get();
 
-        // Contar pacientes por estado
-        $totales = [
-            'hospitalizado' => Paciente::where('estado', 'hospitalizado')->count(),
-            'alta' => Paciente::where('estado', 'alta')->count(),
-        ];
+        // Contar pacientes por estado (con verificación de columna)
+        $totales = [];
+        if (\Schema::hasColumn('pacientes', 'estado')) {
+            $totales = [
+                'hospitalizado' => Paciente::where('estado', 'hospitalizado')->count(),
+                'alta' => Paciente::where('estado', 'alta')->count(),
+            ];
+        } else {
+            $totales = ['hospitalizado' => 0, 'alta' => 0];
+        }
 
         return view('pacientes.reporte', compact('pacientes', 'servicios', 'totales'));
     }
@@ -103,8 +108,12 @@ class PacienteController extends Controller
             });
         }
 
-        // Por defecto prioriza hospitalizados
-        $query->orderByRaw("estado='hospitalizado' DESC")->orderBy('nombre');
+        // Por defecto prioriza hospitalizados (si la columna existe)
+        if (\Schema::hasColumn('pacientes', 'estado')) {
+            $query->orderByRaw("estado='hospitalizado' DESC")->orderBy('nombre');
+        } else {
+            $query->orderBy('nombre');
+        }
 
         $results = $query->limit($limit)->get();
         
