@@ -13,7 +13,7 @@ class ResetUserPasswords extends Command
      *
      * @var string
      */
-    protected $signature = 'users:reset-passwords {--password=123456} {--no-interaction}';
+    protected $signature = 'users:reset-passwords {--password=123456}';
 
     /**
      * The console command description.
@@ -29,12 +29,16 @@ class ResetUserPasswords extends Command
     {
         $password = $this->option('password');
         
-        $this->info('Reseteando contraseñas de usuarios...');
+        if (!$this->option('quiet')) {
+            $this->info('Reseteando contraseñas de usuarios...');
+        }
         
         $users = User::all();
         
         if ($users->isEmpty()) {
-            $this->warn('No hay usuarios en la base de datos.');
+            if (!$this->option('quiet')) {
+                $this->warn('No hay usuarios en la base de datos.');
+            }
             return 0;
         }
         
@@ -42,8 +46,6 @@ class ResetUserPasswords extends Command
         
         foreach ($users as $user) {
             try {
-                // Intentar verificar si la contraseña ya está hasheada
-                // Si no lo está, Hash::check lanzará una excepción o devolverá false
                 $user->password = Hash::make($password);
                 $user->save();
                 $updated++;
@@ -52,24 +54,9 @@ class ResetUserPasswords extends Command
             }
         }
         
-        $this->info("✓ {$updated} usuarios actualizados correctamente.");
-        $this->info("Contraseña por defecto: {$password}");
-        
-        // Crear un usuario admin si no existe (solo si no estamos en modo no-interactivo)
-        if (!User::where('role', 'admin')->exists() && !$this->option('no-interaction')) {
-            if ($this->confirm('¿Deseas crear un usuario administrador?', true)) {
-                $name = $this->ask('Nombre del administrador', 'Administrador');
-                $email = $this->ask('Email del administrador', 'admin@hospital.com');
-                
-                User::create([
-                    'name' => $name,
-                    'email' => $email,
-                    'password' => Hash::make($password),
-                    'role' => 'admin',
-                ]);
-                
-                $this->info("✓ Usuario administrador creado: {$email}");
-            }
+        if (!$this->option('quiet')) {
+            $this->info("✓ {$updated} usuarios actualizados correctamente.");
+            $this->info("Contraseña por defecto: {$password}");
         }
         
         return 0;
