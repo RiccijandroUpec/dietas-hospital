@@ -67,12 +67,12 @@ class ServicioController extends Controller
 
                 for ($i = 0; $i < $cantidadCamas; $i++) {
                     $counter = $start + $i;
-                    $codigo = $prefix . '-' . str_pad($counter, 3, '0', STR_PAD_LEFT);
+                    $codigo = $prefix . '-' . $counter;
 
                     // Garantiza unicidad global del código de cama
                     while (Cama::where('codigo', $codigo)->exists()) {
                         $counter++;
-                        $codigo = $prefix . '-' . str_pad($counter, 3, '0', STR_PAD_LEFT);
+                        $codigo = $prefix . '-' . $counter;
                     }
 
                     Cama::create([
