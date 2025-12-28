@@ -13,9 +13,10 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
-        @if(config('services.adsense.enabled') && config('services.adsense.client'))
-            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ config('services.adsense.client') }}" crossorigin="anonymous"></script>
-        @endif
+        
+        <!-- Google AdSense -->
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6769013572390921"
+             crossorigin="anonymous"></script>
         <style>
             /* Forzar que el texto blanco se muestre en negro */
             .text-white, .dark .text-white {
