@@ -1,71 +1,73 @@
 # 📱 Configuración para Móviles en Railway
 
-## Problema: No puedo iniciar sesión desde el celular
+## ⚠️ Problema: No puedo iniciar sesión desde el celular
 
-Si no puedes iniciar sesión o registrarte desde un dispositivo móvil, el problema está en la configuración de cookies.
+Si no puedes iniciar sesión o registrarte desde un dispositivo móvil, sigue estos pasos:
 
-## Solución: Configurar Variables de Entorno en Railway
+## ✅ Solución Paso a Paso
 
-Ve a tu proyecto en Railway → **Settings** → **Variables** y asegúrate de tener estas variables:
+### 1. Configurar Variables de Entorno en Railway
 
-### Variables Críticas para Móviles:
+**IMPORTANTE:** Ve a Railway → Tu proyecto → **Variables** y configura EXACTAMENTE estas variables:
 
-```env
-# Sesiones - CRUCIAL para móviles
-SESSION_DRIVER=database
-SESSION_SECURE_COOKIE=true
-SESSION_SAME_SITE=none
-SESSION_HTTP_ONLY=true
-SESSION_LIFETIME=120
-
-# APP
-APP_URL=https://tu-dominio.up.railway.app
+```plaintext
+APP_URL=https://dietas-hospital-production.up.railway.app
 APP_ENV=production
 APP_DEBUG=false
+SESSION_DRIVER=database
+SESSION_SAME_SITE=lax
+SESSION_SECURE_COOKIE=true
+SESSION_HTTP_ONLY=true
+SESSION_LIFETIME=120
+CACHE_STORE=database
 ```
 
-### ¿Por qué SESSION_SAME_SITE=none?
+### 2. Verificar APP_URL
 
-Los navegadores móviles (Safari, Chrome mobile) tienen restricciones más estrictas con cookies. `SESSION_SAME_SITE=none` permite que las cookies funcionen correctamente en:
-- Navegadores móviles
-- Peticiones cross-site
-- PWAs (Progressive Web Apps)
+**MUY IMPORTANTE:** El `APP_URL` debe ser EXACTAMENTE tu URL de Railway.
 
-**Nota:** `SESSION_SAME_SITE=none` REQUIERE que `SESSION_SECURE_COOKIE=true` (HTTPS obligatorio).
+Para encontrar tu URL:
+1. Railway Dashboard → Tu proyecto
+2. Copia la URL que aparece arriba (ejemplo: `https://dietas-hospital-production.up.railway.app`)
+3. Pégala en `APP_URL` (CON https://)
 
-## Pasos para Configurar:
+### 3. Después de configurar
 
-### 1. En Railway Dashboard:
+Railway redesplegará automáticamente. Espera 2-3 minutos.
 
-1. Abre tu proyecto en Railway
-2. Ve a **Settings** → **Variables**
-3. Agrega/actualiza estas variables:
+### 4. En tu móvil
 
+1. **Borra la caché del navegador:**
+   - Safari (iOS): Ajustes → Safari → Borrar historial y datos
+   - Chrome (Android): ⋮ → Historial → Borrar datos de navegación
+
+2. **Cierra completamente el navegador** (no solo la pestaña)
+
+3. **Abre el navegador de nuevo** y ve a tu URL de Railway
+
+4. Prueba iniciar sesión con:
+   - Email: `admin@hospital.com`
+   - Contraseña: `123456`
+
+## 🔧 Si AÚN no funciona
+
+### Opción A: Cambiar SESSION_SAME_SITE a 'none'
+
+En Railway Variables, cambia:
 ```
 SESSION_SAME_SITE=none
-SESSION_SECURE_COOKIE=true
-SESSION_DRIVER=database
-SESSION_HTTP_ONLY=true
-APP_URL=https://tu-url-railway.up.railway.app
 ```
 
-### 2. Verificar APP_URL:
+**NOTA:** Esto requiere `SESSION_SECURE_COOKIE=true` (que ya tienes).
 
-**MUY IMPORTANTE:** El `APP_URL` debe ser EXACTAMENTE tu URL de Railway:
+### Opción B: Verificar en modo incógnito
 
-```env
-APP_URL=https://dietas-hospital-production.up.railway.app
-```
+Abre el navegador en modo incógnito/privado y prueba de nuevo.
 
-No uses:
-- ❌ `http://...` (sin SSL)
-- ❌ URLs con puertos
-- ❌ localhost
-- ❌ URLs temporales de ngrok
+### Opción C: Usar otro navegador
 
-### 3. Redesplegar:
-
-Después de cambiar las variables, Railway redesplegará automáticamente.
+- Si estás en iPhone: Prueba Chrome en lugar de Safari
+- Si estás en Android: Prueba Firefox en lugar de Chrome
 
 ## Registro de Usuarios
 
