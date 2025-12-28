@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('registro_dietas', function (Blueprint $table) {
-            $table->boolean('es_tardia')->default(false)->after('observaciones');
-        });
+        if (Schema::hasTable('registro_dietas') && !Schema::hasColumn('registro_dietas', 'es_tardia')) {
+            Schema::table('registro_dietas', function (Blueprint $table) {
+                $table->boolean('es_tardia')->default(false)->after('observaciones');
+            });
+        }
     }
 
     /**
@@ -21,8 +23,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('registro_dietas', function (Blueprint $table) {
-            $table->dropColumn('es_tardia');
-        });
+        if (Schema::hasTable('registro_dietas') && Schema::hasColumn('registro_dietas', 'es_tardia')) {
+            Schema::table('registro_dietas', function (Blueprint $table) {
+                $table->dropColumn('es_tardia');
+            });
+        }
     }
 };

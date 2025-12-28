@@ -8,17 +8,21 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::table('camas', function (Blueprint $table) {
-            $table->unsignedBigInteger('servicio_id')->nullable()->after('codigo');
-            $table->foreign('servicio_id')->references('id')->on('servicios')->onDelete('set null');
-        });
+        if (Schema::hasTable('camas') && !Schema::hasColumn('camas', 'servicio_id')) {
+            Schema::table('camas', function (Blueprint $table) {
+                $table->unsignedBigInteger('servicio_id')->nullable()->after('codigo');
+                $table->foreign('servicio_id')->references('id')->on('servicios')->onDelete('set null');
+            });
+        }
     }
 
     public function down()
     {
-        Schema::table('camas', function (Blueprint $table) {
-            $table->dropForeign(['servicio_id']);
-            $table->dropColumn('servicio_id');
-        });
+        if (Schema::hasTable('camas') && Schema::hasColumn('camas', 'servicio_id')) {
+            Schema::table('camas', function (Blueprint $table) {
+                $table->dropForeign(['servicio_id']);
+                $table->dropColumn('servicio_id');
+            });
+        }
     }
 };

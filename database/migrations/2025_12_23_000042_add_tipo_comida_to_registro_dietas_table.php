@@ -8,15 +8,19 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::table('registro_dietas', function (Blueprint $table) {
-            $table->enum('tipo_comida', ['desayuno', 'almuerzo', 'merienda'])->default('desayuno')->after('dieta_id');
-        });
+        if (Schema::hasTable('registro_dietas') && !Schema::hasColumn('registro_dietas', 'tipo_comida')) {
+            Schema::table('registro_dietas', function (Blueprint $table) {
+                $table->enum('tipo_comida', ['desayuno', 'almuerzo', 'merienda'])->default('desayuno')->after('dieta_id');
+            });
+        }
     }
 
     public function down()
     {
-        Schema::table('registro_dietas', function (Blueprint $table) {
-            $table->dropColumn('tipo_comida');
-        });
+        if (Schema::hasTable('registro_dietas') && Schema::hasColumn('registro_dietas', 'tipo_comida')) {
+            Schema::table('registro_dietas', function (Blueprint $table) {
+                $table->dropColumn('tipo_comida');
+            });
+        }
     }
 };

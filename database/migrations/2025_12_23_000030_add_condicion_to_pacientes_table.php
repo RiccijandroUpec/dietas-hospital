@@ -13,9 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('pacientes', function (Blueprint $table) {
-            $table->string('condicion')->nullable()->after('cama_id');
-        });
+        if (Schema::hasTable('pacientes') && !Schema::hasColumn('pacientes', 'condicion')) {
+            Schema::table('pacientes', function (Blueprint $table) {
+                $table->string('condicion')->nullable()->after('cama_id');
+            });
+        }
     }
 
     /**
@@ -25,8 +27,10 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('pacientes', function (Blueprint $table) {
-            $table->dropColumn('condicion');
-        });
+        if (Schema::hasTable('pacientes') && Schema::hasColumn('pacientes', 'condicion')) {
+            Schema::table('pacientes', function (Blueprint $table) {
+                $table->dropColumn('condicion');
+            });
+        }
     }
 };

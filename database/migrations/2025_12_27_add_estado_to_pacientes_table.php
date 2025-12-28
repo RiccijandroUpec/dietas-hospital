@@ -8,15 +8,19 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('pacientes', function (Blueprint $table) {
-            $table->enum('estado', ['hospitalizado', 'alta'])->default('hospitalizado')->after('cedula');
-        });
+        if (Schema::hasTable('pacientes') && !Schema::hasColumn('pacientes', 'estado')) {
+            Schema::table('pacientes', function (Blueprint $table) {
+                $table->enum('estado', ['hospitalizado', 'alta'])->default('hospitalizado')->after('cedula');
+            });
+        }
     }
 
     public function down(): void
     {
-        Schema::table('pacientes', function (Blueprint $table) {
-            $table->dropColumn('estado');
-        });
+        if (Schema::hasTable('pacientes') && Schema::hasColumn('pacientes', 'estado')) {
+            Schema::table('pacientes', function (Blueprint $table) {
+                $table->dropColumn('estado');
+            });
+        }
     }
 };

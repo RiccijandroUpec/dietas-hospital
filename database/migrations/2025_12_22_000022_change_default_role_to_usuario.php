@@ -9,19 +9,23 @@ return new class extends Migration
 {
     public function up()
     {
-        // Update existing records with older default 'user' to 'usuario'
-        DB::table('users')->where('role', 'user')->update(['role' => 'usuario']);
+        if (Schema::hasTable('users') && Schema::hasColumn('users', 'role')) {
+            // Update existing records with older default 'user' to 'usuario'
+            DB::table('users')->where('role', 'user')->update(['role' => 'usuario']);
 
-        // Change default value for the column
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('role')->default('usuario')->change();
-        });
+            // Change default value for the column
+            Schema::table('users', function (Blueprint $table) {
+                $table->string('role')->default('usuario')->change();
+            });
+        }
     }
 
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('role')->default('user')->change();
-        });
+        if (Schema::hasTable('users') && Schema::hasColumn('users', 'role')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->string('role')->default('user')->change();
+            });
+        }
     }
 };
