@@ -56,7 +56,10 @@
                             @foreach($camas as $cama)
                                 <tr class="hover:bg-gray-50 transition duration-150">
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="font-medium text-gray-900">{{ $cama->codigo }}</span>
+                                        @php
+                                            $codigoNumero = \Illuminate\Support\Str::afterLast($cama->codigo, '-');
+                                        @endphp
+                                        <span class="font-medium text-gray-900">{{ $codigoNumero !== '' ? $codigoNumero : $cama->codigo }}</span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
