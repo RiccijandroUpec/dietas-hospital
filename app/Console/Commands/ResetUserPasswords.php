@@ -13,7 +13,7 @@ class ResetUserPasswords extends Command
      *
      * @var string
      */
-    protected $signature = 'users:reset-passwords {--password=123456}';
+    protected $signature = 'users:reset-passwords {--password=123456} {--no-interaction}';
 
     /**
      * The console command description.
@@ -38,9 +38,6 @@ class ResetUserPasswords extends Command
             return 0;
         }
         
-        $bar = $this->output->createProgressBar($users->count());
-        $bar->start();
-        
         $updated = 0;
         
         foreach ($users as $user) {
@@ -51,21 +48,15 @@ class ResetUserPasswords extends Command
                 $user->save();
                 $updated++;
             } catch (\Exception $e) {
-                $this->error("\nError al actualizar usuario {$user->email}: " . $e->getMessage());
+                $this->error("Error al actualizar usuario {$user->email}: " . $e->getMessage());
             }
-            
-            $bar->advance();
         }
         
-        $bar->finish();
-        
-        $this->newLine(2);
         $this->info("✓ {$updated} usuarios actualizados correctamente.");
         $this->info("Contraseña por defecto: {$password}");
         
-        // Crear un usuario admin si no existe
-        if (!User::where('role', 'admin')->exists()) {
-            $this->newLine();
+        // Crear un usuario admin si no existe (solo si no estamos en modo no-interactivo)
+        if (!User::where('role', 'admin')->exists() && !$this->option('no-interaction')) {
             if ($this->confirm('¿Deseas crear un usuario administrador?', true)) {
                 $name = $this->ask('Nombre del administrador', 'Administrador');
                 $email = $this->ask('Email del administrador', 'admin@hospital.com');
