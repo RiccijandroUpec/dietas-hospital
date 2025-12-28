@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cama;
 use App\Models\Servicio;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class ServicioController extends Controller
 {
@@ -45,10 +48,46 @@ class ServicioController extends Controller
         $data = $request->validate([
             'nombre' => 'required|string|max:255|unique:servicios,nombre',
             'descripcion' => 'nullable|string|max:1000',
+            'cantidad_camas' => 'nullable|integer|min:0|max:500',
         ]);
 
-        Servicio::create($data);
-        return redirect()->route('servicios.index')->with('success', 'Servicio creado.');
+        $cantidadCamas = (int) ($data['cantidad_camas'] ?? 0);
+
+        $servicio = DB::transaction(function () use ($data, $cantidadCamas) {
+            $servicio = Servicio::create([
+                'nombre' => $data['nombre'],
+                'descripcion' => $data['descripcion'] ?? null,
+            ]);
+
+            if ($cantidadCamas > 0) {
+                $prefix = strtoupper(Str::slug($servicio->nombre, '_'));
+                $prefix = $prefix !== '' ? $prefix : 'SERVICIO_' . $servicio->id;
+
+                $start = Cama::where('servicio_id', $servicio->id)->count() + 1;
+
+                for ($i = 0; $i < $cantidadCamas; $i++) {
+                    $counter = $start + $i;
+                    $codigo = $prefix . '-' . str_pad($counter, 3, '0', STR_PAD_LEFT);
+
+                    // Garantiza unicidad global del código de cama
+                    while (Cama::where('codigo', $codigo)->exists()) {
+                        $counter++;
+                        $codigo = $prefix . '-' . str_pad($counter, 3, '0', STR_PAD_LEFT);
+                    }
+
+                    Cama::create([
+                        'codigo' => $codigo,
+                        'servicio_id' => $servicio->id,
+                    ]);
+                }
+            }
+
+            return $servicio;
+        });
+
+        return redirect()
+            ->route('servicios.index')
+            ->with('success', "Servicio creado con {$cantidadCamas} cama(s).");
     }
 
     public function show(Servicio $servicio)
