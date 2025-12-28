@@ -103,3 +103,23 @@ Artisan::command('users:fix-password-hashes', function () {
 
     $this->info("Total de contraseñas reparadas: {$fixed}");
 })->purpose('Repara hashes de contraseñas inválidas en la tabla users');
+
+Artisan::command('users:create-test', function () {
+    $this->info('Creando usuario de prueba...');
+
+    $email = 'test@example.com';
+    
+    // Elimina usuario anterior si existe
+    User::where('email', $email)->delete();
+    
+    User::create([
+        'name' => 'Test User',
+        'email' => $email,
+        'password' => Hash::make('password'),
+        'role' => 'usuario',
+        'email_verified_at' => now(),
+    ]);
+    
+    $this->info("Usuario creado: {$email}");
+    $this->info("Contraseña: password");
+})->purpose('Crea un usuario de prueba con contraseña hasheada correctamente');

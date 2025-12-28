@@ -23,9 +23,13 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        // Use static values instead of fake() to avoid issues in some environments
+        static $counter = 0;
+        $counter++;
+        
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
+            'name' => 'Test User ' . $counter,
+            'email' => 'test' . $counter . '@example.com',
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'role' => 'usuario',
