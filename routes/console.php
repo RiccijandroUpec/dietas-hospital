@@ -3,7 +3,9 @@
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use App\Models\Cama;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
@@ -73,3 +75,31 @@ Artisan::command('camas:delete-all {--force}', function () {
 
     $this->info("Camas eliminadas: {$total}");
 })->purpose('Elimina todas las camas (y dependencias en cascada)');
+
+Artisan::command('users:fix-password-hashes', function () {
+    $this->info('Verificando y reparando contraseñas con hash inválido...');
+
+    $fixed = 0;
+    $users = User::all();
+
+    foreach ($users as $user) {
+        // Intenta verificar que el hash sea válido
+        try {
+            // Si el hash no comienza con $2, $2y, $2a, $2b, no es un hash Bcrypt válido
+            if (!preg_match('/^\$2[aby]\$/', $user->password)) {
+                $this->warn("Usuario {$user->id} ({$user->email}): contraseña sin hashear o formato inválido");
+                
+                // Asumimos que la contraseña es 'password' si está en texto plano
+                // (alternativa: pedir al usuario que resetee su contraseña)
+                $user->password = Hash::make('password');
+                $user->save();
+                $fixed++;
+                $this->info("  → Reparado: contraseña reseteada a 'password'");
+            }
+        } catch (\Exception $e) {
+            $this->error("Error al procesar usuario {$user->id}: {$e->getMessage()}");
+        }
+    }
+
+    $this->info("Total de contraseñas reparadas: {$fixed}");
+})->purpose('Repara hashes de contraseñas inválidas en la tabla users');
