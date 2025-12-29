@@ -37,8 +37,8 @@
                             </select>
                         </div>
                         <div class="flex items-end gap-2">
-                            <button type="submit" class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition">🔍 Filtrar</button>
-                            <a href="{{ route('registro-dietas.reporte') }}" class="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-md text-sm font-medium transition">↺ Limpiar</a>
+                            <button type="submit" class="flex-1 px-5 py-2.5 bg-blue-300 text-blue-900 rounded-lg hover:bg-blue-400 transition font-semibold shadow-md text-sm">🔍 Filtrar</button>
+                            <a href="{{ route('registro-dietas.reporte') }}" class="px-5 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition text-sm font-medium">↺ Limpiar</a>
                         </div>
                     </div>
                 </form>

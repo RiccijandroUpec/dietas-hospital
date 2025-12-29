@@ -73,6 +73,8 @@
                                             <div class="flex justify-center gap-2">
                                                 @if(auth()->user()->role === 'admin' || auth()->user()->role === 'nutricionista')
                                                     <a href="{{ route('tipos-dieta.edit', $tipo) }}" class="px-3 py-1 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded text-xs font-medium transition">✏️ Editar</a>
+                                                @endif
+                                                @if(auth()->user()->role === 'admin' || auth()->user()->role === 'administrador')
                                                     <form action="{{ route('tipos-dieta.destroy', $tipo) }}" method="POST" class="inline-block" onsubmit="return confirm('¿Eliminar este tipo de dieta?')">
                                                         @csrf
                                                         @method('DELETE')

@@ -75,7 +75,7 @@
 
                         <div class="pt-4">
                             <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md">Actualizar</button>
-                            <a href="{{ route('pacientes.index') }}" class="ml-2 text-gray-600">Cancelar</a>
+                                <a href="{{ route('pacientes.index') }}" class="ml-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-100 px-4 py-2">Cancelar</a>
                         </div>
                     </div>
                 </form>

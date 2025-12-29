@@ -7,6 +7,7 @@ use App\Models\Paciente;
 use App\Models\Dieta;
 use App\Models\Servicio;
 use App\Models\Cama;
+use App\Services\AuditService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -222,6 +223,10 @@ class RegistroDietaController extends Controller
             'updated_by' => \Auth::id(),
         ]);
         $registro->dietas()->sync($data['dieta_id']);
+        
+        // Registrar auditoría
+        AuditService::log('create', "Registro de dieta creado para {$paciente->nombre} {$paciente->apellido} - {$data['tipo_comida']}", 'RegistroDieta', $registro->id);
+        
         return redirect()->route('registro-dietas.index')->with('success', 'Registro de dieta creado.');
     }
 
@@ -269,11 +274,25 @@ class RegistroDietaController extends Controller
             'updated_by' => \Auth::id(),
         ]);
         $registro_dieta->dietas()->sync($data['dieta_id']);
+        
+        // Registrar auditoría
+        $paciente = Paciente::find($data['paciente_id']);
+        AuditService::log('update', "Registro de dieta actualizado para {$paciente->nombre} {$paciente->apellido}", 'RegistroDieta', $registro_dieta->id);
+        
         return redirect()->route('registro-dietas.index')->with('success', 'Registro de dieta actualizado.');
     }
 
     public function destroy(RegistroDieta $registro_dieta)
     {
+        // Solo administradores pueden eliminar registros
+        if (auth()->user()->role !== 'administrador') {
+            return redirect()->route('registro-dietas.index')->with('error', 'No tienes permiso para eliminar registros.');
+        }
+
+        // Registrar auditoría antes de eliminar
+        $paciente = $registro_dieta->paciente;
+        AuditService::log('delete', "Registro de dieta eliminado para {$paciente->nombre} {$paciente->apellido}", 'RegistroDieta', $registro_dieta->id);
+
         $registro_dieta->delete();
         return redirect()->route('registro-dietas.index')->with('success', 'Registro de dieta eliminado.');
     }

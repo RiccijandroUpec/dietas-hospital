@@ -49,12 +49,29 @@
                             <input type="date" name="fecha" value="{{ old('fecha', $registroRefrigerio->fecha) }}" class="w-full border rounded-lg px-3 py-2" required>
                         </div>
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-1">Momento</label>
-                            <select name="momento" class="w-full border rounded-lg px-3 py-2" required>
-                                @foreach($momentos as $m)
-                                    <option value="{{ $m }}" @selected(old('momento', $registroRefrigerio->momento)==$m)>{{ ucfirst($m) }}</option>
-                                @endforeach
-                            </select>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Momentos del día</label>
+                            <div class="space-y-2 bg-gray-50 p-3 rounded-lg border">
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="checkbox" name="momentos[]" value="mañana" 
+                                        class="w-4 h-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
+                                        @if(in_array('mañana', (array)old('momentos', [$registroRefrigerio->momento]))) checked @endif>
+                                    <span class="ml-3 text-gray-900 text-sm">🌅 Mañana</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="checkbox" name="momentos[]" value="tarde" 
+                                        class="w-4 h-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
+                                        @if(in_array('tarde', (array)old('momentos', [$registroRefrigerio->momento]))) checked @endif>
+                                    <span class="ml-3 text-gray-900 text-sm">🌞 Tarde</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="checkbox" name="momentos[]" value="noche" 
+                                        class="w-4 h-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
+                                        @if(in_array('noche', (array)old('momentos', [$registroRefrigerio->momento]))) checked @endif>
+                                    <span class="ml-3 text-gray-900 text-sm">🌙 Noche</span>
+                                </label>
+                            </div>
+                            @error('momentos')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
+                            @error('momentos.*')<p class="text-sm text-red-600 mt-1">{{ $message }}</p>@enderror
                         </div>
                     </div>
                     <div class="mb-4">

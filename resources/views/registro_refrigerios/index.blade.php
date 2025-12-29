@@ -39,8 +39,9 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="flex items-end">
-                    <button class="px-4 py-2 bg-orange-600 text-white rounded-lg">Filtrar</button>
+                <div class="flex items-end gap-2">
+                    <button type="submit" class="px-5 py-2.5 bg-blue-300 text-blue-900 rounded-lg hover:bg-blue-400 transition font-semibold shadow-md">Filtrar</button>
+                    <a href="{{ route('registro-refrigerios.index') }}" class="px-5 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition">Limpiar</a>
                 </div>
             </div>
         </form>
@@ -101,6 +102,8 @@
                                         <a href="{{ route('registro-refrigerios.show', $base) }}" class="text-indigo-600 hover:text-indigo-900 font-medium">👁️ Ver</a>
                                         @if(auth()->user()->role !== 'usuario')
                                             <a href="{{ route('registro-refrigerios.edit', $base) }}" class="text-blue-600 hover:text-blue-900">✏️ Editar</a>
+                                        @endif
+                                        @if(auth()->user()->role === 'administrador')
                                             <form action="{{ route('registro-refrigerios.destroy', $base) }}" method="POST" class="inline" onsubmit="return confirm('Eliminar registro?')">
                                                 @csrf @method('DELETE')
                                                 <button class="text-red-600 hover:text-red-900">🗑️ Eliminar</button>

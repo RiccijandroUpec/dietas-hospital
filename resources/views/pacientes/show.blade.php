@@ -115,7 +115,7 @@
                     <button type="submit" class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition">🗑️ Eliminar</button>
                 </form>
             @endif
-            <a href="{{ route('pacientes.index') }}" class="px-6 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-lg font-medium transition">← Volver</a>
+            <a href="{{ route('pacientes.index') }}" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-100 transition">← Volver</a>
         </div>
     </div>
 </div>

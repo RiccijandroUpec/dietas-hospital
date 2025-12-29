@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\RegistroRefrigerio;
 use App\Models\Paciente;
 use App\Models\Refrigerio;
+use App\Services\AuditService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -87,7 +88,8 @@ class RegistroRefrigerioController extends Controller
             'refrigerio_ids' => 'required|array|min:1',
             'refrigerio_ids.*' => 'exists:refrigerios,id',
             'fecha' => 'required|date',
-            'momento' => 'required|in:mañana,tarde,noche',
+            'momentos' => 'required|array|min:1',
+            'momentos.*' => 'in:mañana,tarde,noche',
             'observacion' => 'nullable|string',
         ]);
 
@@ -96,26 +98,34 @@ class RegistroRefrigerioController extends Controller
             return back()->with('error', 'Solo pacientes hospitalizados pueden recibir refrigerios.')->withInput();
         }
         $refrigerioIds = array_unique($validated['refrigerio_ids']);
+        $momentosARegistrar = array_unique($validated['momentos']);
 
-        DB::transaction(function () use ($validated, $refrigerioIds) {
-            // Reemplazar cualquier set previo del mismo paciente/fecha/momento
-            RegistroRefrigerio::where('paciente_id', $validated['paciente_id'])
-                ->whereDate('fecha', $validated['fecha'])
-                ->where('momento', $validated['momento'])
-                ->delete();
+        DB::transaction(function () use ($validated, $refrigerioIds, $momentosARegistrar) {
+            foreach ($momentosARegistrar as $momento) {
+                // Reemplazar cualquier set previo del mismo paciente/fecha/momento
+                RegistroRefrigerio::where('paciente_id', $validated['paciente_id'])
+                    ->whereDate('fecha', $validated['fecha'])
+                    ->where('momento', $momento)
+                    ->delete();
 
-            foreach ($refrigerioIds as $refrigerio_id) {
-                RegistroRefrigerio::create([
-                    'paciente_id' => $validated['paciente_id'],
-                    'refrigerio_id' => $refrigerio_id,
-                    'fecha' => $validated['fecha'],
-                    'momento' => $validated['momento'],
-                    'observacion' => $validated['observacion'],
-                    'created_by' => auth()->id(),
-                    'updated_by' => auth()->id(),
-                ]);
+                foreach ($refrigerioIds as $refrigerio_id) {
+                    RegistroRefrigerio::create([
+                        'paciente_id' => $validated['paciente_id'],
+                        'refrigerio_id' => $refrigerio_id,
+                        'fecha' => $validated['fecha'],
+                        'momento' => $momento,
+                        'observacion' => $validated['observacion'],
+                        'created_by' => auth()->id(),
+                        'updated_by' => auth()->id(),
+                    ]);
+                }
             }
         });
+        
+        // Registrar auditoría
+        $paciente = Paciente::find($validated['paciente_id']);
+        $momentosStr = implode(', ', $momentosARegistrar);
+        AuditService::log('create', "Registro de refrigerio creado para {$paciente->nombre} {$paciente->apellido} - {$momentosStr}", 'RegistroRefrigerio', null);
         
         return redirect()->route('registro-refrigerios.index')->with('success', 'Refrigerio(s) registrado(s) exitosamente.');
     }
@@ -176,27 +186,37 @@ class RegistroRefrigerioController extends Controller
             'refrigerio_ids' => 'required|array|min:1',
             'refrigerio_ids.*' => 'exists:refrigerios,id',
             'fecha' => 'required|date',
-            'momento' => 'required|in:mañana,tarde,noche',
+            'momentos' => 'required|array|min:1',
+            'momentos.*' => 'in:mañana,tarde,noche',
             'observacion' => 'nullable|string',
         ]);
 
-        // Reemplazar todos los registros de ese paciente/fecha/momento con la nueva selección
+        $refrigerioIds = array_unique($validated['refrigerio_ids']);
+        $momentosAActualizar = array_unique($validated['momentos']);
+
+        // Reemplazar todos los registros de ese paciente/fecha con la nueva selección de momentos
         RegistroRefrigerio::where('paciente_id', $validated['paciente_id'])
             ->whereDate('fecha', $validated['fecha'])
-            ->where('momento', $validated['momento'])
+            ->whereIn('momento', ['mañana', 'tarde', 'noche'])
             ->delete();
 
-        foreach ($validated['refrigerio_ids'] as $refrigerioId) {
-            RegistroRefrigerio::create([
-                'paciente_id' => $validated['paciente_id'],
-                'refrigerio_id' => $refrigerioId,
-                'fecha' => $validated['fecha'],
-                'momento' => $validated['momento'],
-                'observacion' => $validated['observacion'],
-                'created_by' => $registroRefrigerio->created_by ?? auth()->id(),
-                'updated_by' => auth()->id(),
-            ]);
+        foreach ($momentosAActualizar as $momento) {
+            foreach ($refrigerioIds as $refrigerioId) {
+                RegistroRefrigerio::create([
+                    'paciente_id' => $validated['paciente_id'],
+                    'refrigerio_id' => $refrigerioId,
+                    'fecha' => $validated['fecha'],
+                    'momento' => $momento,
+                    'observacion' => $validated['observacion'],
+                    'created_by' => $registroRefrigerio->created_by ?? auth()->id(),
+                    'updated_by' => auth()->id(),
+                ]);
+            }
         }
+
+        // Registrar auditoría
+        $paciente = Paciente::find($validated['paciente_id']);
+        AuditService::log('update', "Registro de refrigerio actualizado para {$paciente->nombre} {$paciente->apellido}", 'RegistroRefrigerio', $registroRefrigerio->id);
 
         return redirect()->route('registro-refrigerios.index')->with('success', 'Registro actualizado correctamente.');
     }
@@ -206,6 +226,15 @@ class RegistroRefrigerioController extends Controller
      */
     public function destroy(RegistroRefrigerio $registroRefrigerio)
     {
+        // Solo administradores pueden eliminar registros
+        if (auth()->user()->role !== 'administrador') {
+            return redirect()->route('registro-refrigerios.index')->with('error', 'No tienes permiso para eliminar registros.');
+        }
+
+        // Registrar auditoría antes de eliminar
+        $paciente = $registroRefrigerio->paciente;
+        AuditService::log('delete', "Registro de refrigerio eliminado para {$paciente->nombre} {$paciente->apellido}", 'RegistroRefrigerio', $registroRefrigerio->id);
+
         $registroRefrigerio->delete();
         return redirect()->route('registro-refrigerios.index')->with('success', 'Registro eliminado.');
     }

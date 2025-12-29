@@ -128,6 +128,8 @@
                                         <a href="{{ route('pacientes.show', $paciente) }}" class="px-3 py-1 bg-indigo-100 text-indigo-700 hover:bg-indigo-200 rounded text-xs font-medium transition">👁️ Ver</a>
                                         @if(auth()->check() && auth()->user()->role !== 'usuario')
                                             <a href="{{ route('pacientes.edit', $paciente) }}" class="px-3 py-1 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded text-xs font-medium transition">✏️ Editar</a>
+                                        @endif
+                                        @if(auth()->check() && in_array(auth()->user()->role, ['administrador', 'admin']))
                                             <form action="{{ route('pacientes.destroy', $paciente) }}" method="POST" class="inline-block" onsubmit="return confirm('¿Eliminar este paciente?')">
                                                 @csrf
                                                 @method('DELETE')
@@ -173,6 +175,7 @@ const spinner = document.getElementById('searchSpinner');
 const paginationContainer = document.getElementById('paginationContainer');
 const searchUrl = "{{ route('pacientes.search') }}";
 const isUsuario = {{ auth()->user()->role === 'usuario' ? 'true' : 'false' }};
+const isAdmin = {{ in_array(auth()->user()->role, ['administrador', 'admin']) ? 'true' : 'false' }};
 
 if (searchInput && tbody) {
     searchInput.addEventListener('input', function() {
@@ -248,17 +251,20 @@ function renderRows(pacientes) {
 
         const showUrl = `/pacientes/${p.id}`;
         
+        const editBtn = (!isUsuario && p.edit_url) ? `<a href="${p.edit_url}" class="px-3 py-1 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded text-xs font-medium transition">✏️ Editar</a>` : '';
+        const deleteBtn = (isAdmin && p.delete_url) ? `
+            <form action="${p.delete_url}" method="POST" class="inline-block" onsubmit="return confirm('¿Eliminar este paciente?')">
+                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="_method" value="DELETE">
+                <button type="submit" class="px-3 py-1 bg-red-100 text-red-700 hover:bg-red-200 rounded text-xs font-medium transition">🗑️ Eliminar</button>
+            </form>
+        ` : '';
+
         const acciones = `
             <div class="flex justify-center gap-2">
                 <a href="${showUrl}" class="px-3 py-1 bg-indigo-100 text-indigo-700 hover:bg-indigo-200 rounded text-xs font-medium transition">👁️ Ver</a>
-                ${!isUsuario && p.edit_url && p.delete_url ? `
-                    <a href="${p.edit_url}" class="px-3 py-1 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded text-xs font-medium transition">✏️ Editar</a>
-                    <form action="${p.delete_url}" method="POST" class="inline-block" onsubmit="return confirm('¿Eliminar este paciente?')">
-                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                        <input type="hidden" name="_method" value="DELETE">
-                        <button type="submit" class="px-3 py-1 bg-red-100 text-red-700 hover:bg-red-200 rounded text-xs font-medium transition">🗑️ Eliminar</button>
-                    </form>
-                ` : ''}
+                ${editBtn}
+                ${deleteBtn}
             </div>
         `;
 

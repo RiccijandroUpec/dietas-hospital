@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\SubtipoDieta;
 use App\Models\TipoDieta;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class SubtipoDietaController extends Controller
 {
@@ -57,6 +58,10 @@ class SubtipoDietaController extends Controller
 
     public function destroy(SubtipoDieta $subtipo_dieta)
     {
+        if (!Auth::user() || !in_array(Auth::user()->role, ['administrador', 'admin'], true)) {
+            return redirect()->route('subtipos-dieta.index')->with('error', 'No tienes permiso para eliminar subtipos de dieta.');
+        }
+
         if ($subtipo_dieta->dietas()->count() > 0) {
             return back()->withErrors(['error' => 'No se puede eliminar el subtipo porque tiene dietas asociadas.']);
         }

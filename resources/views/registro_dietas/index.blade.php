@@ -55,8 +55,8 @@
                             <input type="date" name="fecha" value="{{ request('fecha') }}" class="w-full border-gray-300 rounded-md text-sm">
                         </div>
                         <div class="flex items-end gap-2">
-                            <button type="submit" class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm transition">🔍 Buscar</button>
-                            <a href="{{ route('registro-dietas.index') }}" class="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-md text-sm transition">↺ Limpiar</a>
+                            <button type="submit" class="flex-1 px-4 py-2 bg-blue-300 text-blue-900 rounded-md text-sm font-semibold hover:bg-blue-400 transition shadow">🔍 Buscar</button>
+                            <a href="{{ route('registro-dietas.index') }}" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md text-sm hover:bg-gray-100 transition">↺ Limpiar</a>
                         </div>
                     </div>
                 </form>
@@ -170,6 +170,8 @@
                                                 <a href="{{ route('registro-dietas.show', $r) }}" class="px-3 py-1 bg-indigo-100 text-indigo-700 hover:bg-indigo-200 rounded text-xs font-medium transition">👁️ Ver</a>
                                                 @if(auth()->user()->role !== 'usuario')
                                                     <a href="{{ route('registro-dietas.edit', $r) }}" class="px-3 py-1 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded text-xs font-medium transition">✏️ Editar</a>
+                                                @endif
+                                                @if(auth()->user()->role === 'administrador')
                                                     <form action="{{ route('registro-dietas.destroy', $r) }}" method="POST" class="inline-block" onsubmit="return confirm('¿Eliminar este registro?')">
                                                         @csrf
                                                         @method('DELETE')

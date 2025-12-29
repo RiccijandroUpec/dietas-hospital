@@ -111,6 +111,8 @@
         <div class="flex gap-2">
             @if(auth()->user()->role !== 'usuario')
                 <a href="{{ route('registro-dietas.edit', $registro) }}" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition">✏️ Editar Registro</a>
+            @endif
+            @if(auth()->user()->role === 'administrador')
                 <form action="{{ route('registro-dietas.destroy', $registro) }}" method="POST" onsubmit="return confirm('¿Eliminar este registro?')">
                     @csrf @method('DELETE')
                     <button type="submit" class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition">🗑️ Eliminar</button>

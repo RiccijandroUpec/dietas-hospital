@@ -82,7 +82,7 @@
         </div>
 
         <div class="mt-8 pt-6 border-t text-center text-sm text-gray-600">
-            <p>&copy; {{ now()->year }} {{ config('app.name') }}. Desarrollado por {{ config('app.developer.name') }}.</p>
+            <p>&copy; {{ now()->year }} {{ config('app.name') }}. Desarrollado por @riccijandro.</p>
         </div>
     </div>
 </footer>

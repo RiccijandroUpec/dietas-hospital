@@ -244,6 +244,19 @@
                                 <p class="text-sm text-gray-600">Administrar refrigerios disponibles</p>
                             </div>
                         </a>
+
+                        <!-- Historial de Auditoría (admin) -->
+                        <a href="{{ route('audits.index') }}" class="group flex items-center p-4 bg-gradient-to-r from-red-50 to-red-100 rounded-lg hover:from-red-100 hover:to-red-200 transition border-l-4 border-red-600">
+                            <div class="bg-red-600 rounded-lg p-3 group-hover:scale-110 transition">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <p class="font-semibold text-gray-800">Historial de Auditoría</p>
+                                <p class="text-sm text-gray-600">Ver registro de actividades del sistema</p>
+                            </div>
+                        </a>
                         @endif
                     </div>
                 </div>

@@ -20,39 +20,184 @@
         @endif
     </head>
     <body class="bg-[#FDFDFC] dark:bg-[#0a0a0a] text-[#1b1b18] flex p-0 min-h-screen flex-col">
-        <header class="w-full">
-            <nav class="flex items-center justify-end gap-4 p-6">
-                @if (Route::has('login'))
-                    @auth
-                        <a href="{{ url('/dashboard') }}" class="inline-block px-5 py-1.5 text-white bg-blue-700 rounded shadow hover:bg-blue-800">Panel principal</a>
-                    @else
-                        <a href="{{ route('login') }}" class="inline-block px-5 py-1.5 text-white bg-blue-700 rounded shadow hover:bg-blue-800">Iniciar sesión</a>
-                        <a href="{{route('register')}}" class= "inline-block px-5 py-1.5 text-white bg-blue-700 rounded shadow hover:bg-blue-800">Registrarse</a>
-                        
-                    @endauth
-                @endif
+        <header class="w-full border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+            <nav class="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 py-4">
+                <div class="flex items-center gap-2">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+                        </svg>
+                    </div>
+                    <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">Dietas Hospitalarias</h1>
+                </div>
+                <div class="flex items-center gap-3">
+                    @if (Route::has('login'))
+                        @auth
+                            <a href="{{ url('/dashboard') }}" class="px-4 py-2 text-white bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg hover:from-blue-700 hover:to-blue-800 shadow-md transition">Panel Principal</a>
+                        @else
+                            <a href="{{ route('login') }}" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition font-medium">Iniciar Sesión</a>
+                            <a href="{{route('register')}}" class="px-4 py-2 text-white bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg hover:from-blue-700 hover:to-blue-800 shadow-md transition">Registrarse</a>
+                        @endauth
+                    @endif
+                </div>
             </nav>
         </header>
-        <main class="flex flex-col items-center justify-center flex-1 p-6">
-            <div class="max-w-2xl w-full text-center">
-                <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80" alt="Hospital" class="w-full h-64 object-cover rounded-lg shadow mb-8">
-                <h1 class="text-4xl font-bold text-blue-900 mb-4">Sistema de Dietas Hospitalarias</h1>
-                <p class="mt-4 text-lg text-gray-700 mb-6">Bienvenido al sistema de gestión de dietas para hospitales. Administra pacientes, dietas y registros de manera eficiente y profesional.</p>
-                @if (Route::has('login'))
-                    @auth
-                        <a href="{{ url('/dashboard') }}" class="inline-block px-6 py-2 text-white bg-green-600 rounded hover:bg-green-700 shadow">Ir al panel</a>
-                    @else
-                        <a href="{{ route('login') }}" class="inline-block px-6 py-2 text-white bg-green-600 rounded hover:bg-green-700 shadow">Iniciar sesión</a>
-                    @endauth
-                @endif
-            </div>
+
+        <main class="flex-1 w-full">
+            <!-- Hero Section -->
+            <section class="relative overflow-hidden bg-gradient-to-b from-blue-50 via-white to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                        <!-- Contenido -->
+                        <div class="space-y-8">
+                            <div class="space-y-4">
+                                <div class="inline-flex items-center px-3 py-1 bg-blue-100 dark:bg-blue-900 rounded-full">
+                                    <span class="text-sm font-semibold text-blue-700 dark:text-blue-300">✨ Solución Completa</span>
+                                </div>
+                                <h1 class="text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white leading-tight">
+                                    Gestión de Dietas <span class="bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">Hospitalarias</span>
+                                </h1>
+                                <p class="text-xl text-gray-600 dark:text-gray-400">
+                                    Administra pacientes, dietas y refrigerios con un sistema profesional, intuitivo y confiable. Optimiza la gestión nutricional de tu hospital.
+                                </p>
+                            </div>
+
+                            <!-- Características Principales -->
+                            <div class="space-y-3">
+                                <div class="flex items-start gap-3">
+                                    <div class="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center flex-shrink-0 mt-1">
+                                        <svg class="w-4 h-4 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    </div>
+                                    <span class="text-lg text-gray-700 dark:text-gray-300">Gestión integral de pacientes y camas</span>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <div class="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center flex-shrink-0 mt-1">
+                                        <svg class="w-4 h-4 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    </div>
+                                    <span class="text-lg text-gray-700 dark:text-gray-300">Control de dietas y refrigerios</span>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <div class="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center flex-shrink-0 mt-1">
+                                        <svg class="w-4 h-4 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    </div>
+                                    <span class="text-lg text-gray-700 dark:text-gray-300">Auditoría completa de actividades</span>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <div class="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center flex-shrink-0 mt-1">
+                                        <svg class="w-4 h-4 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    </div>
+                                    <span class="text-lg text-gray-700 dark:text-gray-300">Control de acceso basado en roles</span>
+                                </div>
+                            </div>
+
+                            <!-- Botones CTA -->
+                            <div class="flex gap-4 pt-4">
+                                @if (Route::has('login'))
+                                    @auth
+                                        <a href="{{ url('/dashboard') }}" class="px-8 py-3 text-white bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg hover:from-blue-700 hover:to-blue-800 shadow-lg transition font-semibold">Ir al Panel</a>
+                                    @else
+                                        <a href="{{ route('login') }}" class="px-8 py-3 text-white bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg hover:from-blue-700 hover:to-blue-800 shadow-lg transition font-semibold">Iniciar Sesión</a>
+                                        <a href="{{ route('register') }}" class="px-8 py-3 text-blue-600 bg-blue-100 rounded-lg hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-200 dark:hover:bg-blue-800 transition font-semibold">Crear Cuenta</a>
+                                    @endauth
+                                @endif
+                            </div>
+                        </div>
+
+                        <!-- Imagen Hero -->
+                        <div class="relative">
+                            <div class="absolute inset-0 bg-gradient-to-br from-blue-400 to-blue-600 rounded-3xl blur-3xl opacity-20"></div>
+                            <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=600&q=80" alt="Hospital" class="relative w-full rounded-3xl shadow-2xl">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Características Detalladas -->
+            <section class="bg-white dark:bg-gray-800 py-20">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="text-center mb-16">
+                        <h2 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">Características Principales</h2>
+                        <p class="text-xl text-gray-600 dark:text-gray-400">Todo lo que necesitas para gestionar dietas hospitalarias</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <!-- Feature 1 -->
+                        <div class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-gray-700 dark:to-gray-800 rounded-2xl p-8 hover:shadow-lg transition">
+                            <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mb-4">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Gestión de Pacientes</h3>
+                            <p class="text-gray-600 dark:text-gray-400">Registro y seguimiento completo de pacientes con estados de hospitalización</p>
+                        </div>
+
+                        <!-- Feature 2 -->
+                        <div class="bg-gradient-to-br from-green-50 to-green-100 dark:from-gray-700 dark:to-gray-800 rounded-2xl p-8 hover:shadow-lg transition">
+                            <div class="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center mb-4">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Control de Dietas</h3>
+                            <p class="text-gray-600 dark:text-gray-400">Asigna y administra dietas personalizadas para cada paciente</p>
+                        </div>
+
+                        <!-- Feature 3 -->
+                        <div class="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-gray-700 dark:to-gray-800 rounded-2xl p-8 hover:shadow-lg transition">
+                            <div class="w-12 h-12 bg-orange-600 rounded-xl flex items-center justify-center mb-4">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Refrigerios</h3>
+                            <p class="text-gray-600 dark:text-gray-400">Registra refrigerios en múltiples momentos del día</p>
+                        </div>
+
+                        <!-- Feature 4 -->
+                        <div class="bg-gradient-to-br from-red-50 to-red-100 dark:from-gray-700 dark:to-gray-800 rounded-2xl p-8 hover:shadow-lg transition">
+                            <div class="w-12 h-12 bg-red-600 rounded-xl flex items-center justify-center mb-4">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Auditoría</h3>
+                            <p class="text-gray-600 dark:text-gray-400">Registro completo de todas las acciones del sistema</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CTA Final -->
+            <section class="bg-gradient-to-r from-blue-600 to-blue-800 py-16">
+                <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                    <h2 class="text-4xl font-bold text-white mb-4">¿Listo para comenzar?</h2>
+                    <p class="text-xl text-blue-100 mb-8">Accede al sistema y empieza a gestionar dietas hospitalarias de manera profesional</p>
+                    @if (Route::has('login'))
+                        @guest
+                            <div class="flex gap-4 justify-center">
+                                <a href="{{ route('login') }}" class="px-8 py-3 bg-white text-blue-600 rounded-lg hover:bg-gray-100 shadow-lg transition font-semibold">Iniciar Sesión</a>
+                                <a href="{{ route('register') }}" class="px-8 py-3 border-2 border-white text-white rounded-lg hover:bg-blue-700 transition font-semibold">Registrarse</a>
+                            </div>
+                        @endguest
+                    @endif
+                </div>
+            </section>
         </main>
 
-          
-        </div>
-
-        @if (Route::has('login'))
-            <div class="h-14.5 hidden lg:block"></div>
-        @endif
+        <!-- Footer -->
+        <footer class="bg-gray-900 dark:bg-black text-gray-400 py-8 mt-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <p>&copy; 2025 Sistema de Dietas Hospitalarias. Todos los derechos reservados.</p>
+            </div>
+        </footer>
     </body>
 </html>

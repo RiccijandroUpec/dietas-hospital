@@ -102,8 +102,8 @@
                     </div>
 
                     <div class="flex gap-2 pt-6">
-                        <button id="submit_btn" type="submit" class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md font-medium transition">✓ Guardar Paciente</button>
-                        <a href="{{ route('pacientes.index') }}" class="px-6 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-md font-medium transition">✕ Cancelar</a>
+                        <button id="submit_btn" type="submit" class="px-6 py-2 bg-blue-300 text-blue-900 rounded-md font-semibold hover:bg-blue-400 transition shadow">✓ Guardar Paciente</button>
+                        <a href="{{ route('pacientes.index') }}" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-md font-medium hover:bg-gray-100 transition">✕ Cancelar</a>
                     </div>
                 </form>
 

@@ -37,7 +37,7 @@
         </div>
 
         <div class="flex items-center gap-4 pt-4 border-t border-gray-200">
-            <button type="submit" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md font-medium transition">
+            <button type="submit" class="px-5 py-2.5 bg-blue-300 text-blue-900 rounded-lg hover:bg-blue-400 transition font-semibold shadow-md">
                 🔐 Actualizar contraseña
             </button>
 

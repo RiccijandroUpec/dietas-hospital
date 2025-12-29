@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Paciente;
 use App\Models\Servicio;
 use App\Models\Cama;
+use App\Services\AuditService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -25,8 +26,17 @@ class PacienteController extends Controller
     {
         $estado = $request->input('estado');
         $servicio_id = $request->input('servicio_id');
+        $search = trim((string) $request->input('q', ''));
 
         $query = Paciente::with(['servicio', 'cama', 'createdBy', 'updatedBy']);
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('nombre', 'like', "%{$search}%")
+                  ->orWhere('apellido', 'like', "%{$search}%")
+                  ->orWhere('cedula', 'like', "%{$search}%");
+            });
+        }
 
         if ($estado && \Schema::hasColumn('pacientes', 'estado')) {
             $query->where('estado', $estado);
@@ -35,7 +45,7 @@ class PacienteController extends Controller
             $query->where('servicio_id', $servicio_id);
         }
 
-        $pacientes = $query->orderBy('nombre')->paginate(25);
+        $pacientes = $query->orderBy('nombre')->paginate(25)->withQueryString();
         $servicios = Servicio::orderBy('nombre')->get();
 
         // Contar pacientes por estado (con verificación de columna)
@@ -99,6 +109,9 @@ class PacienteController extends Controller
         $limit = (int) ($request->query('limit', 50));
         $limit = $limit > 0 && $limit <= 50 ? $limit : 50;
 
+        $estado = $request->query('estado');
+        $servicioId = $request->query('servicio_id');
+
         $query = Paciente::query()->with(['servicio', 'cama'])->select('*');
         if ($q !== '') {
             $query->where(function ($sub) use ($q) {
@@ -106,6 +119,14 @@ class PacienteController extends Controller
                     ->orWhere('apellido', 'like', "%$q%")
                     ->orWhere('cedula', 'like', "%$q%");
             });
+        }
+
+        if ($estado) {
+            $query->where('estado', $estado);
+        }
+
+        if ($servicioId) {
+            $query->where('servicio_id', $servicioId);
         }
 
         // Por defecto prioriza hospitalizados (si la columna existe)
@@ -130,7 +151,7 @@ class PacienteController extends Controller
                     'servicio' => $p->servicio ? $p->servicio->nombre : null,
                     'cama' => $p->cama ? $p->cama->codigo : null,
                     'edit_url' => auth()->user()->role !== 'usuario' ? route('pacientes.edit', $p) : null,
-                    'delete_url' => auth()->user()->role !== 'usuario' ? route('pacientes.destroy', $p) : null,
+                    'delete_url' => in_array(auth()->user()->role, ['administrador', 'admin'], true) ? route('pacientes.destroy', $p) : null,
                 ];
             })
         ]);
@@ -193,6 +214,10 @@ class PacienteController extends Controller
         }
 
         Paciente::create($data);
+        
+        // Registrar auditoría
+        AuditService::log('create', "Paciente creado: {$data['nombre']} {$data['apellido']}", 'Paciente', null);
+        
         return redirect()->route('pacientes.index')->with('success', 'Paciente creado.');
     }
 
@@ -223,11 +248,14 @@ class PacienteController extends Controller
             'cama_id' => 'nullable|exists:camas,id',
         ]);
 
-        // Verificar que la cama no esté ocupada por otro paciente
-        if (!empty($data['cama_id'])) {
-            $exists = Paciente::where('cama_id', $data['cama_id'])->where('id', '!=', $paciente->id)->exists();
-            if ($exists) {
-                return back()->withErrors(['cama_id' => 'La cama está ocupada por otro paciente.'])->withInput();
+        // Al editar un paciente, eliminar la asignación de cama
+        $data['cama_id'] = null;
+
+        // Si el estado es "alta", cambiar el servicio a "ALTA"
+        if ($data['estado'] === 'alta') {
+            $servicioAlta = Servicio::where('nombre', 'ALTA')->first();
+            if ($servicioAlta) {
+                $data['servicio_id'] = $servicioAlta->id;
             }
         }
 
@@ -245,14 +273,23 @@ class PacienteController extends Controller
         }
 
         $paciente->update($data);
+        
+        // Registrar auditoría
+        AuditService::log('update', "Paciente actualizado: {$paciente->nombre} {$paciente->apellido}", 'Paciente', $paciente->id);
+        
         return redirect()->route('pacientes.index')->with('success', 'Paciente actualizado.');
     }
 
     public function destroy(Paciente $paciente)
     {
-        if (Auth::user() && Auth::user()->role === 'usuario') {
+        if (!Auth::user() || !in_array(Auth::user()->role, ['administrador', 'admin'], true)) {
             return redirect()->route('pacientes.index')->with('error', 'No tienes permiso para eliminar pacientes.');
         }
+        
+        // Registrar auditoría antes de eliminar
+        $nombrePaciente = "{$paciente->nombre} {$paciente->apellido}";
+        AuditService::log('delete', "Paciente eliminado: {$nombrePaciente}", 'Paciente', $paciente->id);
+        
         $paciente->delete();
         return redirect()->route('pacientes.index')->with('success', 'Paciente eliminado.');
     }

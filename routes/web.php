@@ -73,6 +73,14 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('usuarios', UsuarioController::class);
 });
 
+// Auditoría (solo administradores)
+Route::middleware(['auth'])->group(function () {
+    Route::get('audits', [App\Http\Controllers\AuditController::class, 'index'])->name('audits.index');
+    Route::get('audits/{audit}', [App\Http\Controllers\AuditController::class, 'show'])->name('audits.show');
+    // Redirección para acceder con /audit (singular)
+    Route::redirect('audit', 'audits');
+});
+
 require __DIR__.'/auth.php';
 
 // Operación administrativa: eliminar todas las camas en el entorno actual
