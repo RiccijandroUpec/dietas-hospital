@@ -261,8 +261,8 @@ class PacienteController extends Controller
                 $servicio = \App\Models\Servicio::find($data['servicio_id']);
                 if ($servicio && strtolower($servicio->nombre) === 'diálisis') {
                     // Si el servicio es Diálisis, no guardar cama
-                    $data['cama_id'] = null;
-                } else if (!empty($data['cama_id'])) {
+                    unset($data['cama_id']);
+                } elseif (!empty($data['cama_id'])) {
                     // Verificar que la cama no esté ocupada por otro paciente
                     $exists = Paciente::where('cama_id', $data['cama_id'])
                         ->where('id', '!=', $paciente->id)
