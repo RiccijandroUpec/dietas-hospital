@@ -188,10 +188,10 @@ class PacienteController extends Controller
 
         // Si el servicio es Diálisis, no guardar cama
         if (!empty($data['servicio_id'])) {
-            $servicio = \App\Models\Servicio::find($data['servicio_id']);
+            $servicio = Servicio::find($data['servicio_id']);
             if ($servicio && strtolower($servicio->nombre) === 'diálisis') {
                 unset($data['cama_id']);
-            } else if (!empty($data['cama_id'])) {
+            } elseif (!empty($data['cama_id'])) {
                 $exists = Paciente::where('cama_id', $data['cama_id'])->exists();
                 if ($exists) {
                     return back()->withErrors(['cama_id' => 'La cama está ocupada.'])->withInput();
@@ -258,7 +258,7 @@ class PacienteController extends Controller
         } else {
             // Si el estado es "hospitalizado", validar y guardar la cama del servicio
             if (!empty($data['servicio_id'])) {
-                $servicio = \App\Models\Servicio::find($data['servicio_id']);
+                $servicio = Servicio::find($data['servicio_id']);
                 if ($servicio && strtolower($servicio->nombre) === 'diálisis') {
                     // Si el servicio es Diálisis, no guardar cama
                     unset($data['cama_id']);
