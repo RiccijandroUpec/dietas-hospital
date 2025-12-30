@@ -248,14 +248,29 @@ class PacienteController extends Controller
             'cama_id' => 'nullable|exists:camas,id',
         ]);
 
-        // Al editar un paciente, eliminar la asignación de cama
-        $data['cama_id'] = null;
-
-        // Si el estado es "alta", cambiar el servicio a "ALTA"
+        // Si el estado es "alta", limpiar la cama y cambiar el servicio a "ALTA"
         if ($data['estado'] === 'alta') {
+            $data['cama_id'] = null;
             $servicioAlta = Servicio::where('nombre', 'ALTA')->first();
             if ($servicioAlta) {
                 $data['servicio_id'] = $servicioAlta->id;
+            }
+        } else {
+            // Si el estado es "hospitalizado", validar y guardar la cama del servicio
+            if (!empty($data['servicio_id'])) {
+                $servicio = \App\Models\Servicio::find($data['servicio_id']);
+                if ($servicio && strtolower($servicio->nombre) === 'diálisis') {
+                    // Si el servicio es Diálisis, no guardar cama
+                    $data['cama_id'] = null;
+                } else if (!empty($data['cama_id'])) {
+                    // Verificar que la cama no esté ocupada por otro paciente
+                    $exists = Paciente::where('cama_id', $data['cama_id'])
+                        ->where('id', '!=', $paciente->id)
+                        ->exists();
+                    if ($exists) {
+                        return back()->withErrors(['cama_id' => 'La cama está ocupada.'])->withInput();
+                    }
+                }
             }
         }
 
