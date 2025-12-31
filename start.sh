@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 echo "🚀 Starting Railway deployment..."
 
@@ -29,10 +30,9 @@ php artisan view:cache
 echo "🔗 Creating storage link..."
 php artisan storage:link 2>/dev/null || echo "⚠️  Storage link already exists"
 
-# Start Nginx with PHP-FPM
 echo "🌐 Starting web server..."
 echo "✅ Deployment complete!"
 
-# Start PHP built-in server as fallback
-# In production, Railway will use Nginx, but this ensures compatibility
+# Start PHP built-in server
+# Note: This is a lightweight server suitable for Railway's containerized environment
 exec php -S 0.0.0.0:${PORT:-8080} -t public
