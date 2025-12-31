@@ -19,6 +19,25 @@ El sistema ha sido diseñado siguiendo buenas prácticas de desarrollo de softwa
 
 ---
 
+## 🚀 Deploy Rápido en Railway
+
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/)
+
+### Deploy en 5 minutos:
+
+1. Haz clic en el botón de arriba
+2. Conecta tu cuenta de GitHub
+3. Agrega PostgreSQL database
+4. Configura las variables de entorno (ver [RAILWAY.md](RAILWAY.md))
+5. ¡Listo! Railway desplegará automáticamente
+
+📚 **Guías de Despliegue:**
+- [RAILWAY.md](RAILWAY.md) - Guía rápida de 5 minutos
+- [DEPLOY.md](DEPLOY.md) - Guía completa paso a paso
+- [IMPROVEMENTS.md](IMPROVEMENTS.md) - Detalles técnicos de las mejoras
+
+---
+
 ## 🎯 Objetivo del sistema
 
 El objetivo principal del sistema es:
@@ -107,6 +126,79 @@ Cualquier persona interesada puede:
 - Integración responsable de Inteligencia Artificial  
 
 Este proyecto fue desarrollado como parte de un proceso de aprendizaje, investigación y aplicación práctica de conocimientos en desarrollo de software.
+
+---
+
+## 📦 Instalación Local
+
+### Requisitos Previos
+
+- PHP 8.2 o superior
+- Composer
+- Node.js y npm
+- MySQL o PostgreSQL
+- Git
+
+### Pasos de Instalación
+
+1. **Clonar el repositorio**
+   ```bash
+   git clone https://github.com/RiccijandroUpec/dietas-hospital.git
+   cd dietas-hospital
+   ```
+
+2. **Instalar dependencias**
+   ```bash
+   composer install
+   npm install
+   ```
+
+3. **Configurar entorno**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+
+4. **Configurar base de datos**
+   
+   Edita `.env` con tus credenciales de base de datos:
+   ```env
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=dietas_hospital
+   DB_USERNAME=tu_usuario
+   DB_PASSWORD=tu_contraseña
+   ```
+
+5. **Ejecutar migraciones y seeders**
+   ```bash
+   php artisan migrate --seed
+   ```
+
+6. **Compilar assets**
+   ```bash
+   npm run build
+   ```
+
+7. **Iniciar servidor**
+   ```bash
+   php artisan serve
+   ```
+
+   La aplicación estará disponible en `http://localhost:8000`
+
+### Usuarios por Defecto
+
+Después de ejecutar las migraciones con seeders:
+
+| Email | Contraseña | Rol |
+|-------|------------|-----|
+| admin@hospital.com | 123456 | admin |
+| nutricionista@hospital.com | 123456 | nutricionista |
+| enfermero@hospital.com | 123456 | enfermero |
+
+⚠️ **Importante:** Cambia estas contraseñas en producción.
 
 ---
 
