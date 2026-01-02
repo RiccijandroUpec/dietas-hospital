@@ -46,16 +46,22 @@
 
             /* Mejora de responsividad global */
             @media (max-width: 640px) {
-                /* Compactar tablas en móviles */
-                .overflow-x-auto table,
-                .overflow-x-auto .min-w-full,
-                .overflow-x-auto .table-auto,
-                .overflow-x-auto .w-full {
-                    font-size: 0.9rem;
+                /* Tablas compactas en móviles */
+                table {
+                    font-size: 0.75rem;
+                    width: 100%;
                 }
-                .overflow-x-auto th,
-                .overflow-x-auto td {
-                    padding: 0.5rem 0.75rem !important;
+                table th,
+                table td {
+                    padding: 0.4rem 0.5rem !important;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+                table th { font-size: 0.65rem; }
+                .overflow-x-auto {
+                    overflow-x: auto;
+                    -webkit-overflow-scrolling: touch;
                 }
                 /* Encabezados y tarjetas */
                 header .py-6 { padding-top: 1rem; padding-bottom: 1rem; }
@@ -66,35 +72,6 @@
                 .grid { gap: 0.75rem; }
                 .px-6 { padding-left: 1rem; padding-right: 1rem; }
                 .lg\:px-8 { padding-left: 1rem; padding-right: 1rem; }
-            }
-
-            /* Tablas apiladas en móvil para evitar desplazamiento horizontal */
-            @media (max-width: 768px) {
-                .stack-table { width: 100%; border-spacing: 0; }
-                .stack-table thead { display: none; }
-                .stack-table,
-                .stack-table tbody,
-                .stack-table tr,
-                .stack-table td { display: block; width: 100%; }
-                .stack-table tr {
-                    margin-bottom: 1rem;
-                    border: 1px solid #e5e7eb;
-                    border-radius: 0.75rem;
-                    background: #fff;
-                    overflow: hidden;
-                    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-                }
-                .stack-table td {
-                    padding: 0.75rem 1rem;
-                    display: flex;
-                    justify-content: space-between;
-                    gap: 1rem;
-                }
-                .stack-table td::before {
-                    content: attr(data-label);
-                    font-weight: 600;
-                    color: #374151;
-                }
             }
         </style>
     </head>

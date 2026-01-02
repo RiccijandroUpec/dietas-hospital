@@ -71,8 +71,8 @@
                 </div>
 
                 <!-- Table -->
-                <div class="w-full">
-                    <table class="w-full divide-y divide-gray-200 text-sm stack-table">
+                <div class="w-full overflow-x-auto">
+                    <table class="w-full divide-y divide-gray-200 text-sm">
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="px-4 py-3 text-left font-semibold text-gray-700">Nombre</th>
@@ -89,19 +89,19 @@
                         @if($pacientes->count() > 0)
                             @foreach($pacientes as $paciente)
                             <tr class="hover:bg-gray-50 transition">
-                                <td class="px-4 py-3 font-medium text-gray-900" data-label="Nombre">
+                                <td class="px-4 py-3 font-medium text-gray-900">
                                     {{ $paciente->nombre }} {{ $paciente->apellido }}
                                 </td>
-                                <td class="px-4 py-3 text-gray-600 font-mono text-sm" data-label="Cédula">{{ $paciente->cedula }}</td>
-                                <td class="px-4 py-3" data-label="Estado">
+                                <td class="px-4 py-3 text-gray-600 font-mono text-sm">{{ $paciente->cedula }}</td>
+                                <td class="px-4 py-3">
                                     @if($paciente->estado === 'hospitalizado')
                                         <span class="inline-block bg-blue-100 text-blue-800 rounded-full px-3 py-1 text-xs font-semibold">Hospitalizado</span>
                                     @else
                                         <span class="inline-block bg-green-100 text-green-800 rounded-full px-3 py-1 text-xs font-semibold">Alta</span>
                                     @endif
                                 </td>
-                                <td class="px-4 py-3 text-gray-600" data-label="Edad">{{ $paciente->edad ?? '–' }} años</td>
-                                <td class="px-4 py-3" data-label="Condición">
+                                <td class="px-4 py-3 text-gray-600">{{ $paciente->edad ?? '–' }} años</td>
+                                <td class="px-4 py-3">
                                     @php
                                         $cond = $paciente->condicion;
                                         $labels = [
@@ -121,9 +121,9 @@
                                         <span class="text-gray-400">–</span>
                                     @endif
                                 </td>
-                                <td class="px-4 py-3 text-gray-600" data-label="Servicio">{{ optional($paciente->servicio)->nombre ?? '–' }}</td>
-                                <td class="px-4 py-3 text-gray-600 font-mono" data-label="Cama">{{ optional($paciente->cama)->codigo ?? '–' }}</td>
-                                <td class="px-4 py-3 text-center" data-label="Acciones">
+                                <td class="px-4 py-3 text-gray-600">{{ optional($paciente->servicio)->nombre ?? '–' }}</td>
+                                <td class="px-4 py-3 text-gray-600 font-mono">{{ optional($paciente->cama)->codigo ?? '–' }}</td>
+                                <td class="px-4 py-3 text-center">
                                     <div class="flex justify-center gap-2">
                                         <a href="{{ route('pacientes.show', $paciente) }}" class="px-3 py-1 bg-indigo-100 text-indigo-700 hover:bg-indigo-200 rounded text-xs font-medium transition">👁️ Ver</a>
                                         @if(auth()->check() && auth()->user()->role !== 'usuario')
@@ -142,7 +142,7 @@
                         @endforeach
                         @else
                             <tr>
-                                <td colspan="8" class="text-center py-12" data-label="Pacientes">
+                                <td colspan="8" class="text-center py-12">
                                     <div class="text-6xl mb-4">👥</div>
                                     <h3 class="text-lg font-semibold text-gray-800 mb-2">No hay pacientes</h3>
                                     <p class="text-gray-600 mb-4">Comienza creando el primer paciente.</p>
