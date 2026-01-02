@@ -40,11 +40,20 @@ class RegistrationScheduleSeeder extends Seeder
         );
 
         \App\Models\RegistrationSchedule::updateOrCreate(
-            ['meal_type' => 'refrigerio'],
+            ['meal_type' => 'refrigerio_mañana'],
             [
                 'start_time' => '08:00',
-                'end_time' => '18:00',
-                'description' => 'Horario de refrigerio (todo el día)',
+                'end_time' => '10:00',
+                'description' => 'Horario de refrigerio en la mañana',
+            ]
+        );
+
+        \App\Models\RegistrationSchedule::updateOrCreate(
+            ['meal_type' => 'refrigerio_tarde'],
+            [
+                'start_time' => '14:00',
+                'end_time' => '16:00',
+                'description' => 'Horario de refrigerio en la tarde',
             ]
         );
     }

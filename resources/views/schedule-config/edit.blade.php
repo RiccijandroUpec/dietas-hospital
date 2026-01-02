@@ -16,14 +16,13 @@
                         @csrf
                         @method('PUT')
 
-                        @foreach(['desayuno', 'almuerzo', 'merienda', 'refrigerio'] as $meal)
+                        @foreach(['desayuno', 'almuerzo', 'merienda'] as $meal)
                             @php
                                 $schedule = $schedules[$meal] ?? null;
                                 $emoji = [
                                     'desayuno' => '🌅',
                                     'almuerzo' => '🍽️',
                                     'merienda' => '☕',
-                                    'refrigerio' => '🍊'
                                 ][$meal];
                             @endphp
                             <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 border border-blue-200">
@@ -70,6 +69,102 @@
                                 </div>
                             </div>
                         @endforeach
+
+                        <!-- Refrigerio Mañana -->
+                        @php
+                            $refrigerio_mañana = $schedules['refrigerio_mañana'] ?? null;
+                        @endphp
+                        <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-6 border border-orange-200">
+                            <h3 class="text-lg font-bold text-gray-800 mb-4">
+                                🍊 Refrigerio Mañana
+                            </h3>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <!-- Hora de inicio -->
+                                <div>
+                                    <label for="refrigerio_mañana_start" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Hora de inicio
+                                    </label>
+                                    <input 
+                                        type="time"
+                                        name="refrigerio_mañana_start"
+                                        id="refrigerio_mañana_start"
+                                        value="{{ $refrigerio_mañana ? $refrigerio_mañana->start_time->format('H:i') : '' }}"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition"
+                                        required
+                                    >
+                                    @error("refrigerio_mañana_start")
+                                        <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <!-- Hora de fin -->
+                                <div>
+                                    <label for="refrigerio_mañana_end" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Hora de fin
+                                    </label>
+                                    <input 
+                                        type="time"
+                                        name="refrigerio_mañana_end"
+                                        id="refrigerio_mañana_end"
+                                        value="{{ $refrigerio_mañana ? $refrigerio_mañana->end_time->format('H:i') : '' }}"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition"
+                                        required
+                                    >
+                                    @error("refrigerio_mañana_end")
+                                        <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Refrigerio Tarde -->
+                        @php
+                            $refrigerio_tarde = $schedules['refrigerio_tarde'] ?? null;
+                        @endphp
+                        <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-lg p-6 border border-yellow-200">
+                            <h3 class="text-lg font-bold text-gray-800 mb-4">
+                                🍋 Refrigerio Tarde
+                            </h3>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <!-- Hora de inicio -->
+                                <div>
+                                    <label for="refrigerio_tarde_start" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Hora de inicio
+                                    </label>
+                                    <input 
+                                        type="time"
+                                        name="refrigerio_tarde_start"
+                                        id="refrigerio_tarde_start"
+                                        value="{{ $refrigerio_tarde ? $refrigerio_tarde->start_time->format('H:i') : '' }}"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition"
+                                        required
+                                    >
+                                    @error("refrigerio_tarde_start")
+                                        <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <!-- Hora de fin -->
+                                <div>
+                                    <label for="refrigerio_tarde_end" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Hora de fin
+                                    </label>
+                                    <input 
+                                        type="time"
+                                        name="refrigerio_tarde_end"
+                                        id="refrigerio_tarde_end"
+                                        value="{{ $refrigerio_tarde ? $refrigerio_tarde->end_time->format('H:i') : '' }}"
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition"
+                                        required
+                                    >
+                                    @error("refrigerio_tarde_end")
+                                        <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
 
                         <!-- Botones -->
                         <div class="flex gap-4">

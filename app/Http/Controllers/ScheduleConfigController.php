@@ -28,7 +28,7 @@ class ScheduleConfigController extends Controller
     public function edit()
     {
         $schedules = RegistrationSchedule::all()->keyBy('meal_type');
-        $mealTypes = ['desayuno', 'almuerzo', 'merienda', 'refrigerio'];
+        $mealTypes = ['desayuno', 'almuerzo', 'merienda', 'refrigerio_mañana', 'refrigerio_tarde'];
         return view('schedule-config.edit', compact('schedules', 'mealTypes'));
     }
 
@@ -44,11 +44,13 @@ class ScheduleConfigController extends Controller
             'almuerzo_end' => 'required|date_format:H:i|after:almuerzo_start',
             'merienda_start' => 'required|date_format:H:i',
             'merienda_end' => 'required|date_format:H:i|after:merienda_start',
-            'refrigerio_start' => 'required|date_format:H:i',
-            'refrigerio_end' => 'required|date_format:H:i|after:refrigerio_start',
+            'refrigerio_mañana_start' => 'required|date_format:H:i',
+            'refrigerio_mañana_end' => 'required|date_format:H:i|after:refrigerio_mañana_start',
+            'refrigerio_tarde_start' => 'required|date_format:H:i',
+            'refrigerio_tarde_end' => 'required|date_format:H:i|after:refrigerio_tarde_start',
         ]);
 
-        $mealTypes = ['desayuno', 'almuerzo', 'merienda', 'refrigerio'];
+        $mealTypes = ['desayuno', 'almuerzo', 'merienda', 'refrigerio_mañana', 'refrigerio_tarde'];
         
         foreach ($mealTypes as $meal) {
             RegistrationSchedule::updateOrCreate(

@@ -26,14 +26,13 @@
 
                     <!-- Horarios actuales -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        @foreach(['desayuno', 'almuerzo', 'merienda', 'refrigerio'] as $meal)
+                        @foreach(['desayuno', 'almuerzo', 'merienda'] as $meal)
                             @php
                                 $schedule = $schedules[$meal] ?? null;
                                 $emoji = [
                                     'desayuno' => '🌅',
                                     'almuerzo' => '🍽️',
                                     'merienda' => '☕',
-                                    'refrigerio' => '🍊'
                                 ][$meal];
                             @endphp
                             <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 border border-blue-200">
@@ -56,6 +55,54 @@
                                 @endif
                             </div>
                         @endforeach
+
+                        <!-- Refrigerio Mañana -->
+                        @php
+                            $refrigerio_mañana = $schedules['refrigerio_mañana'] ?? null;
+                        @endphp
+                        <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-6 border border-orange-200">
+                            <h3 class="text-lg font-bold text-gray-800 mb-4">
+                                🍊 Refrigerio Mañana
+                            </h3>
+                            @if($refrigerio_mañana)
+                                <div class="space-y-2">
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">Inicio:</span>
+                                        <span class="font-mono font-bold text-orange-600">{{ $refrigerio_mañana->start_time->format('H:i') }}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">Fin:</span>
+                                        <span class="font-mono font-bold text-orange-600">{{ $refrigerio_mañana->end_time->format('H:i') }}</span>
+                                    </div>
+                                </div>
+                            @else
+                                <p class="text-gray-500 italic">No configurado</p>
+                            @endif
+                        </div>
+
+                        <!-- Refrigerio Tarde -->
+                        @php
+                            $refrigerio_tarde = $schedules['refrigerio_tarde'] ?? null;
+                        @endphp
+                        <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-lg p-6 border border-yellow-200">
+                            <h3 class="text-lg font-bold text-gray-800 mb-4">
+                                🍋 Refrigerio Tarde
+                            </h3>
+                            @if($refrigerio_tarde)
+                                <div class="space-y-2">
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">Inicio:</span>
+                                        <span class="font-mono font-bold text-yellow-600">{{ $refrigerio_tarde->start_time->format('H:i') }}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">Fin:</span>
+                                        <span class="font-mono font-bold text-yellow-600">{{ $refrigerio_tarde->end_time->format('H:i') }}</span>
+                                    </div>
+                                </div>
+                            @else
+                                <p class="text-gray-500 italic">No configurado</p>
+                            @endif
+                        </div>
                     </div>
 
                     <!-- Botón editar -->

@@ -90,16 +90,19 @@ class RegistroRefrigerioController extends Controller
             'refrigerio_ids.*' => 'exists:refrigerios,id',
             'fecha' => 'required|date',
             'momentos' => 'required|array|min:1',
-            'momentos.*' => 'in:mañana,tarde,noche',
+            'momentos.*' => 'in:mañana,tarde',
             'observacion' => 'nullable|string',
         ]);
 
-        // Validar horario de registro para refrigerio
-        $schedule = RegistrationSchedule::getByMealType('refrigerio');
-        if ($schedule && !$schedule->isCurrentTimeAllowed()) {
-            $startTime = $schedule->start_time->format('H:i');
-            $endTime = $schedule->end_time->format('H:i');
-            return back()->with('error', "Registro de refrigerio fuera de horario. Permitido: {$startTime} - {$endTime}")->withInput();
+        // Validar horario de registro para refrigerio según el momento
+        foreach ($validated['momentos'] as $momento) {
+            $mealType = $momento === 'mañana' ? 'refrigerio_mañana' : 'refrigerio_tarde';
+            $schedule = RegistrationSchedule::getByMealType($mealType);
+            if ($schedule && !$schedule->isCurrentTimeAllowed()) {
+                $startTime = $schedule->start_time->format('H:i');
+                $endTime = $schedule->end_time->format('H:i');
+                return back()->with('error', "Refrigerio {$momento} fuera de horario. Permitido: {$startTime} - {$endTime}")->withInput();
+            }
         }
 
         $paciente = Paciente::findOrFail($validated['paciente_id']);
