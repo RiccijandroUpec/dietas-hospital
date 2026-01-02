@@ -113,6 +113,10 @@ document.addEventListener('DOMContentLoaded', function () {
             servicioWrapper.style.display = 'block';
             camaWrapper.style.display = 'block';
             servicioSelect.setAttribute('required', 'required');
+            // Si hay un servicio seleccionado, cargar sus camas
+            if (servicioSelect.value) {
+                loadCamas(servicioSelect.value, currentCama ? parseInt(currentCama) : null);
+            }
         }
     }
 
