@@ -62,11 +62,13 @@ class PacienteController extends Controller
         return view('pacientes.reporte', compact('pacientes', 'servicios', 'totales'));
     }
 
-    // Devuelve camas disponibles para un servicio (no asignadas a pacientes)
+    // Devuelve camas disponibles para un servicio (no asignadas a pacientes hospitalizados)
     public function availableCamas($servicioId)
     {
         $camas = Cama::where('servicio_id', $servicioId)
-            ->whereDoesntHave('pacientes')
+            ->whereDoesntHave('pacientes', function($query) {
+                $query->where('estado', 'hospitalizado');
+            })
             ->get(['id', 'codigo']);
 
         return response()->json($camas);
@@ -258,16 +260,17 @@ class PacienteController extends Controller
         if ($data['estado'] === 'alta') {
             $data['servicio_id'] = null;
             $data['cama_id'] = null;
-        }
-
-        // Al editar un paciente, eliminar la asignación de cama
-        $data['cama_id'] = null;
-
-        // Si el estado es "alta", cambiar el servicio a "ALTA"
-        if ($data['estado'] === 'alta') {
-            $servicioAlta = Servicio::where('nombre', 'ALTA')->first();
-            if ($servicioAlta) {
-                $data['servicio_id'] = $servicioAlta->id;
+        } else {
+            // Si está hospitalizado, validar que no se asigne una cama ocupada por otro paciente
+            if (!empty($data['cama_id'])) {
+                $camaOcupada = Paciente::where('cama_id', $data['cama_id'])
+                    ->where('id', '!=', $paciente->id)
+                    ->where('estado', 'hospitalizado')
+                    ->exists();
+                
+                if ($camaOcupada) {
+                    return back()->withErrors(['cama_id' => 'La cama está ocupada por otro paciente.'])->withInput();
+                }
             }
         }
 
