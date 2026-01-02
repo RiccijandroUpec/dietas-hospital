@@ -210,8 +210,10 @@
 
         <!-- Main Content -->
         <main class="flex-1 overflow-auto">
-            {{ $slot ?? '' }}
-            @yield('content')
+            <div class="px-4 sm:px-0">
+                {{ $slot ?? '' }}
+                @yield('content')
+            </div>
         </main>
     </div>
 </div>
