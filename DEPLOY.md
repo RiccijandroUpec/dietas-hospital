@@ -10,7 +10,7 @@ Este error ocurre cuando las contraseñas en la base de datos no están correcta
 
 Se han creado las siguientes herramientas:
 
-1. **Comando Artisan**: `users:reset-passwords`
+1. **Comando Artisan**: `users:reset-passwords` (solo reseta en primer deploy)
 2. **Seeder**: `UsersSeeder`
 
 ## 🚀 Pasos para Despliegue en Railway
@@ -44,11 +44,15 @@ CACHE_STORE=database
 QUEUE_CONNECTION=database
 ```
 
-### 2. Después del Deploy
+### 2. Después del Deploy (Primer Deploy)
 
-Una vez que Railway haya desplegado tu aplicación, necesitas ejecutar comandos para configurar usuarios:
+Una vez que Railway haya desplegado tu aplicación por primera vez, el comando `users:reset-passwords` se ejecutará automáticamente y reseteará todas las contraseñas.
 
-#### Opción A: Desde Railway CLI
+**✓ Nota**: En los próximos deploys, las contraseñas NO serán reseteadas automáticamente. Se creará un marcador (`.deploy-initialized`) que evita resetear contraseñas en futuras actualizaciones.
+
+#### Si necesitas resetear contraseñas nuevamente
+
+Para resetear contraseñas manualmente en Railway (después del primer deploy):
 
 ```bash
 # Instalar Railway CLI si no lo tienes
@@ -60,31 +64,13 @@ railway login
 # Conectar al proyecto
 railway link
 
-# Ejecutar comando para resetear contraseñas
-railway run php artisan users:reset-passwords
-
-# O ejecutar el seeder de usuarios
-railway run php artisan db:seed --class=UsersSeeder
-```
-
-#### Opción B: Agregar al comando de inicio
-
-Edita el archivo `railway.json` para incluir el seeder en el deploy:
-
-```json
-{
-  "build": {
-    "builder": "nixpacks"
-  },
-  "deploy": {
-    "startCommand": "php artisan config:clear && php artisan cache:clear && php artisan view:clear && php artisan route:clear && php artisan migrate --force && php artisan db:seed --class=UsersSeeder --force && php artisan config:cache && php artisan route:cache && php -S 0.0.0.0:${PORT:-8080} -t public"
-  }
-}
+# Resetear contraseñas con force flag
+railway run php artisan users:reset-passwords --force
 ```
 
 ### 3. Usuarios Creados
 
-Después de ejecutar el seeder, tendrás estos usuarios disponibles:
+Después del primer deploy, tendrás estos usuarios disponibles:
 
 | Email | Contraseña | Rol |
 |-------|------------|-----|
@@ -111,6 +97,12 @@ Con contraseña personalizada:
 php artisan users:reset-passwords --password=micontraseña
 ```
 
+Si necesitas forzar un reset (por ejemplo, después de múltiples deploys locales):
+
+```bash
+php artisan users:reset-passwords --force
+```
+
 ### Crear Usuarios Iniciales
 
 ```bash
@@ -129,8 +121,21 @@ php artisan migrate:fresh --seed
 2. **Sesiones en Producción**: Usar `SESSION_DRIVER=database` con `SESSION_SECURE_COOKIE=true`
 3. **HTTPS Obligatorio**: Railway provee HTTPS automáticamente
 4. **APP_KEY**: Debe estar configurada (se genera con `php artisan key:generate`)
+5. **Marcador de Deploy**: El archivo `app/.deploy-initialized` controla el reset automático (no se trackea en git)
 
 ## 🐛 Solución de Problemas
+
+### Las contraseñas se resetan en cada deploy
+
+Este problema ha sido solucionado. El comando ahora solo reseta en el primer deploy. Si quieres resetear de nuevo:
+
+```bash
+# En desarrollo
+php artisan users:reset-passwords --force
+
+# En producción (Railway)
+railway run php artisan users:reset-passwords --force
+```
 
 ### Error: "This password does not use the Bcrypt algorithm"
 
@@ -149,7 +154,7 @@ Verificar que estas variables estén configuradas:
 ### No puedo iniciar sesión después del deploy
 
 1. Verifica que las migraciones se hayan ejecutado
-2. Ejecuta el seeder de usuarios
+2. Ejecuta el seeder de usuarios si es necesario
 3. Limpia la caché del navegador
 4. Verifica que la URL en `APP_URL` sea correcta
 
@@ -157,7 +162,7 @@ Verificar que estas variables estén configuradas:
 
 ```bash
 git add .
-git commit -m "Fix: Passwords y sesiones para producción"
+git commit -m "Fix: Las contraseñas solo se resetan en primer deploy"
 git push origin main
 ```
 

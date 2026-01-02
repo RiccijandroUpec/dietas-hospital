@@ -13,20 +13,34 @@ class ResetUserPasswords extends Command
      *
      * @var string
      */
-    protected $signature = 'users:reset-passwords {--password=123456}';
+    protected $signature = 'users:reset-passwords {--password=123456} {--force}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Resetea todas las contraseñas de usuarios a una contraseña segura hasheada con Bcrypt';
+    protected $description = 'Resetea todas las contraseñas de usuarios a una contraseña segura hasheada con Bcrypt (solo en primer deploy)';
 
     /**
      * Execute the console command.
      */
     public function handle()
     {
+        // Archivo para rastrear si ya se hizo el primer deploy
+        $deployMarkerFile = 'app/.deploy-initialized';
+        $hasBeenDeployed = file_exists(base_path($deployMarkerFile));
+        $force = $this->option('force');
+
+        // Si ya se hizo el deploy y no se usa --force, salir
+        if ($hasBeenDeployed && !$force) {
+            if (!$this->option('quiet')) {
+                $this->info('✓ Sistema ya fue inicializado. Las contraseñas no serán reseteadas.');
+                $this->info('  Usa --force para resetear todas las contraseñas.');
+            }
+            return 0;
+        }
+
         $password = $this->option('password');
         
         if (!$this->option('quiet')) {
@@ -54,9 +68,16 @@ class ResetUserPasswords extends Command
             }
         }
         
+        // Crear archivo marcador para indicar que el deploy ya se inicializó
+        if (!file_exists(base_path('app'))) {
+            mkdir(base_path('app'), 0755, true);
+        }
+        file_put_contents(base_path($deployMarkerFile), date('Y-m-d H:i:s'));
+
         if (!$this->option('quiet')) {
             $this->info("✓ {$updated} usuarios actualizados correctamente.");
             $this->info("Contraseña por defecto: {$password}");
+            $this->info("Sistema inicializado. El próximo deploy no reseteará las contraseñas.");
         }
         
         return 0;
