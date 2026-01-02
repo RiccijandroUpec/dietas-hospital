@@ -67,6 +67,35 @@
                 .px-6 { padding-left: 1rem; padding-right: 1rem; }
                 .lg\:px-8 { padding-left: 1rem; padding-right: 1rem; }
             }
+
+            /* Tablas apiladas en móvil para evitar desplazamiento horizontal */
+            @media (max-width: 768px) {
+                .stack-table { width: 100%; border-spacing: 0; }
+                .stack-table thead { display: none; }
+                .stack-table,
+                .stack-table tbody,
+                .stack-table tr,
+                .stack-table td { display: block; width: 100%; }
+                .stack-table tr {
+                    margin-bottom: 1rem;
+                    border: 1px solid #e5e7eb;
+                    border-radius: 0.75rem;
+                    background: #fff;
+                    overflow: hidden;
+                    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+                }
+                .stack-table td {
+                    padding: 0.75rem 1rem;
+                    display: flex;
+                    justify-content: space-between;
+                    gap: 1rem;
+                }
+                .stack-table td::before {
+                    content: attr(data-label);
+                    font-weight: 600;
+                    color: #374151;
+                }
+            }
         </style>
     </head>
     <body class="font-sans antialiased">
