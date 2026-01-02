@@ -182,9 +182,15 @@ class PacienteController extends Controller
             'edad' => 'nullable|integer|min:0',
             'condicion' => 'nullable|array',
             'condicion.*' => 'in:normal,diabetico,hiposodico',
-            'servicio_id' => 'nullable|exists:servicios,id',
+            'servicio_id' => $request->estado === 'hospitalizado' ? 'required|exists:servicios,id' : 'nullable|exists:servicios,id',
             'cama_id' => 'nullable|exists:camas,id',
         ]);
+
+        // Si está de alta, limpiar servicio y cama
+        if ($data['estado'] === 'alta') {
+            $data['servicio_id'] = null;
+            $data['cama_id'] = null;
+        }
 
         // Si el servicio es Diálisis, no guardar cama
         if (!empty($data['servicio_id'])) {
@@ -244,9 +250,15 @@ class PacienteController extends Controller
             'edad' => 'nullable|integer|min:0',
             'condicion' => 'nullable|array',
             'condicion.*' => 'in:normal,diabetico,hiposodico',
-            'servicio_id' => 'nullable|exists:servicios,id',
+            'servicio_id' => $request->estado === 'hospitalizado' ? 'required|exists:servicios,id' : 'nullable|exists:servicios,id',
             'cama_id' => 'nullable|exists:camas,id',
         ]);
+
+        // Si está de alta, limpiar servicio y cama
+        if ($data['estado'] === 'alta') {
+            $data['servicio_id'] = null;
+            $data['cama_id'] = null;
+        }
 
         // Al editar un paciente, eliminar la asignación de cama
         $data['cama_id'] = null;

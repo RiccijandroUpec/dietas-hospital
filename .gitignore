@@ -23,3 +23,7 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 app/.deploy-initialized
+
+# Database backups
+*.sql
+backup*.sql

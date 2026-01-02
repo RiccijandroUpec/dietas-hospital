@@ -44,7 +44,7 @@
                         <!-- Estado -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">🏥 Estado</label>
-                            <select name="estado" class="w-full border-gray-300 rounded-md">
+                            <select id="estado_select" name="estado" class="w-full border-gray-300 rounded-md">
                                 <option value="hospitalizado" @if(old('estado', 'hospitalizado') == 'hospitalizado') selected @endif>Hospitalizado</option>
                                 <option value="alta" @if(old('estado') == 'alta') selected @endif>Alta</option>
                             </select>
@@ -59,9 +59,11 @@
                         </div>
 
                         <!-- Servicio -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">🏢 Servicio</label>
-                            <select id="servicio_select" name="servicio_id" class="w-full border-gray-300 rounded-md">
+                        <div id="servicio_wrapper">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                🏢 Servicio <span class="text-red-500" id="servicio_required">*</span>
+                            </label>
+                            <select id="servicio_select" name="servicio_id" class="w-full border-gray-300 rounded-md" required>
                                 <option value="">-- Seleccione --</option>
                                 @foreach($servicios as $servicio)
                                     <option value="{{ $servicio->id }}" @if(old('servicio_id') == $servicio->id) selected @endif>{{ $servicio->nombre }}</option>
@@ -71,7 +73,7 @@
                         </div>
 
                         <!-- Cama -->
-                        <div>
+                        <div id="cama_wrapper">
                             <label class="block text-sm font-medium text-gray-700 mb-1">🛏️ Cama</label>
                             <select id="cama_select" name="cama_id" class="w-full border-gray-300 rounded-md" disabled>
                                 <option value="">-- Seleccione servicio primero --</option>
@@ -113,11 +115,32 @@
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    const estadoSelect = document.getElementById('estado_select');
     const servicioSelect = document.getElementById('servicio_select');
     const camaSelect = document.getElementById('cama_select');
+    const servicioWrapper = document.getElementById('servicio_wrapper');
+    const camaWrapper = document.getElementById('cama_wrapper');
     const cedulaInput = document.getElementById('cedula_input');
     const cedulaFeedback = document.getElementById('cedula_feedback');
     const submitBtn = document.getElementById('submit_btn');
+
+    function toggleServicioCama() {
+        const estado = estadoSelect.value;
+        if (estado === 'alta') {
+            servicioWrapper.style.display = 'none';
+            camaWrapper.style.display = 'none';
+            servicioSelect.value = '';
+            camaSelect.value = '';
+            servicioSelect.removeAttribute('required');
+        } else {
+            servicioWrapper.style.display = 'block';
+            camaWrapper.style.display = 'block';
+            servicioSelect.setAttribute('required', 'required');
+        }
+    }
+
+    estadoSelect.addEventListener('change', toggleServicioCama);
+    toggleServicioCama(); // Ejecutar al cargar
 
     async function loadCamas(servicioId, selectedId = null) {
         camaSelect.innerHTML = '';
