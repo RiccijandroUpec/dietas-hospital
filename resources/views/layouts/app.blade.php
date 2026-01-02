@@ -18,6 +18,9 @@
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6769013572390921"
              crossorigin="anonymous"></script>
         <style>
+            /* Alpine.js cloak */
+            [x-cloak] { display: none !important; }
+            
             /* Forzar que el texto blanco se muestre en negro */
             .text-white, .dark .text-white {
                 color: #000 !important;
