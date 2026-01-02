@@ -63,12 +63,12 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7 4h10a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2z" />
                         </svg>
                         <span :class="!sidebarOpen && 'lg:hidden'" class="text-sm font-medium flex-1 text-left">Registros</span>
-                        <svg :class="registrosOpen && 'rotate-180'" class="h-4 w-4 transition-transform" :class="!sidebarOpen && 'hidden'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg :class="registrosOpen && 'rotate-180'" class="h-4 w-4 transition-transform" :class="!sidebarOpen && 'lg:hidden'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                         </svg>
                     </button>
 
-                    <div x-show="registrosOpen" class="pl-8 mt-1 space-y-1" :class="!sidebarOpen && 'hidden'">
+                    <div x-show="registrosOpen" class="pl-8 mt-1 space-y-1" :class="!sidebarOpen && 'lg:hidden'">
                         <a href="{{ route('registro-dietas.index') }}" class="flex items-center px-4 py-2 rounded-lg text-sm transition-all {{ request()->routeIs('registro-dietas.index') ? 'bg-blue-600 text-white' : 'text-blue-100 hover:bg-blue-700' }}">
                             <svg class="h-4 w-4 me-2 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7 4h10a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2z" />
@@ -106,12 +106,12 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
                         <span :class="!sidebarOpen && 'lg:hidden'" class="text-sm font-medium flex-1 text-left">Administración</span>
-                        <svg :class="adminOpen && 'rotate-180'" class="h-4 w-4 transition-transform" :class="!sidebarOpen && 'hidden'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg :class="adminOpen && 'rotate-180'" class="h-4 w-4 transition-transform" :class="!sidebarOpen && 'lg:hidden'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                         </svg>
                     </button>
 
-                    <div x-show="adminOpen" class="pl-8 mt-1 space-y-1" :class="!sidebarOpen && 'hidden'">
+                    <div x-show="adminOpen" class="pl-8 mt-1 space-y-1" :class="!sidebarOpen && 'lg:hidden'">
                         <a href="{{ route('usuarios.index') }}" class="flex items-center px-4 py-2 rounded-lg text-sm transition-all {{ request()->routeIs('usuarios.*') ? 'bg-blue-600 text-white' : 'text-blue-100 hover:bg-blue-700' }}">
                             <svg class="h-4 w-4 me-2 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 8.048M12 12H8m4 0h4m-2-2v4m5.5-10.5a1 1 0 11-2 0 1 1 0 012 0z" />
@@ -166,13 +166,13 @@
                     <svg class="h-5 w-5 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2m0 0a4 4 0 004 4h8a4 4 0 004-4m-2-2a4 4 0 00-8 0" />
                     </svg>
-                    <span :class="!sidebarOpen && 'hidden'" class="text-sm font-medium ms-3 flex-1 text-left truncate">{{ Auth::user()->name }}</span>
+                    <span :class="!sidebarOpen && 'lg:hidden'" class="text-sm font-medium ms-3 flex-1 text-left truncate">{{ Auth::user()->name }}</span>
                     <svg :class="userOpen && 'rotate-180'" class="h-4 w-4 transition-transform" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                     </svg>
                 </button>
 
-                <div x-show="userOpen" class="pl-8 mt-1 space-y-1" :class="!sidebarOpen && 'hidden'">
+                <div x-show="userOpen" class="pl-8 mt-1 space-y-1" :class="!sidebarOpen && 'lg:hidden'">
                     <a href="{{ route('profile.edit') }}" class="flex items-center px-4 py-2 rounded-lg text-sm text-blue-100 hover:bg-blue-700 transition-all">
                         <svg class="h-4 w-4 me-2 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
