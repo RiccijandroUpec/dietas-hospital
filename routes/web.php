@@ -81,6 +81,13 @@ Route::middleware(['auth'])->group(function () {
     Route::redirect('audit', 'audits');
 });
 
+// Configuración de horarios (solo administradores)
+Route::middleware(['auth'])->group(function () {
+    Route::get('schedule-config', [App\Http\Controllers\ScheduleConfigController::class, 'index'])->name('schedule-config.index');
+    Route::get('schedule-config/edit', [App\Http\Controllers\ScheduleConfigController::class, 'edit'])->name('schedule-config.edit');
+    Route::put('schedule-config', [App\Http\Controllers\ScheduleConfigController::class, 'update'])->name('schedule-config.update');
+});
+
 require __DIR__.'/auth.php';
 
 // Operación administrativa: eliminar todas las camas en el entorno actual

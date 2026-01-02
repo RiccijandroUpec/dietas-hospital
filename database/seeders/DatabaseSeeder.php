@@ -20,5 +20,8 @@ class DatabaseSeeder extends Seeder
 
         // Seed servicios and camas
         $this->call(\Database\Seeders\ServiciosCamasSeeder::class);
+
+        // Seed registration schedules
+        $this->call(\Database\Seeders\RegistrationScheduleSeeder::class);
     }
 }

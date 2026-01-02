@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\RegistroRefrigerio;
 use App\Models\Paciente;
 use App\Models\Refrigerio;
+use App\Models\RegistrationSchedule;
 use App\Services\AuditService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -92,6 +93,14 @@ class RegistroRefrigerioController extends Controller
             'momentos.*' => 'in:mañana,tarde,noche',
             'observacion' => 'nullable|string',
         ]);
+
+        // Validar horario de registro para refrigerio
+        $schedule = RegistrationSchedule::getByMealType('refrigerio');
+        if ($schedule && !$schedule->isCurrentTimeAllowed()) {
+            $startTime = $schedule->start_time->format('H:i');
+            $endTime = $schedule->end_time->format('H:i');
+            return back()->with('error', "Registro de refrigerio fuera de horario. Permitido: {$startTime} - {$endTime}")->withInput();
+        }
 
         $paciente = Paciente::findOrFail($validated['paciente_id']);
         if (\Schema::hasColumn('pacientes', 'estado') && $paciente->estado !== 'hospitalizado') {

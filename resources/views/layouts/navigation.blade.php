@@ -136,6 +136,12 @@
                             </svg>
                             Config. Dietas
                         </a>
+                        <a href="{{ route('schedule-config.index') }}" class="flex items-center px-4 py-2 rounded-lg text-sm transition-all {{ request()->routeIs('schedule-config.*') ? 'bg-blue-600 text-white' : 'text-blue-100 hover:bg-blue-700' }}">
+                            <svg class="h-4 w-4 me-2 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Horarios
+                        </a>
                     </div>
                 </div>
             @elseif(auth()->check() && auth()->user()->role === 'nutricionista')
