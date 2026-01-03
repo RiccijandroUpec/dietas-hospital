@@ -7,7 +7,7 @@ use App\Models\Cama;
 use App\Models\Paciente;
 use Illuminate\Http\Request;
 
-class CamasController extends Controller
+class CamasGraficaController extends Controller
 {
     public function index(Request $request)
     {
