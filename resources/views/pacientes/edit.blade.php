@@ -58,10 +58,15 @@
                                 $saved = old('condicion', isset($paciente->condicion) ? explode(',', $paciente->condicion) : []);
                                 $saved = is_array($saved) ? $saved : [$saved];
                             @endphp
-                            <div class="mt-1 space-x-4">
-                                <label><input type="checkbox" name="condicion[]" value="normal" @if(in_array('normal', $saved)) checked @endif> Normal</label>
-                                <label><input type="checkbox" name="condicion[]" value="diabetico" @if(in_array('diabetico', $saved)) checked @endif> Diabético</label>
-                                <label><input type="checkbox" name="condicion[]" value="hiposodico" @if(in_array('hiposodico', $saved)) checked @endif> Hiposódico</label>
+                            <div class="mt-2 grid grid-cols-2 gap-3 p-3 bg-gray-50 rounded-md border border-gray-200">
+                                <label class="inline-flex items-center p-2 bg-white rounded border border-gray-300 hover:border-blue-500 cursor-pointer transition">
+                                    <input type="checkbox" name="condicion[]" value="diabetico" @if(in_array('diabetico', $saved)) checked @endif>
+                                    <span class="ml-2 text-sm font-medium">Diabético</span>
+                                </label>
+                                <label class="inline-flex items-center p-2 bg-white rounded border border-gray-300 hover:border-blue-500 cursor-pointer transition">
+                                    <input type="checkbox" name="condicion[]" value="hiposodico" @if(in_array('hiposodico', $saved)) checked @endif>
+                                    <span class="ml-2 text-sm font-medium">Hiposódico</span>
+                                </label>
                             </div>
                         </div>
 

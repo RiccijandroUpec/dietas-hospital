@@ -113,11 +113,7 @@
                         <div class="md:col-span-2">
                             <label class="block text-sm font-medium text-gray-700 mb-2">⚕️ Condición Médica</label>
                             @php $oldCond = old('condicion', []); @endphp
-                            <div class="grid grid-cols-3 gap-3 p-3 bg-gray-50 rounded-md border border-gray-200">
-                                <label class="inline-flex items-center p-2 bg-white rounded border border-gray-300 hover:border-blue-500 cursor-pointer transition">
-                                    <input type="checkbox" name="condicion[]" value="normal" @if(in_array('normal', (array)$oldCond)) checked @endif>
-                                    <span class="ml-2 text-sm font-medium">Normal</span>
-                                </label>
+                            <div class="grid grid-cols-2 gap-3 p-3 bg-gray-50 rounded-md border border-gray-200">
                                 <label class="inline-flex items-center p-2 bg-white rounded border border-gray-300 hover:border-blue-500 cursor-pointer transition">
                                     <input type="checkbox" name="condicion[]" value="diabetico" @if(in_array('diabetico', (array)$oldCond)) checked @endif>
                                     <span class="ml-2 text-sm font-medium">Diabético</span>
