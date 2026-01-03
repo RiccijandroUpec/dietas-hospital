@@ -98,25 +98,38 @@
             <!-- Estadísticas Rápidas -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                 <!-- Pacientes: Hospitalizados vs Total -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg hover:shadow-lg transition">
+                <div class="bg-gradient-to-br from-green-50 to-emerald-50 overflow-hidden shadow-sm sm:rounded-lg hover:shadow-lg transition border-l-4 border-green-500">
                     <div class="p-6">
                         <div class="flex items-center justify-between">
-                            <div>
+                            <div class="flex-1">
                                 <p class="text-sm font-medium text-gray-600">Pacientes Hospitalizados</p>
-                                <p class="text-4xl font-bold text-green-600 mt-2">
-                                    {{ \App\Models\Paciente::where('estado', 'hospitalizado')->count() }}
-                                </p>
-                                <div class="flex gap-3 mt-3 flex-col">
-                                    <p class="text-xs text-gray-600 font-medium">
-                                        📊 Total: <span class="font-bold text-blue-600">{{ \App\Models\Paciente::count() }}</span>
-                                    </p>
-                                    <p class="text-xs text-gray-500">
-                                        🔵 {{ \App\Models\Paciente::where('estado', 'alta')->count() }} de alta
-                                    </p>
+                                <div class="mt-3 space-y-3">
+                                    <!-- Hospitalizados (Destacado) -->
+                                    <div class="bg-white rounded-lg p-3 border-2 border-green-300 shadow">
+                                        <p class="text-xs font-bold text-green-600 uppercase tracking-wide">🏥 Hospitalizados</p>
+                                        <p class="text-4xl font-bold text-green-600 mt-1">
+                                            {{ \App\Models\Paciente::where('estado', 'hospitalizado')->count() }}
+                                        </p>
+                                    </div>
+                                    <!-- Desglose -->
+                                    <div class="grid grid-cols-2 gap-2 mt-2">
+                                        <div class="bg-blue-50 rounded p-2 border border-blue-200">
+                                            <p class="text-xs font-bold text-blue-700">📊 Total</p>
+                                            <p class="text-2xl font-bold text-blue-600 mt-0.5">
+                                                {{ \App\Models\Paciente::count() }}
+                                            </p>
+                                        </div>
+                                        <div class="bg-purple-50 rounded p-2 border border-purple-200">
+                                            <p class="text-xs font-bold text-purple-700">✓ De Alta</p>
+                                            <p class="text-2xl font-bold text-purple-600 mt-0.5">
+                                                {{ \App\Models\Paciente::where('estado', 'alta')->count() }}
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="bg-green-100 rounded-full p-3">
-                                <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="bg-green-100 rounded-full p-4 flex-shrink-0">
+                                <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                                 </svg>
                             </div>
@@ -125,20 +138,29 @@
                 </div>
 
                 <!-- Registros de Dieta -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg hover:shadow-lg transition">
+                <div class="bg-gradient-to-br from-pink-50 to-rose-50 overflow-hidden shadow-sm sm:rounded-lg hover:shadow-lg transition border-l-4 border-pink-500">
                     <div class="p-6">
                         <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm font-medium text-gray-600">Registros Dieta</p>
-                                <p class="text-3xl font-bold text-pink-600 mt-2">
-                                    {{ \App\Models\RegistroDieta::count() }}
-                                </p>
-                                <p class="text-xs text-gray-500 mt-2">
-                                    {{ \App\Models\RegistroDieta::whereDate('created_at', today())->count() }} hoy
-                                </p>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-600">Registros de Dieta</p>
+                                <div class="mt-3 space-y-3">
+                                    <!-- Registros de Hoy (Destacado) -->
+                                    <div class="bg-white rounded-lg p-3 border-2 border-pink-300 shadow">
+                                        <p class="text-xs font-bold text-pink-600 uppercase tracking-wide">📅 Registros Hoy</p>
+                                        <p class="text-4xl font-bold text-pink-600 mt-1">
+                                            {{ \App\Models\RegistroDieta::whereDate('created_at', today())->count() }}
+                                        </p>
+                                    </div>
+                                    <!-- Total General -->
+                                    <p class="text-xs text-gray-600 font-medium">
+                                        <span class="inline-block bg-pink-100 text-pink-800 px-3 py-1 rounded-full text-sm font-bold">
+                                            📊 Total: {{ \App\Models\RegistroDieta::count() }}
+                                        </span>
+                                    </p>
+                                </div>
                             </div>
-                            <div class="bg-pink-100 rounded-full p-3">
-                                <svg class="w-8 h-8 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="bg-pink-100 rounded-full p-4 flex-shrink-0">
+                                <svg class="w-10 h-10 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
                                 </svg>
                             </div>
@@ -146,21 +168,46 @@
                     </div>
                 </div>
 
-                <!-- Servicios -->
-                @if(auth()->user()->role === 'admin')
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg hover:shadow-lg transition">
+                <!-- Registros de Refrigerios -->
+                <div class="bg-gradient-to-br from-orange-50 to-amber-50 overflow-hidden shadow-sm sm:rounded-lg hover:shadow-lg transition border-l-4 border-orange-500">
                     <div class="p-6">
                         <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm font-medium text-gray-600">Servicios</p>
-                                <p class="text-3xl font-bold text-green-600 mt-2">
-                                    {{ \App\Models\Servicio::count() }}
-                                </p>
-                                <p class="text-xs text-gray-500 mt-2">Activos</p>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-600">Registros de Refrigerios</p>
+                                <div class="mt-3 space-y-2">
+                                    <!-- Registros de Hoy (Destacado) -->
+                                    <div class="bg-white rounded-lg p-3 border-2 border-orange-300 shadow">
+                                        <p class="text-xs font-bold text-orange-600 uppercase tracking-wide">📅 Registros Hoy</p>
+                                        <p class="text-4xl font-bold text-orange-600 mt-1">
+                                            {{ \App\Models\RegistroRefrigerio::whereDate('created_at', today())->count() }}
+                                        </p>
+                                    </div>
+                                    <!-- Desglose por turno -->
+                                    <div class="grid grid-cols-3 gap-2 mt-2">
+                                        <div class="bg-yellow-50 rounded p-2 border border-yellow-200">
+                                            <p class="text-xs font-bold text-yellow-700">🌅 Mañana</p>
+                                            <p class="text-2xl font-bold text-yellow-600 mt-0.5">
+                                                {{ \App\Models\RegistroRefrigerio::whereDate('created_at', today())->where('momento', 'mañana')->count() }}
+                                            </p>
+                                        </div>
+                                        <div class="bg-orange-50 rounded p-2 border border-orange-200">
+                                            <p class="text-xs font-bold text-orange-700">☀️ Tarde</p>
+                                            <p class="text-2xl font-bold text-orange-600 mt-0.5">
+                                                {{ \App\Models\RegistroRefrigerio::whereDate('created_at', today())->where('momento', 'tarde')->count() }}
+                                            </p>
+                                        </div>
+                                        <div class="bg-indigo-50 rounded p-2 border border-indigo-200">
+                                            <p class="text-xs font-bold text-indigo-700">🌙 Noche</p>
+                                            <p class="text-2xl font-bold text-indigo-600 mt-0.5">
+                                                {{ \App\Models\RegistroRefrigerio::whereDate('created_at', today())->where('momento', 'noche')->count() }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="bg-green-100 rounded-full p-3">
-                                <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                            <div class="bg-orange-100 rounded-full p-4 flex-shrink-0">
+                                <svg class="w-10 h-10 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
                             </div>
                         </div>
@@ -168,38 +215,48 @@
                 </div>
 
                 <!-- Camas -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg hover:shadow-lg transition">
+                @if(auth()->user()->role === 'admin')
+                <div class="bg-gradient-to-br from-blue-50 to-cyan-50 overflow-hidden shadow-sm sm:rounded-lg hover:shadow-lg transition border-l-4 border-blue-500">
                     <div class="p-6">
                         <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm font-medium text-gray-600">Camas</p>
-                                <p class="text-3xl font-bold text-yellow-600 mt-2">
-                                    {{ \App\Models\Cama::count() }}
-                                </p>
-                                <p class="text-xs text-gray-500 mt-2">Total disponibles</p>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-gray-600">Estado de Camas</p>
+                                <div class="mt-3 space-y-3">
+                                    <!-- Total de Camas -->
+                                    <div class="bg-white rounded-lg p-3 border-2 border-blue-300 shadow">
+                                        <p class="text-xs font-bold text-blue-600 uppercase tracking-wide">🛏️ Total</p>
+                                        <p class="text-4xl font-bold text-blue-600 mt-1">
+                                            {{ \App\Models\Cama::count() }}
+                                        </p>
+                                    </div>
+                                    <!-- Desglose Ocupadas/Vacías -->
+                                    <div class="grid grid-cols-2 gap-2 mt-2">
+                                        <div class="bg-red-50 rounded p-2 border border-red-200">
+                                            <p class="text-xs font-bold text-red-700">🔴 Ocupadas</p>
+                                            <p class="text-2xl font-bold text-red-600 mt-0.5">
+                                                @php
+                                                    $ocupadas = \App\Models\Cama::whereHas('pacientes', function($q) {
+                                                        $q->where('estado', 'hospitalizado');
+                                                    })->count();
+                                                @endphp
+                                                {{ $ocupadas }}
+                                            </p>
+                                        </div>
+                                        <div class="bg-green-50 rounded p-2 border border-green-200">
+                                            <p class="text-xs font-bold text-green-700">🟢 Vacías</p>
+                                            <p class="text-2xl font-bold text-green-600 mt-0.5">
+                                                @php
+                                                    $vacias = \App\Models\Cama::count() - $ocupadas;
+                                                @endphp
+                                                {{ $vacias }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="bg-yellow-100 rounded-full p-3">
-                                <svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="bg-blue-100 rounded-full p-4 flex-shrink-0">
+                                <svg class="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                @else
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg hover:shadow-lg transition">
-                    <div class="p-6">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm font-medium text-gray-600">Dietas</p>
-                                <p class="text-3xl font-bold text-purple-600 mt-2">
-                                    {{ \App\Models\Dieta::count() }}
-                                </p>
-                                <p class="text-xs text-gray-500 mt-2">Tipos disponibles</p>
-                            </div>
-                            <div class="bg-purple-100 rounded-full p-3">
-                                <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                                 </svg>
                             </div>
                         </div>
