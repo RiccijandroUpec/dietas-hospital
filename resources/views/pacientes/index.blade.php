@@ -317,8 +317,10 @@
 <script>
 const searchInput = document.getElementById('pacientesSearchInput');
 const tbody = document.getElementById('pacientesTbody');
+const pacientesMobile = document.getElementById('pacientesMobile');
 const spinner = document.getElementById('searchSpinner');
 const paginationContainer = document.getElementById('paginationContainer');
+const paginationContainerMobile = document.getElementById('paginationContainerMobile');
 const searchUrl = "{{ route('pacientes.search') }}";
 const isUsuario = {{ auth()->user()->role === 'usuario' ? 'true' : 'false' }};
 const isAdmin = {{ in_array(auth()->user()->role, ['administrador', 'admin']) ? 'true' : 'false' }};
@@ -371,6 +373,9 @@ function fetchPacientes(query) {
         if (paginationContainer) {
             paginationContainer.style.display = query ? 'none' : 'block';
         }
+        if (paginationContainerMobile) {
+            paginationContainerMobile.style.display = query ? 'none' : 'block';
+        }
     })
     .catch(error => {
         console.error('Error fetching pacientes:', error);
@@ -379,91 +384,201 @@ function fetchPacientes(query) {
 }
 
 function renderRows(pacientes) {
-    if (!tbody) return;
+    if (!tbody && !pacientesMobile) return;
 
     if (pacientes.length === 0) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="8" class="text-center py-8 text-gray-500">
-                    <div class="text-4xl mb-2">🔍</div>
-                    No se encontraron pacientes
-                </td>
-            </tr>
-        `;
+        if (tbody) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="8" class="text-center py-8 text-gray-500">
+                        <div class="text-4xl mb-2">🔍</div>
+                        No se encontraron pacientes
+                    </td>
+                </tr>
+            `;
+        }
+        if (pacientesMobile) {
+            pacientesMobile.innerHTML = `
+                <div class="bg-white rounded-lg shadow-md p-8 text-center">
+                    <div class="text-6xl mb-4">🔍</div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">No se encontraron pacientes</h3>
+                    <p class="text-gray-600">Intenta con otros criterios de búsqueda.</p>
+                </div>
+            `;
+        }
         return;
     }
 
-    tbody.innerHTML = pacientes.map(p => {
-        const condiciones = p.condicion ? p.condicion.split(',') : [];
-        const labels = {
-            'normal': 'Normal',
-            'diabetico': 'Diabético',
-            'hiposodico': 'Hiposódico'
-        };
-        
-        const condBadges = condiciones.length && condiciones[0] !== '' 
-            ? condiciones.map(c => {
-                const label = labels[c.trim()] || c;
-                return `<span class="inline-block bg-yellow-100 text-yellow-800 rounded-full px-2 py-0.5 text-xs font-medium">${label}</span>`;
-              }).join('')
-            : '<span class="text-gray-400">–</span>';
+    // Renderizar tabla de escritorio
+    if (tbody) {
+        tbody.innerHTML = pacientes.map(p => {
+            const condiciones = p.condicion ? p.condicion.split(',') : [];
+            const labels = {
+                'normal': 'Normal',
+                'diabetico': 'Diabético',
+                'hiposodico': 'Hiposódico'
+            };
+            
+            const condBadges = condiciones.length && condiciones[0] !== '' 
+                ? condiciones.map(c => {
+                    const label = labels[c.trim()] || c;
+                    return `<span class="inline-block bg-yellow-100 text-yellow-800 rounded-full px-2 py-0.5 text-xs font-medium">${label}</span>`;
+                  }).join('')
+                : '<span class="text-gray-400">–</span>';
 
-        const estadoBadge = p.estado === 'hospitalizado'
-            ? '<span class="inline-block bg-blue-100 text-blue-800 rounded-full px-3 py-1 text-xs font-semibold">Hospitalizado</span>'
-            : '<span class="inline-block bg-green-100 text-green-800 rounded-full px-3 py-1 text-xs font-semibold">Alta</span>';
+            const estadoBadge = p.estado === 'hospitalizado'
+                ? '<span class="inline-block bg-blue-100 text-blue-800 rounded-full px-3 py-1 text-xs font-semibold">Hospitalizado</span>'
+                : '<span class="inline-block bg-green-100 text-green-800 rounded-full px-3 py-1 text-xs font-semibold">Alta</span>';
 
-        const showUrl = `/pacientes/${p.id}`;
-        
-        const editBtn = (!isUsuario && p.edit_url) ? `<a href="${p.edit_url}" class="px-3 py-1 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded text-xs font-medium transition">✏️ Editar</a>` : '';
-        const deleteBtn = (isAdmin && p.delete_url) ? `
-            <form action="${p.delete_url}" method="POST" class="inline-block" onsubmit="return confirm('¿Eliminar este paciente?')">
-                <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                <input type="hidden" name="_method" value="DELETE">
-                <button type="submit" class="px-3 py-1 bg-red-100 text-red-700 hover:bg-red-200 rounded text-xs font-medium transition">🗑️ Eliminar</button>
-            </form>
-        ` : '';
+            const showUrl = `/pacientes/${p.id}`;
+            
+            const editBtn = (!isUsuario && p.edit_url) ? `<a href="${p.edit_url}" class="px-3 py-1 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded text-xs font-medium transition">✏️ Editar</a>` : '';
+            const deleteBtn = (isAdmin && p.delete_url) ? `
+                <form action="${p.delete_url}" method="POST" class="inline-block" onsubmit="return confirm('¿Eliminar este paciente?')">
+                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <button type="submit" class="px-3 py-1 bg-red-100 text-red-700 hover:bg-red-200 rounded text-xs font-medium transition">🗑️ Eliminar</button>
+                </form>
+            ` : '';
 
-        const acciones = `
-            <div class="flex justify-center gap-2">
-                <a href="${showUrl}" class="px-3 py-1 bg-indigo-100 text-indigo-700 hover:bg-indigo-200 rounded text-xs font-medium transition">👁️ Ver</a>
-                ${editBtn}
-                ${deleteBtn}
-            </div>
-        `;
+            const acciones = `
+                <div class="flex justify-center gap-2">
+                    <a href="${showUrl}" class="px-3 py-1 bg-indigo-100 text-indigo-700 hover:bg-indigo-200 rounded text-xs font-medium transition">👁️ Ver</a>
+                    ${editBtn}
+                    ${deleteBtn}
+                </div>
+            `;
 
-        return `
-            <tr class="hover:bg-gray-50 transition" data-estado="${p.estado}">
-                <td class="px-4 py-3 font-medium text-gray-900">${p.nombre} ${p.apellido}</td>
-                <td class="px-4 py-3 text-gray-600 font-mono text-sm">${p.cedula}</td>
-                <td class="px-4 py-3">${estadoBadge}</td>
-                <td class="px-4 py-3 text-gray-600">${p.edad || '–'} años</td>
-                <td class="px-4 py-3"><div class="flex flex-wrap gap-1">${condBadges}</div></td>
-                <td class="px-4 py-3 text-gray-600">
-                    <div class="flex flex-wrap gap-1">
-                        <span class="inline-block bg-sky-50 text-sky-800 rounded-full px-2.5 py-0.5 text-xs font-semibold">${p.servicio || '–'}</span>
-                        <span class="inline-block bg-violet-50 text-violet-800 rounded-full px-2.5 py-0.5 text-xs font-semibold font-mono">${p.cama || '–'}</span>
+            return `
+                <tr class="hover:bg-gray-50 transition" data-estado="${p.estado}">
+                    <td class="px-4 py-3 font-medium text-gray-900">${p.nombre} ${p.apellido}</td>
+                    <td class="px-4 py-3 text-gray-600 font-mono text-sm">${p.cedula}</td>
+                    <td class="px-4 py-3">${estadoBadge}</td>
+                    <td class="px-4 py-3 text-gray-600">${p.edad || '–'} años</td>
+                    <td class="px-4 py-3"><div class="flex flex-wrap gap-1">${condBadges}</div></td>
+                    <td class="px-4 py-3 text-gray-600">
+                        <div class="flex flex-wrap gap-1">
+                            <span class="inline-block bg-sky-50 text-sky-800 rounded-full px-2.5 py-0.5 text-xs font-semibold">${p.servicio || '–'}</span>
+                            <span class="inline-block bg-violet-50 text-violet-800 rounded-full px-2.5 py-0.5 text-xs font-semibold font-mono">${p.cama || '–'}</span>
+                        </div>
+                    </td>
+                    <td class="px-4 py-3 text-gray-500 text-xs">${p.updated_at_human || p.updated_at || '–'}</td>
+                    <td class="px-4 py-3 text-center">${acciones}</td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    // Renderizar tarjetas móviles
+    if (pacientesMobile) {
+        pacientesMobile.innerHTML = pacientes.map(p => {
+            const condiciones = p.condicion ? p.condicion.split(',') : [];
+            const labels = {
+                'normal': 'Normal',
+                'diabetico': 'Diabético',
+                'hiposodico': 'Hiposódico'
+            };
+            
+            const condBadges = condiciones.length && condiciones[0] !== '' 
+                ? condiciones.map(c => {
+                    const label = labels[c.trim()] || c;
+                    return `<span class="inline-block bg-yellow-100 text-yellow-800 rounded-full px-3 py-1 text-xs font-semibold">${label}</span>`;
+                  }).join('')
+                : '<span class="text-gray-400 text-sm">Sin especificar</span>';
+
+            const estadoBadge = p.estado === 'hospitalizado'
+                ? '<span class="inline-block bg-blue-100 text-blue-800 rounded-full px-3 py-1 text-xs font-semibold">Hospitalizado</span>'
+                : '<span class="inline-block bg-green-100 text-green-800 rounded-full px-3 py-1 text-xs font-semibold">Alta</span>';
+
+            const showUrl = `/pacientes/${p.id}`;
+            
+            const editBtn = (!isUsuario && p.edit_url) 
+                ? `<a href="${p.edit_url}" class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-lg rounded-lg transition" title="Editar">✏️</a>` 
+                : '';
+            
+            const deleteBtn = (isAdmin && p.delete_url) ? `
+                <form action="${p.delete_url}" method="POST" class="inline-block" onsubmit="return confirm('¿Eliminar este paciente?')">
+                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <button type="submit" style="color: white !important;" class="px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-lg rounded-lg transition" title="Eliminar">🗑️</button>
+                </form>
+            ` : '';
+
+            return `
+                <div class="bg-white rounded-lg shadow-md p-4 border-l-4 border-green-500" data-estado="${p.estado}">
+                    <div class="mb-3">
+                        <h3 class="text-lg font-bold text-gray-900 mb-1">${p.nombre} ${p.apellido}</h3>
+                        <p class="text-xs text-gray-500 font-mono">CI: ${p.cedula}</p>
                     </div>
-                </td>
-                <td class="px-4 py-3 text-gray-500 text-xs">${p.updated_at_human || p.updated_at || '–'}</td>
-                <td class="px-4 py-3 text-center">${acciones}</td>
-            </tr>
-        `;
-    }).join('');
+
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                        <div>
+                            <div class="text-xs font-semibold text-gray-500 uppercase mb-1">📊 Estado</div>
+                            ${estadoBadge}
+                        </div>
+                        <div>
+                            <div class="text-xs font-semibold text-gray-500 uppercase mb-1">🎂 Edad</div>
+                            <div class="text-sm text-gray-900">${p.edad || '–'} años</div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="text-xs font-semibold text-gray-500 uppercase mb-2">🏥 Condición</div>
+                        <div class="flex flex-wrap gap-2">${condBadges}</div>
+                    </div>
+
+                    <div class="mb-3 pb-3 border-b border-gray-100">
+                        <div class="text-xs font-semibold text-gray-500 uppercase mb-2">🛏️ Ubicación</div>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="inline-block bg-sky-100 text-sky-800 rounded-full px-3 py-1 text-xs font-semibold">${p.servicio || 'Sin servicio'}</span>
+                            <span class="inline-block bg-violet-100 text-violet-800 rounded-full px-3 py-1 text-xs font-semibold font-mono">Cama: ${p.cama || '–'}</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="text-xs font-semibold text-gray-500 uppercase mb-1">🕒 Actualizado</div>
+                        <div class="text-sm text-gray-700">${p.updated_at_human || p.updated_at || '–'}</div>
+                    </div>
+
+                    <div class="flex justify-center gap-2">
+                        <a href="${showUrl}" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-lg rounded-lg transition" title="Ver">👁️</a>
+                        ${editBtn}
+                        ${deleteBtn}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
 
     applyFilters();
 }
 
 function applyFilters() {
-    if (!tbody) return;
     const estadoValue = estadoFilter ? estadoFilter.value : '';
-    const rows = Array.from(tbody.querySelectorAll('tr[data-estado]'));
-    if (!estadoValue) {
-        rows.forEach(row => row.style.display = '');
-        return;
+    
+    // Filtrar tabla de escritorio
+    if (tbody) {
+        const rows = Array.from(tbody.querySelectorAll('tr[data-estado]'));
+        if (!estadoValue) {
+            rows.forEach(row => row.style.display = '');
+        } else {
+            rows.forEach(row => {
+                row.style.display = row.dataset.estado === estadoValue ? '' : 'none';
+            });
+        }
     }
-    rows.forEach(row => {
-        row.style.display = row.dataset.estado === estadoValue ? '' : 'none';
-    });
+    
+    // Filtrar tarjetas móviles
+    if (pacientesMobile) {
+        const cards = Array.from(pacientesMobile.querySelectorAll('div[data-estado]'));
+        if (!estadoValue) {
+            cards.forEach(card => card.style.display = '');
+        } else {
+            cards.forEach(card => {
+                card.style.display = card.dataset.estado === estadoValue ? '' : 'none';
+            });
+        }
+    }
 }
 </script>
 @endpush
