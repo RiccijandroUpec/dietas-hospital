@@ -7,6 +7,7 @@ use App\Models\Paciente;
 use App\Models\Dieta;
 use App\Models\Servicio;
 use App\Models\Cama;
+use App\Models\RegistrationSchedule;
 use App\Services\AuditService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -195,6 +196,16 @@ class RegistroDietaController extends Controller
             'es_tardia' => 'nullable|boolean',
         ]);
 
+        // Validar horario de registro
+        $schedule = RegistrationSchedule::getByMealType($data['tipo_comida']);
+        if ($schedule && !$schedule->isCurrentTimeAllowed()) {
+            $startTime = $schedule->start_time->format('H:i');
+            $endTime = $schedule->end_time->format('H:i');
+            return back()->withErrors([
+                'tipo_comida' => "Registro fuera de horario permitido. {$data['tipo_comida']}: {$startTime} - {$endTime}"
+            ])->withInput();
+        }
+
         // Validar que el paciente esté hospitalizado (si la columna existe)
         $paciente = Paciente::find($data['paciente_id']);
         if (!$paciente || (\Schema::hasColumn('pacientes', 'estado') && $paciente->estado !== 'hospitalizado')) {
@@ -285,7 +296,7 @@ class RegistroDietaController extends Controller
     public function destroy(RegistroDieta $registro_dieta)
     {
         // Solo administradores pueden eliminar registros
-        if (auth()->user()->role !== 'administrador') {
+        if (auth()->user()->role !== 'admin') {
             return redirect()->route('registro-dietas.index')->with('error', 'No tienes permiso para eliminar registros.');
         }
 
