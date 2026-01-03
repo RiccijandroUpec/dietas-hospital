@@ -74,9 +74,16 @@
                 .lg\:px-8 { padding-left: 1rem; padding-right: 1rem; }
             }
         </style>
+        @stack('styles')
     </head>
     <body class="font-sans antialiased">
         @include('layouts.navigation')
+        
+        <!-- Page Content -->
+        <main>
+            {{ $slot }}
+        </main>
+        
         {{-- Scripts adicionales inyectados desde las vistas --}}
         @stack('scripts')
     </body>

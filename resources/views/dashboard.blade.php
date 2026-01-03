@@ -466,7 +466,128 @@
             </div>
         </div>
     </div>
+    
+    <!-- Modal de Actualizaciones -->
+    <div id="modalActualizaciones" class="hidden fixed inset-0 bg-gray-900 bg-opacity-60 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
+    <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-auto animate-[slideIn_0.3s_ease-out]">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-t-2xl px-6 py-5">
+            <div class="flex justify-between items-center">
+                <h3 class="text-2xl font-bold text-white flex items-center gap-2">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    🎉 Actualizaciones del Sistema
+                </h3>
+                <button onclick="cerrarModalActualizaciones()" class="text-white hover:text-gray-200 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <p class="text-blue-100 text-sm mt-1">Novedades y mejoras recientes</p>
+        </div>
+
+        <!-- Contenido -->
+        <div class="px-6 py-6 max-h-[70vh] overflow-y-auto">
+            <!-- Aquí puedes colocar tu texto de actualizaciones -->
+            <div class="space-y-4">
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+                    <h4 class="font-bold text-blue-900 mb-2 flex items-center gap-2">
+                        <span class="text-xl">✨</span>
+                        Nueva Funcionalidad - Historial de Cambios
+                    </h4>
+                    <p class="text-blue-800 text-sm">
+                        Ahora puedes ver el historial completo de actualizaciones haciendo clic en la columna "Actualizado por" en el listado de registros de refrigerios.
+                    </p>
+                </div>
+
+                <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
+                    <h4 class="font-bold text-green-900 mb-2 flex items-center gap-2">
+                        <span class="text-xl">🔧</span>
+                        Mejoras en el Dashboard
+                    </h4>
+                    <p class="text-green-800 text-sm">
+                        Hemos mejorado la visualización de estadísticas y agregado más información en tiempo real sobre los horarios de registro disponibles.
+                    </p>
+                </div>
+
+                <div class="bg-purple-50 border-l-4 border-purple-500 p-4 rounded-r-lg">
+                    <h4 class="font-bold text-purple-900 mb-2 flex items-center gap-2">
+                        <span class="text-xl">📊</span>
+                        Reportes Mejorados
+                    </h4>
+                    <p class="text-purple-800 text-sm">
+                        Los reportes ahora incluyen información más detallada sobre quién creó y actualizó cada registro, con fechas y horas precisas.
+                    </p>
+                </div>
+
+                <!-- Agrega más secciones según necesites -->
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="bg-gray-50 px-6 py-4 rounded-b-2xl border-t flex justify-between items-center">
+            <div class="flex items-center gap-2 text-sm text-gray-600">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                <span>Actualizado: {{ now()->format('d/m/Y') }}</span>
+            </div>
+            <button onclick="cerrarModalActualizaciones()" class="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all shadow-md font-semibold">
+                Entendido
+            </button>
+        </div>
+    </div>
+    </div>
 </x-app-layout>
+
+<script>
+// Test directo - ejecutar inmediatamente
+console.log('Script cargado');
+console.log('Buscando modal...');
+const modal = document.getElementById('modalActualizaciones');
+console.log('Modal encontrado:', modal);
+
+if (modal) {
+    console.log('Mostrando modal ahora...');
+    modal.classList.remove('hidden');
+} else {
+    console.error('ERROR: Modal no encontrado en el DOM');
+}
+
+function cerrarModalActualizaciones() {
+    const fechaHoy = new Date().toDateString();
+    localStorage.setItem('actualizacionesVistaFecha', fechaHoy);
+    
+    const modal = document.getElementById('modalActualizaciones');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+}
+
+// Cerrar con Escape
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        cerrarModalActualizaciones();
+    }
+});
+</script>
+
+@push('styles')
+<style>
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>
+@endpush
 
 @push('scripts')
 <script>
