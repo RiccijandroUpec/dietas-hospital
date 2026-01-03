@@ -74,6 +74,7 @@ Route::middleware('auth')->group(function () {
 
 // ruta de usuarios 
 Route::middleware(['auth'])->group(function () {
+    Route::get('usuarios/search', [UsuarioController::class, 'search'])->name('usuarios.search');
     Route::resource('usuarios', UsuarioController::class);
 });
 

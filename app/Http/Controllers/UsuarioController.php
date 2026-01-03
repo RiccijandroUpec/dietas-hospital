@@ -98,4 +98,32 @@ class UsuarioController extends Controller
         $usuario -> delete();
         return back();
     }
+
+    /**
+     * Búsqueda en vivo de usuarios
+     */
+    public function search(Request $request)
+    {
+        $query = $request->get('q', '');
+        
+        $usuarios = User::query()
+            ->when($query, function ($q) use ($query) {
+                return $q->where('name', 'LIKE', "%{$query}%")
+                    ->orWhere('email', 'LIKE', "%{$query}%");
+            })
+            ->get();
+
+        return response()->json([
+            'usuarios' => $usuarios->map(function ($usuario) {
+                return [
+                    'id' => $usuario->id,
+                    'name' => $usuario->name,
+                    'email' => $usuario->email,
+                    'role' => $usuario->role,
+                    'edit_url' => route('usuarios.edit', $usuario->id),
+                    'delete_url' => route('usuarios.destroy', $usuario->id),
+                ];
+            })
+        ]);
+    }
 }
