@@ -152,6 +152,12 @@
                 </div>
             @elseif(auth()->check() && auth()->user()->role === 'nutricionista')
                 <div class="border-t border-blue-700 my-2"></div>
+                <a href="{{ route('camas-grafica.index') }}" class="flex items-center px-4 py-3 rounded-lg transition-all {{ request()->routeIs('camas-grafica.*') ? 'bg-blue-600 text-white' : 'text-blue-100 hover:bg-blue-700' }}">
+                    <svg class="h-5 w-5 me-3 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h7v7H3V3zm11 0h7v7h-7V3zM3 14h7v7H3v-7zm11 0h7v7h-7v-7z" />
+                    </svg>
+                    <span :class="!sidebarOpen && 'lg:hidden'" class="text-sm font-medium">📊 Camas Gráfica</span>
+                </a>
                 <a href="{{ route('tipos-dieta.index') }}" class="flex items-center px-4 py-3 rounded-lg transition-all {{ request()->routeIs('tipos-dieta.*', 'subtipos-dieta.*') ? 'bg-blue-600 text-white' : 'text-blue-100 hover:bg-blue-700' }}">
                     <svg class="h-5 w-5 me-3 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />

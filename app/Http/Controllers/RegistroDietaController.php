@@ -17,6 +17,8 @@ class RegistroDietaController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        // Solo admin puede eliminar
+        $this->middleware('admin')->only(['destroy']);
     }
 
     public function reporte(Request $request)
@@ -198,7 +200,7 @@ class RegistroDietaController extends Controller
 
         // Validar horario de registro
         $schedule = RegistrationSchedule::getByMealType($data['tipo_comida']);
-        if ($schedule && !$schedule->isCurrentTimeAllowed()) {
+        if ($schedule && !$schedule->allow_out_of_schedule && !$schedule->isCurrentTimeAllowed()) {
             $startTime = $schedule->start_time->format('H:i');
             $endTime = $schedule->end_time->format('H:i');
             return back()->withErrors([

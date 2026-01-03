@@ -103,7 +103,7 @@
                                         @if(auth()->user()->role !== 'usuario')
                                             <a href="{{ route('registro-refrigerios.edit', $base) }}" class="text-blue-600 hover:text-blue-900">✏️ Editar</a>
                                         @endif
-                                        @if(auth()->user()->role === 'administrador')
+                                        @if(auth()->user()->role === 'admin')
                                             <form action="{{ route('registro-refrigerios.destroy', $base) }}" method="POST" class="inline" onsubmit="return confirm('Eliminar registro?')">
                                                 @csrf @method('DELETE')
                                                 <button class="text-red-600 hover:text-red-900">🗑️ Eliminar</button>

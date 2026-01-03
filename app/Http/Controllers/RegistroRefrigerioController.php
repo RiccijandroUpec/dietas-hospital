@@ -12,6 +12,13 @@ use Illuminate\Support\Facades\DB;
 
 class RegistroRefrigerioController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+        // Solo admin puede eliminar
+        $this->middleware('admin')->only(['destroy']);
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -98,7 +105,7 @@ class RegistroRefrigerioController extends Controller
         foreach ($validated['momentos'] as $momento) {
             $mealType = $momento === 'mañana' ? 'refrigerio_mañana' : 'refrigerio_tarde';
             $schedule = RegistrationSchedule::getByMealType($mealType);
-            if ($schedule && !$schedule->isCurrentTimeAllowed()) {
+            if ($schedule && !$schedule->allow_out_of_schedule && !$schedule->isCurrentTimeAllowed()) {
                 $startTime = $schedule->start_time->format('H:i');
                 $endTime = $schedule->end_time->format('H:i');
                 return back()->with('error', "Refrigerio {$momento} fuera de horario. Permitido: {$startTime} - {$endTime}")->withInput();

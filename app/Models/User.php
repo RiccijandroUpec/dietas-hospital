@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Services\AuditService;
 
 class User extends Authenticatable
 {
@@ -33,6 +34,23 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($model) {
+            AuditService::log('create', "Usuario creado: {$model->name}", 'User', $model->id);
+        });
+
+        static::updated(function ($model) {
+            AuditService::log('update', "Usuario actualizado: {$model->name}", 'User', $model->id);
+        });
+
+        static::deleted(function ($model) {
+            AuditService::log('delete', "Usuario eliminado: {$model->name}", 'User', $model->id);
+        });
+    }
 
     /**
      * Get the attributes that should be cast.

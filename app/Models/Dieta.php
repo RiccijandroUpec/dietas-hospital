@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Services\AuditService;
 
 class Dieta extends Model
 {
@@ -14,6 +15,23 @@ class Dieta extends Model
         'nombre',
         'descripcion',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($model) {
+            AuditService::log('create', "Dieta creada: {$model->nombre}", 'Dieta', $model->id);
+        });
+
+        static::updated(function ($model) {
+            AuditService::log('update', "Dieta actualizada: {$model->nombre}", 'Dieta', $model->id);
+        });
+
+        static::deleted(function ($model) {
+            AuditService::log('delete', "Dieta eliminada: {$model->nombre}", 'Dieta', $model->id);
+        });
+    }
 
     public function tipo()
     {

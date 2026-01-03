@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Services\AuditService;
 
 class SubtipoDieta extends Model
 {
@@ -16,6 +17,23 @@ class SubtipoDieta extends Model
         'nombre',
         'descripcion',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($model) {
+            AuditService::log('create', "Subtipo de dieta creado: {$model->nombre}", 'SubtipoDieta', $model->id);
+        });
+
+        static::updated(function ($model) {
+            AuditService::log('update', "Subtipo de dieta actualizado: {$model->nombre}", 'SubtipoDieta', $model->id);
+        });
+
+        static::deleted(function ($model) {
+            AuditService::log('delete', "Subtipo de dieta eliminado: {$model->nombre}", 'SubtipoDieta', $model->id);
+        });
+    }
 
     public function tipo()
     {

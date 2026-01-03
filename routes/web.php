@@ -90,6 +90,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('schedule-config', [App\Http\Controllers\ScheduleConfigController::class, 'index'])->name('schedule-config.index');
     Route::get('schedule-config/edit', [App\Http\Controllers\ScheduleConfigController::class, 'edit'])->name('schedule-config.edit');
     Route::put('schedule-config', [App\Http\Controllers\ScheduleConfigController::class, 'update'])->name('schedule-config.update');
+    Route::post('schedule-config/toggle-out-of-schedule', [App\Http\Controllers\ScheduleConfigController::class, 'toggleOutOfSchedule'])->name('schedule-config.toggle-out-of-schedule');
 });
 
 require __DIR__.'/auth.php';

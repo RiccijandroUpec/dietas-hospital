@@ -10,21 +10,82 @@
             <!-- Bienvenida -->
             <div class="bg-gradient-to-r from-blue-600 to-purple-600 overflow-hidden shadow-sm sm:rounded-lg mb-6">
                 <div class="p-6 text-white">
-                    <h3 class="text-2xl font-bold">¡Bienvenido, {{ auth()->user()->name }}! 👋</h3>
-                    <p class="mt-2 text-blue-100">Sistema de Gestión de Dietas Hospitalarias</p>
-                    <div class="mt-3 flex items-center gap-4 text-sm">
-                        <span class="flex items-center gap-2">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
-                            </svg>
-                            Rol: <strong>{{ ucfirst(auth()->user()->role) }}</strong>
-                        </span>
-                        <span class="flex items-center gap-2">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
-                            </svg>
-                            {{ now()->locale('es')->translatedFormat('l, d \d\e F \d\e Y') }}
-                        </span>
+                    <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+                        <div class="flex-1">
+                            <h3 class="text-2xl font-bold">¡Bienvenido, {{ auth()->user()->name }}! 👋</h3>
+                            <p class="mt-2 text-blue-100">Sistema de Gestión de Dietas Hospitalarias</p>
+                            <div class="mt-3 flex flex-wrap items-center gap-4 text-sm">
+                                <span class="flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    Rol: <strong>{{ ucfirst(auth()->user()->role) }}</strong>
+                                </span>
+                                <span class="flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    {{ now()->locale('es')->translatedFormat('l, d \d\e F \d\e Y') }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="w-full lg:w-80 bg-white/10 border border-white/20 rounded-xl p-4 backdrop-blur">
+                            <div class="text-xs uppercase tracking-wide text-blue-100 font-semibold">Hora actual</div>
+                            <div class="mt-1 text-3xl font-bold" id="dashboardClock">{{ now()->setTimezone(config('app.timezone'))->format('H:i:s') }}</div>
+                            <div class="mt-3">
+                                <p class="text-xs text-blue-50 mb-2">Registros disponibles ahora</p>
+                                <div class="space-y-1.5 text-sm">
+                                    @php
+                                        $now = now();
+                                        $currentTime = $now->format('H:i');
+                                        $schedules = \App\Models\RegistrationSchedule::all();
+                                        $activeSchedules = [];
+                                        
+                                        foreach ($schedules as $schedule) {
+                                            if ($schedule->isCurrentTimeAllowed()) {
+                                                $activeSchedules[] = $schedule;
+                                            }
+                                        }
+                                    @endphp
+                                    
+                                    @if(count($activeSchedules) > 0)
+                                        @foreach($activeSchedules as $schedule)
+                                            @php
+                                                $icons = [
+                                                    'desayuno' => '🌅',
+                                                    'almuerzo' => '🍽️',
+                                                    'merienda' => '☕',
+                                                    'refrigerio_mañana' => '🍊',
+                                                    'refrigerio_tarde' => '🍋',
+                                                ];
+                                                $names = [
+                                                    'desayuno' => 'Desayuno',
+                                                    'almuerzo' => 'Almuerzo',
+                                                    'merienda' => 'Merienda',
+                                                    'refrigerio_mañana' => 'Refrigerio Mañana',
+                                                    'refrigerio_tarde' => 'Refrigerio Tarde',
+                                                ];
+                                                $remaining = $schedule->getRemainingMinutes();
+                                            @endphp
+                                            <div class="flex items-center justify-between px-3 py-1.5 bg-white/20 rounded-lg">
+                                                <span class="font-medium">
+                                                    {{ $icons[$schedule->meal_type] ?? '📋' }} 
+                                                    {{ $names[$schedule->meal_type] ?? ucfirst($schedule->meal_type) }}
+                                                </span>
+                                                @if($remaining >= 0 && $remaining <= 30)
+                                                    <span class="text-xs text-yellow-200">{{ $remaining }}m</span>
+                                                @endif
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        <div class="px-3 py-2 bg-white/10 rounded-lg text-center">
+                                            <p class="text-blue-100 text-xs">⏸️ Fuera de horario de registro</p>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -406,3 +467,26 @@
         </div>
     </div>
 </x-app-layout>
+
+@push('scripts')
+<script>
+function updateDashboardClock() {
+    const el = document.getElementById('dashboardClock');
+    if (!el) return;
+    const now = new Date();
+    const formatted = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    el.textContent = formatted;
+}
+
+function initDashboardClock() {
+    updateDashboardClock();
+    setInterval(updateDashboardClock, 1000);
+}
+
+if (document.readyState === 'complete') {
+    initDashboardClock();
+} else {
+    window.addEventListener('load', initDashboardClock, { once: true });
+}
+</script>
+@endpush

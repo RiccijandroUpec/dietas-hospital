@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Services\AuditService;
 
 class RegistroDieta extends Model
 {
@@ -22,6 +23,29 @@ class RegistroDieta extends Model
         'created_by',
         'updated_by',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($model) {
+            $paciente = $model->paciente;
+            $nombre = $paciente ? "{$paciente->nombre} {$paciente->apellido}" : "ID {$model->paciente_id}";
+            AuditService::log('create', "Registro de dieta creado para {$nombre}", 'RegistroDieta', $model->id);
+        });
+
+        static::updated(function ($model) {
+            $paciente = $model->paciente;
+            $nombre = $paciente ? "{$paciente->nombre} {$paciente->apellido}" : "ID {$model->paciente_id}";
+            AuditService::log('update', "Registro de dieta actualizado para {$nombre}", 'RegistroDieta', $model->id);
+        });
+
+        static::deleted(function ($model) {
+            $paciente = $model->paciente;
+            $nombre = $paciente ? "{$paciente->nombre} {$paciente->apellido}" : "ID {$model->paciente_id}";
+            AuditService::log('delete', "Registro de dieta eliminado para {$nombre}", 'RegistroDieta', $model->id);
+        });
+    }
 
     public function paciente()
     {

@@ -36,9 +36,22 @@
                                 ][$meal];
                             @endphp
                             <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 border border-blue-200">
-                                <h3 class="text-lg font-bold text-gray-800 mb-4">
-                                    {{ $emoji }} {{ ucfirst($meal) }}
-                                </h3>
+                                <div class="flex items-start justify-between mb-4">
+                                    <h3 class="text-lg font-bold text-gray-800">
+                                        {{ $emoji }} {{ ucfirst($meal) }}
+                                    </h3>
+                                    @if($schedule)
+                                        <form action="{{ route('schedule-config.toggle-out-of-schedule') }}" method="POST" class="inline">
+                                            @csrf
+                                            <input type="hidden" name="meal_type" value="{{ $meal }}">
+                                            <button type="submit" 
+                                                class="px-3 py-1 text-xs rounded-full font-medium transition {{ $schedule->allow_out_of_schedule ? 'bg-green-100 text-green-800 hover:bg-green-200' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}"
+                                                title="{{ $schedule->allow_out_of_schedule ? 'Deshabilitar registro fuera de horario' : 'Habilitar registro fuera de horario' }}">
+                                                {{ $schedule->allow_out_of_schedule ? '✓ Fuera de horario habilitado' : '⏸ Fuera de horario bloqueado' }}
+                                            </button>
+                                        </form>
+                                    @endif
+                                </div>
                                 @if($schedule)
                                     <div class="space-y-2">
                                         <div class="flex justify-between">
@@ -61,9 +74,22 @@
                             $refrigerio_mañana = $schedules['refrigerio_mañana'] ?? null;
                         @endphp
                         <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-6 border border-orange-200">
-                            <h3 class="text-lg font-bold text-gray-800 mb-4">
-                                🍊 Refrigerio Mañana
-                            </h3>
+                            <div class="flex items-start justify-between mb-4">
+                                <h3 class="text-lg font-bold text-gray-800">
+                                    🍊 Refrigerio Mañana
+                                </h3>
+                                @if($refrigerio_mañana)
+                                    <form action="{{ route('schedule-config.toggle-out-of-schedule') }}" method="POST" class="inline">
+                                        @csrf
+                                        <input type="hidden" name="meal_type" value="refrigerio_mañana">
+                                        <button type="submit" 
+                                            class="px-3 py-1 text-xs rounded-full font-medium transition {{ $refrigerio_mañana->allow_out_of_schedule ? 'bg-green-100 text-green-800 hover:bg-green-200' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}"
+                                            title="{{ $refrigerio_mañana->allow_out_of_schedule ? 'Deshabilitar registro fuera de horario' : 'Habilitar registro fuera de horario' }}">
+                                            {{ $refrigerio_mañana->allow_out_of_schedule ? '✓ Habilitado' : '⏸ Bloqueado' }}
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
                             @if($refrigerio_mañana)
                                 <div class="space-y-2">
                                     <div class="flex justify-between">
@@ -85,9 +111,22 @@
                             $refrigerio_tarde = $schedules['refrigerio_tarde'] ?? null;
                         @endphp
                         <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-lg p-6 border border-yellow-200">
-                            <h3 class="text-lg font-bold text-gray-800 mb-4">
-                                🍋 Refrigerio Tarde
-                            </h3>
+                            <div class="flex items-start justify-between mb-4">
+                                <h3 class="text-lg font-bold text-gray-800">
+                                    🍋 Refrigerio Tarde
+                                </h3>
+                                @if($refrigerio_tarde)
+                                    <form action="{{ route('schedule-config.toggle-out-of-schedule') }}" method="POST" class="inline">
+                                        @csrf
+                                        <input type="hidden" name="meal_type" value="refrigerio_tarde">
+                                        <button type="submit" 
+                                            class="px-3 py-1 text-xs rounded-full font-medium transition {{ $refrigerio_tarde->allow_out_of_schedule ? 'bg-green-100 text-green-800 hover:bg-green-200' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}"
+                                            title="{{ $refrigerio_tarde->allow_out_of_schedule ? 'Deshabilitar registro fuera de horario' : 'Habilitar registro fuera de horario' }}">
+                                            {{ $refrigerio_tarde->allow_out_of_schedule ? '✓ Habilitado' : '⏸ Bloqueado' }}
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
                             @if($refrigerio_tarde)
                                 <div class="space-y-2">
                                     <div class="flex justify-between">
@@ -121,6 +160,8 @@
                     <li>Los usuarios verán un mensaje si intentan registrar fuera del horario permitido.</li>
                     <li>El sistema usa la hora actual del servidor.</li>
                     <li>Los horarios se validan automáticamente al crear registros.</li>
+                    <li><strong>Nuevo:</strong> Puedes habilitar el registro fuera de horario usando los botones en cada tipo de comida.</li>
+                    <li>Cuando está habilitado (✓ Habilitado), se permite registrar en cualquier momento del día.</li>
                 </ul>
             </div>
         </div>

@@ -171,7 +171,7 @@
                                                 @if(auth()->user()->role !== 'usuario')
                                                     <a href="{{ route('registro-dietas.edit', $r) }}" class="px-3 py-1 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded text-xs font-medium transition">✏️ Editar</a>
                                                 @endif
-                                                @if(auth()->user()->role === 'administrador')
+                                                @if(auth()->user()->role === 'admin')
                                                     <form action="{{ route('registro-dietas.destroy', $r) }}" method="POST" class="inline-block" onsubmit="return confirm('¿Eliminar este registro?')">
                                                         @csrf
                                                         @method('DELETE')

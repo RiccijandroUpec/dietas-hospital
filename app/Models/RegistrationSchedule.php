@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Services\AuditService;
 
 class RegistrationSchedule extends Model
 {
@@ -11,12 +12,30 @@ class RegistrationSchedule extends Model
         'start_time',
         'end_time',
         'description',
+        'allow_out_of_schedule',
     ];
 
     protected $casts = [
         'start_time' => 'datetime:H:i',
         'end_time' => 'datetime:H:i',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($model) {
+            AuditService::log('create', "Horario de registro creado: {$model->meal_type}", 'RegistrationSchedule', $model->id);
+        });
+
+        static::updated(function ($model) {
+            AuditService::log('update', "Horario de registro actualizado: {$model->meal_type}", 'RegistrationSchedule', $model->id);
+        });
+
+        static::deleted(function ($model) {
+            AuditService::log('delete', "Horario de registro eliminado: {$model->meal_type}", 'RegistrationSchedule', $model->id);
+        });
+    }
 
     /**
      * Get schedule by meal type (desayuno, almuerzo, merienda, refrigerio)

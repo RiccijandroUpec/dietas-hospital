@@ -64,4 +64,21 @@ class ScheduleConfigController extends Controller
 
         return redirect()->route('schedule-config.index')->with('success', 'Horarios actualizados correctamente');
     }
+
+    /**
+     * Toggle allow out of schedule setting
+     */
+    public function toggleOutOfSchedule(Request $request)
+    {
+        $validated = $request->validate([
+            'meal_type' => 'required|string|exists:registration_schedules,meal_type',
+        ]);
+
+        $schedule = RegistrationSchedule::where('meal_type', $validated['meal_type'])->firstOrFail();
+        $schedule->allow_out_of_schedule = !$schedule->allow_out_of_schedule;
+        $schedule->save();
+
+        $status = $schedule->allow_out_of_schedule ? 'habilitado' : 'deshabilitado';
+        return back()->with('success', "Registro fuera de horario {$status} para {$schedule->meal_type}");
+    }
 }

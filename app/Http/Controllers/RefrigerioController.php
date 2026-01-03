@@ -8,6 +8,12 @@ use Illuminate\Http\Request;
 
 class RefrigerioController extends Controller
 {
+    public function __construct()
+    {
+        // Solo admins pueden crear, editar y eliminar
+        $this->middleware('admin')->except(['index', 'show']);
+    }
+
     /**
      * Display a listing of the resource.
      */
