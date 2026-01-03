@@ -186,7 +186,9 @@
                             <h4 class="text-sm font-bold text-gray-800 mb-3">Distribución por Servicio</h4>
                             <div class="space-y-2">
                                 @php
-                                    $serviciosCount = \App\Models\Paciente::groupBy('servicio_id')
+                                    $pacientesConServicio = \App\Models\Paciente::whereNotNull('servicio_id')->get();
+                                    $serviciosCount = \App\Models\Paciente::whereNotNull('servicio_id')
+                                        ->groupBy('servicio_id')
                                         ->select(\Illuminate\Support\Facades\DB::raw('servicio_id, count(*) as total'))
                                         ->with('servicio')
                                         ->get();
@@ -197,7 +199,7 @@
                                             <span class="font-medium truncate">{{ $sc->servicio->nombre ?? 'Sin servicio' }}</span>
                                             <div class="flex items-center gap-2">
                                                 <div class="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
-                                                    <div class="h-full bg-blue-600" style="width: {{ ($sc->total / $allPacientes->count()) * 100 }}%"></div>
+                                                    <div class="h-full bg-blue-600" style="width: {{ ($sc->total / max($pacientesConServicio->count(), 1)) * 100 }}%"></div>
                                                 </div>
                                                 <span class="font-bold text-gray-800 w-6 text-right">{{ $sc->total }}</span>
                                             </div>

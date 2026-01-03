@@ -53,7 +53,18 @@
                         <!-- Cédula -->
                         <div class="md:col-span-2">
                             <label class="block text-sm font-medium text-gray-700 mb-1">🆔 Cédula</label>
-                            <input id="cedula_input" type="text" name="cedula" value="{{ old('cedula') }}" placeholder="Ej: 12345678" class="w-full border-gray-300 rounded-md font-mono" required>
+                            <input
+                                id="cedula_input"
+                                type="text"
+                                name="cedula"
+                                value="{{ old('cedula') }}"
+                                placeholder="Ej: 1234567890"
+                                class="w-full border-gray-300 rounded-md font-mono"
+                                inputmode="numeric"
+                                pattern="\d{10}"
+                                maxlength="10"
+                                required
+                            >
                             <div id="cedula_feedback" class="text-sm mt-1"></div>
                             @error('cedula')<div class="text-red-600 text-sm mt-1">⚠️ {{ $message }}</div>@enderror
                         </div>
@@ -150,11 +161,65 @@ document.addEventListener('DOMContentLoaded', function () {
     const servicioHidden = document.createElement('input');
     const camaHidden = document.createElement('input');
 
+    const CEDULA_TOTAL_DIGITS = 10;
+
+    const nombreInput = document.querySelector('input[name="nombre"]');
+    const apellidoInput = document.querySelector('input[name="apellido"]');
+
+    function toTitleCase(str) {
+        return (str || '')
+            .split(' ')
+            .filter(Boolean)
+            .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+            .join(' ');
+    }
+
+    function normalizarNombreApellido() {
+        if (nombreInput) nombreInput.value = toTitleCase(nombreInput.value);
+        if (apellidoInput) apellidoInput.value = toTitleCase(apellidoInput.value);
+    }
+
+    function validarCedula() {
+        const raw = cedulaInput.value || '';
+        const soloNumeros = raw.replace(/\D/g, '').slice(0, CEDULA_TOTAL_DIGITS);
+        if (soloNumeros !== raw) {
+            cedulaInput.value = soloNumeros;
+        }
+
+        if (!soloNumeros.length) {
+            cedulaFeedback.textContent = 'Ingresa 10 dígitos numéricos.';
+            cedulaFeedback.className = 'text-sm mt-1 text-gray-500';
+            return false;
+        }
+
+        if (soloNumeros.length !== CEDULA_TOTAL_DIGITS) {
+            cedulaFeedback.textContent = `Faltan dígitos: ${CEDULA_TOTAL_DIGITS - soloNumeros.length}`;
+            cedulaFeedback.className = 'text-sm mt-1 text-red-600';
+            return false;
+        }
+
+        cedulaFeedback.textContent = 'Formato válido (10 dígitos).';
+        cedulaFeedback.className = 'text-sm mt-1 text-green-600';
+        return true;
+    }
+
+    cedulaInput.addEventListener('input', validarCedula);
+    cedulaInput.addEventListener('blur', validarCedula);
+
     // Listener al submit para verificar estado del formulario
     form.addEventListener('submit', function(e) {
+        normalizarNombreApellido();
+        if (!validarCedula()) {
+            e.preventDefault();
+            cedulaInput.focus();
+            return;
+        }
         console.log('Form submitted - Action:', form.action, 'Method:', formMethod.value, '_method value:', formMethod.value);
         console.log('Form data:', new FormData(form));
     });
+
+    if (nombreInput) nombreInput.addEventListener('blur', normalizarNombreApellido);
+    if (apellidoInput) apellidoInput.addEventListener('blur', normalizarNombreApellido);
 
     function toggleServicioCama() {
         const estado = estadoSelect.value;

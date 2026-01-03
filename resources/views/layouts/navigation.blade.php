@@ -175,6 +175,17 @@
                     <span :class="!sidebarOpen && 'lg:hidden'" class="text-sm font-medium">Servicios</span>
                 </a>
             @endif
+
+            @if(auth()->check())
+                <div class="border-t border-blue-700 my-2"></div>
+                <a href="{{ route('developer') }}" class="flex items-center px-4 py-3 rounded-lg transition-all {{ request()->routeIs('developer') ? 'bg-blue-600 text-white' : 'text-blue-100 hover:bg-blue-700' }}">
+                    <svg class="h-5 w-5 me-3 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V4z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 16h18M10 20h4" />
+                    </svg>
+                    <span :class="!sidebarOpen && 'lg:hidden'" class="text-sm font-medium">Programador</span>
+                </a>
+            @endif
         </nav>
 
         <!-- Footer Section -->

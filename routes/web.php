@@ -22,6 +22,9 @@ Route::middleware('auth')->group(function () {
     Route::get('pacientes/search', [App\Http\Controllers\PacienteController::class, 'search'])->name('pacientes.search');
     Route::get('pacientes/exportar', [App\Http\Controllers\PacienteController::class, 'exportar'])->name('pacientes.exportar');
     Route::resource('pacientes', App\Http\Controllers\PacienteController::class);
+
+    // Vista del programador
+    Route::view('programador', 'developer')->name('developer');
 });
 
 // Servicios and Camas (admin)
