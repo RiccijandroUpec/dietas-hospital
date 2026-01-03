@@ -92,29 +92,37 @@ class PacienteController extends Controller
     // Comprueba si existe un paciente por cédula (AJAX)
     public function checkCedula(Request $request)
     {
-        $cedula = $request->query('cedula');
-        if (!$cedula) {
+        try {
+            $cedula = $request->query('cedula');
+            if (!$cedula) {
+                return response()->json(['exists' => false]);
+            }
+
+            $paciente = Paciente::where('cedula', $cedula)->first();
+            if ($paciente) {
+                return response()->json([
+                    'exists' => true,
+                    'id' => $paciente->id,
+                    'nombre' => $paciente->nombre,
+                    'apellido' => $paciente->apellido,
+                    'cedula' => $paciente->cedula,
+                    'edad' => $paciente->edad,
+                    'condicion' => $paciente->condicion ? explode(',', $paciente->condicion) : [],
+                    'servicio_id' => $paciente->servicio_id,
+                    'cama_id' => $paciente->cama_id,
+                    'estado' => $paciente->estado,
+                    'edit_url' => route('pacientes.edit', $paciente),
+                ]);
+            }
+
             return response()->json(['exists' => false]);
-        }
-
-        $paciente = Paciente::where('cedula', $cedula)->first();
-        if ($paciente) {
+        } catch (\Exception $e) {
+            \Log::error('Error in checkCedula: ' . $e->getMessage());
             return response()->json([
-                'exists' => true,
-                'id' => $paciente->id,
-                'nombre' => $paciente->nombre,
-                'apellido' => $paciente->apellido,
-                'cedula' => $paciente->cedula,
-                'edad' => $paciente->edad,
-                'condicion' => $paciente->condicion ? explode(',', $paciente->condicion) : [],
-                'servicio_id' => $paciente->servicio_id,
-                'cama_id' => $paciente->cama_id,
-                'estado' => $paciente->estado,
-                'edit_url' => route('pacientes.edit', $paciente),
-            ]);
+                'exists' => false,
+                'error' => 'Error al buscar paciente: ' . $e->getMessage()
+            ], 500);
         }
-
-        return response()->json(['exists' => false]);
     }
 
     // Búsqueda AJAX por nombre o cédula

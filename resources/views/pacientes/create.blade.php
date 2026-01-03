@@ -216,6 +216,17 @@ document.addEventListener('DOMContentLoaded', function () {
         fetch(`/pacientes/check-cedula?cedula=${encodeURIComponent(ced)}`)
             .then(res => {
                 console.log('Response status:', res.status);
+                console.log('Response headers:', res.headers.get('content-type'));
+                
+                // Verificar si la respuesta es JSON
+                const contentType = res.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    return res.text().then(text => {
+                        console.error('Response is not JSON:', text.substring(0, 500));
+                        throw new Error('Server returned non-JSON response');
+                    });
+                }
+                
                 return res.json();
             })
             .then(data => {
