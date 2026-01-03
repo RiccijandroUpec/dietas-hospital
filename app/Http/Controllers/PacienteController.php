@@ -6,8 +6,10 @@ use App\Models\Paciente;
 use App\Models\Servicio;
 use App\Models\Cama;
 use App\Services\AuditService;
+use App\Exports\PacientesExport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PacienteController extends Controller
 {
@@ -349,5 +351,10 @@ class PacienteController extends Controller
         
         $paciente->delete();
         return redirect()->route('pacientes.index')->with('success', 'Paciente eliminado.');
+    }
+
+    public function exportar()
+    {
+        return Excel::download(new PacientesExport(), 'pacientes_' . now()->format('Y-m-d_H-i-s') . '.xlsx');
     }
 }
