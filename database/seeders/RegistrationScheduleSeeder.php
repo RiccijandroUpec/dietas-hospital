@@ -12,37 +12,38 @@ class RegistrationScheduleSeeder extends Seeder
      */
     public function run(): void
     {
-        \App\Models\RegistrationSchedule::updateOrCreate(
+        // Solo crear si no existen los registros
+        \App\Models\RegistrationSchedule::firstOrCreate(
             ['meal_type' => 'desayuno'],
             [
                 'start_time' => '06:00',
-                'end_time' => '09:00',
+                'end_time' => '08:00',
                 'description' => 'Horario de desayuno',
             ]
         );
 
-        \App\Models\RegistrationSchedule::updateOrCreate(
+        \App\Models\RegistrationSchedule::firstOrCreate(
             ['meal_type' => 'almuerzo'],
             [
-                'start_time' => '11:00',
-                'end_time' => '14:00',
+                'start_time' => '06:00',
+                'end_time' => '11:00',
                 'description' => 'Horario de almuerzo',
             ]
         );
 
-        \App\Models\RegistrationSchedule::updateOrCreate(
+        \App\Models\RegistrationSchedule::firstOrCreate(
             ['meal_type' => 'merienda'],
             [
-                'start_time' => '16:00',
-                'end_time' => '18:00',
+                'start_time' => '00:00',
+                'end_time' => '16:00',
                 'description' => 'Horario de merienda/cena',
             ]
         );
 
-        \App\Models\RegistrationSchedule::updateOrCreate(
+        \App\Models\RegistrationSchedule::firstOrCreate(
             ['meal_type' => 'refrigerio_mañana'],
             [
-                'start_time' => '08:00',
+                'start_time' => '06:00',
                 'end_time' => '10:00',
                 'description' => 'Horario de refrigerio en la mañana',
             ]
@@ -51,8 +52,8 @@ class RegistrationScheduleSeeder extends Seeder
         \App\Models\RegistrationSchedule::updateOrCreate(
             ['meal_type' => 'refrigerio_tarde'],
             [
-                'start_time' => '14:00',
-                'end_time' => '16:00',
+                'start_time' => '06:00',
+                'end_time' => '14:00',
                 'description' => 'Horario de refrigerio en la tarde',
             ]
         );
