@@ -25,22 +25,22 @@
             .text-white, .dark .text-white {
                 color: #000 !important;
             }
-            /* Botones azul marino globales */
-            button,
-            input[type="submit"],
+            /* Botones azul marino globales - excepto botones con colores específicos */
+            button:not(.bg-indigo-50):not(.bg-indigo-100):not(.bg-indigo-600):not(.bg-red-600):not(.bg-green-600):not(.bg-blue-600):not(.bg-pink-600):not(.bg-gradient-to-r),
+            input[type="submit"]:not(.bg-indigo-50):not(.bg-indigo-100):not(.bg-indigo-600):not(.bg-red-600):not(.bg-green-600):not(.bg-blue-600):not(.bg-pink-600),
             a.btn,
             .btn,
-            .inline-flex.px-4.py-2,
-            .inline-flex.px-2.py-1 {
+            .inline-flex.px-4.py-2:not(.bg-indigo-50):not(.bg-indigo-100):not(.bg-indigo-600):not(.bg-red-600):not(.bg-green-600):not(.bg-blue-600):not(.bg-pink-600):not(.bg-gradient-to-r),
+            .inline-flex.px-2.py-1:not(.bg-indigo-50):not(.bg-indigo-100):not(.bg-indigo-600):not(.bg-red-600):not(.bg-green-600):not(.bg-blue-600):not(.bg-pink-600) {
                 background-color: #0b2340 !important; /* azul marino */
                 color: #ffffff !important;
                 border-color: #0b2340 !important;
             }
-            button:hover,
-            input[type="submit"]:hover,
+            button:hover:not(.bg-indigo-50):not(.bg-indigo-100):not(.bg-indigo-600):not(.bg-red-600):not(.bg-green-600):not(.bg-blue-600):not(.bg-pink-600):not(.bg-gradient-to-r),
+            input[type="submit"]:hover:not(.bg-indigo-50):not(.bg-indigo-100):not(.bg-indigo-600):not(.bg-red-600):not(.bg-green-600):not(.bg-blue-600):not(.bg-pink-600),
             a.btn:hover,
-            .inline-flex.px-4.py-2:hover,
-            .inline-flex.px-2.py-1:hover {
+            .inline-flex.px-4.py-2:hover:not(.bg-indigo-50):not(.bg-indigo-100):not(.bg-indigo-600):not(.bg-red-600):not(.bg-green-600):not(.bg-blue-600):not(.bg-pink-600):not(.bg-gradient-to-r),
+            .inline-flex.px-2.py-1:hover:not(.bg-indigo-50):not(.bg-indigo-100):not(.bg-indigo-600):not(.bg-red-600):not(.bg-green-600):not(.bg-blue-600):not(.bg-pink-600) {
                 background-color: #091a33 !important;
             }
 

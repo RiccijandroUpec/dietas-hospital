@@ -73,8 +73,10 @@
                             <div class="grid grid-cols-1 gap-4" style="{{ !$isAllowed ? 'opacity: 0.5; pointer-events: none;' : '' }}">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">🔍 Buscar Paciente (Hospitalizado)</label>
-                                    <input type="text" id="buscador_paciente" placeholder="Nombre, apellido o cédula" class="mt-1 block w-full border-gray-300 rounded-md" {{ !$isAllowed ? 'disabled' : '' }}>
-                                    <div id="buscador_paciente_results" class="border border-gray-200 bg-white absolute z-10 w-96 max-h-64 overflow-y-auto rounded-md shadow-lg"></div>
+                                    <div class="relative">
+                                        <input type="text" id="buscador_paciente" placeholder="Nombre, apellido o cédula" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" {{ !$isAllowed ? 'disabled' : '' }}>
+                                        <div id="buscador_paciente_results" class="hidden border border-gray-200 bg-white absolute z-10 w-full max-h-64 overflow-y-auto rounded-md shadow-lg mt-1"></div>
+                                    </div>
                                     <select id="paciente_select" name="paciente_id" class="hidden">
                                         <option value="">-- Seleccione --</option>
                                         @foreach($pacientes as $p)
@@ -134,7 +136,7 @@
 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">🍽️ Tipo de Comida</label>
-                                    <select name="tipo_comida" class="mt-1 block w-full border-gray-300 rounded-md">
+                                    <select name="tipo_comida" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                                         <option value="">-- Seleccione --</option>
                                         <option value="desayuno" @if(old('tipo_comida') == 'desayuno') selected @endif>Desayuno</option>
                                         <option value="almuerzo" @if(old('tipo_comida') == 'almuerzo') selected @endif>Almuerzo</option>
@@ -160,13 +162,13 @@
 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">📅 Fecha</label>
-                                    <input type="date" name="fecha" value="{{ old('fecha', date('Y-m-d')) }}" class="mt-1 block w-full border-gray-300 rounded-md">
+                                    <input type="date" name="fecha" value="{{ old('fecha', date('Y-m-d')) }}" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                                     @error('fecha')<div class="text-red-600 text-sm mt-1">⚠️ {{ $message }}</div>@enderror
                                 </div>
 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">📝 Observaciones</label>
-                                    <textarea name="observaciones" placeholder="Agregar notas o comentarios..." class="mt-1 block w-full border-gray-300 rounded-md h-24" maxlength="500">{{ old('observaciones') }}</textarea>
+                                    <textarea name="observaciones" placeholder="Agregar notas o comentarios..." class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 h-24" maxlength="500">{{ old('observaciones') }}</textarea>
                                     <div class="text-xs text-gray-500 mt-1">Máximo 500 caracteres</div>
                                 </div>
 
