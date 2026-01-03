@@ -17,7 +17,9 @@ class CamasGraficaController extends Controller
         $pacientesPorCama = [];
 
         if ($servicioId) {
-            $camas = Cama::where('servicio_id', $servicioId)->orderBy('codigo')->get();
+            $camas = Cama::where('servicio_id', $servicioId)
+                ->orderByRaw('CAST(REGEXP_REPLACE(codigo, "[^0-9]", "") AS UNSIGNED)')
+                ->get();
             
             // Obtener pacientes hospitalizados por cama
             $pacientesPorCama = Paciente::where('servicio_id', $servicioId)
