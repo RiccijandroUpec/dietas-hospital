@@ -10,9 +10,28 @@
 
     <div class="py-6">
         <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
+            
+            @if(session('error'))
+                <div class="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-md flex items-start">
+                    <span class="mr-3">⚠️</span>
+                    <span>{{ session('error') }}</span>
+                </div>
+            @endif
+
+            @if($errors->any())
+                <div class="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-md">
+                    <p class="font-semibold mb-2">Errores de validación:</p>
+                    <ul class="list-disc list-inside space-y-1">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
-                    <form action="{{ route('schedule-config.update') }}" method="PUT" class="space-y-8">
+                    <form action="{{ route('schedule-config.update') }}" method="POST" class="space-y-8">
                         @csrf
                         @method('PUT')
 
@@ -72,7 +91,7 @@
 
                         <!-- Refrigerio Mañana -->
                         @php
-                            $refrigerio_mañana = $schedules['refrigerio_mañana'] ?? null;
+                            $refrigerio_manana = $schedules['refrigerio_mañana'] ?? null;
                         @endphp
                         <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-6 border border-orange-200">
                             <h3 class="text-lg font-bold text-gray-800 mb-4">
@@ -82,36 +101,36 @@
                             <div class="grid grid-cols-2 gap-4">
                                 <!-- Hora de inicio -->
                                 <div>
-                                    <label for="refrigerio_mañana_start" class="block text-sm font-medium text-gray-700 mb-2">
+                                    <label for="refrigerio_manana_start" class="block text-sm font-medium text-gray-700 mb-2">
                                         Hora de inicio
                                     </label>
                                     <input 
                                         type="time"
-                                        name="refrigerio_mañana_start"
-                                        id="refrigerio_mañana_start"
-                                        value="{{ $refrigerio_mañana ? $refrigerio_mañana->start_time->format('H:i') : '' }}"
+                                        name="refrigerio_manana_start"
+                                        id="refrigerio_manana_start"
+                                        value="{{ $refrigerio_manana ? $refrigerio_manana->start_time->format('H:i') : '' }}"
                                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition"
                                         required
                                     >
-                                    @error("refrigerio_mañana_start")
+                                    @error("refrigerio_manana_start")
                                         <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
                                     @enderror
                                 </div>
 
                                 <!-- Hora de fin -->
                                 <div>
-                                    <label for="refrigerio_mañana_end" class="block text-sm font-medium text-gray-700 mb-2">
+                                    <label for="refrigerio_manana_end" class="block text-sm font-medium text-gray-700 mb-2">
                                         Hora de fin
                                     </label>
                                     <input 
                                         type="time"
-                                        name="refrigerio_mañana_end"
-                                        id="refrigerio_mañana_end"
-                                        value="{{ $refrigerio_mañana ? $refrigerio_mañana->end_time->format('H:i') : '' }}"
+                                        name="refrigerio_manana_end"
+                                        id="refrigerio_manana_end"
+                                        value="{{ $refrigerio_manana ? $refrigerio_manana->end_time->format('H:i') : '' }}"
                                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition"
                                         required
                                     >
-                                    @error("refrigerio_mañana_end")
+                                    @error("refrigerio_manana_end")
                                         <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
                                     @enderror
                                 </div>

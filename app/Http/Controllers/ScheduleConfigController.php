@@ -44,20 +44,27 @@ class ScheduleConfigController extends Controller
             'almuerzo_end' => 'required|date_format:H:i|after:almuerzo_start',
             'merienda_start' => 'required|date_format:H:i',
             'merienda_end' => 'required|date_format:H:i|after:merienda_start',
-            'refrigerio_mañana_start' => 'required|date_format:H:i',
-            'refrigerio_mañana_end' => 'required|date_format:H:i|after:refrigerio_mañana_start',
+            'refrigerio_manana_start' => 'required|date_format:H:i',
+            'refrigerio_manana_end' => 'required|date_format:H:i|after:refrigerio_manana_start',
             'refrigerio_tarde_start' => 'required|date_format:H:i',
             'refrigerio_tarde_end' => 'required|date_format:H:i|after:refrigerio_tarde_start',
         ]);
 
-        $mealTypes = ['desayuno', 'almuerzo', 'merienda', 'refrigerio_mañana', 'refrigerio_tarde'];
+        // Mapear los nombres de los campos del formulario a los tipos de comida en la DB
+        $mealMappings = [
+            'desayuno' => 'desayuno',
+            'almuerzo' => 'almuerzo',
+            'merienda' => 'merienda',
+            'refrigerio_manana' => 'refrigerio_mañana',
+            'refrigerio_tarde' => 'refrigerio_tarde'
+        ];
         
-        foreach ($mealTypes as $meal) {
+        foreach ($mealMappings as $formField => $dbMealType) {
             RegistrationSchedule::updateOrCreate(
-                ['meal_type' => $meal],
+                ['meal_type' => $dbMealType],
                 [
-                    'start_time' => $validated["{$meal}_start"],
-                    'end_time' => $validated["{$meal}_end"],
+                    'start_time' => $validated["{$formField}_start"],
+                    'end_time' => $validated["{$formField}_end"],
                 ]
             );
         }

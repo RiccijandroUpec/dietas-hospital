@@ -201,9 +201,9 @@
                                 '{{ addslashes(optional($base->updatedBy)->name ?? 'Sistema') }}',
                                 '{{ $base->updated_at->format('d/m/Y H:i') }}'
                             )" 
-                            class="text-left hover:bg-blue-50 rounded px-2 py-1 -mx-2 transition-colors w-full"
+                            class="text-left bg-gray-50 hover:bg-blue-50 rounded px-2 py-1 -mx-2 transition-colors w-full border border-gray-200"
                         >
-                            <div class="text-sm text-gray-700">{{ optional($base->updatedBy)->name ?? '—' }}</div>
+                            <div class="text-sm text-gray-900">{{ optional($base->updatedBy)->name ?? '—' }}</div>
                             <div class="text-xs text-gray-500">{{ $base->updated_at->format('d/m/Y H:i') }}</div>
                             <div class="text-blue-600 text-xs mt-1">📋 Ver historial completo</div>
                         </button>

@@ -262,19 +262,19 @@
                                     </div>
 
                                     <!-- Acciones -->
-                                    <div class="flex flex-wrap gap-2">
-                                        <a href="{{ route('pacientes.show', $paciente) }}" class="flex-1 text-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition">
-                                            👁️ Ver
+                                    <div class="flex justify-center gap-2">
+                                        <a href="{{ route('pacientes.show', $paciente) }}" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-lg rounded-lg transition" title="Ver">
+                                            👁️
                                         </a>
                                         @if(auth()->check() && auth()->user()->role !== 'usuario')
-                                            <a href="{{ route('pacientes.edit', $paciente) }}" class="flex-1 text-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition">
-                                                ✏️ Editar
+                                            <a href="{{ route('pacientes.edit', $paciente) }}" class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-lg rounded-lg transition" title="Editar">
+                                                ✏️
                                             </a>
                                         @endif
                                         @if(auth()->check() && in_array(auth()->user()->role, ['administrador', 'admin']))
-                                            <form action="{{ route('pacientes.destroy', $paciente) }}" method="POST" class="flex-1" onsubmit="return confirm('¿Eliminar este paciente?')">
+                                            <form action="{{ route('pacientes.destroy', $paciente) }}" method="POST" class="inline-block" onsubmit="return confirm('¿Eliminar este paciente?')">
                                                 @csrf @method('DELETE')
-                                                <button type="submit" class="w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition">🗑️ Eliminar</button>
+                                                <button type="submit" class="px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-lg rounded-lg transition" title="Eliminar">🗑️</button>
                                             </form>
                                         @endif
                                     </div>
