@@ -9,6 +9,7 @@
                 <p class="text-gray-600 mt-1">Listado de refrigerios registrados a pacientes</p>
             </div>
             <div class="flex gap-2">
+                <a href="{{ route('registro-refrigerios.estadisticas') }}" class="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg">📈 Estadísticas</a>
                 <a href="{{ route('registro-refrigerios.dashboard') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">📊 Dashboard</a>
                 @if(auth()->user()->role !== 'usuario')
                     <a href="{{ route('registro-refrigerios.create') }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white rounded-lg shadow-md transition-all duration-200 transform hover:scale-105">

@@ -64,6 +64,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('registro-refrigerios/dashboard', [App\Http\Controllers\RegistroRefrigerioController::class, 'dashboard'])->name('registro-refrigerios.dashboard');
     Route::get('registro-refrigerios/reporte', [App\Http\Controllers\RegistroRefrigerioController::class, 'reporte'])->name('registro-refrigerios.reporte');
+    Route::get('registro-refrigerios/estadisticas', [App\Http\Controllers\RegistroRefrigerioController::class, 'estadisticas'])->name('registro-refrigerios.estadisticas');
     Route::resource('registro-refrigerios', App\Http\Controllers\RegistroRefrigerioController::class);
 });
 

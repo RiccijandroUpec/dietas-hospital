@@ -9,6 +9,7 @@ use App\Models\RegistrationSchedule;
 use App\Services\AuditService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class RegistroRefrigerioController extends Controller
 {
@@ -314,4 +315,72 @@ class RegistroRefrigerioController extends Controller
         $momentoLabels = ['mañana' => 'Mañana', 'tarde' => 'Tarde', 'noche' => 'Noche'];
 
         return view('registro_refrigerios.dashboard', compact('registros', 'fecha', 'momento', 'servicios', 'totales', 'momentoLabels'));
-    }}
+    }
+
+    public function estadisticas()
+    {
+        $registros = RegistroRefrigerio::with(['paciente.servicio', 'refrigerio'])->get();
+
+        // Agrupar por paciente + fecha + momento para contar entregas únicas
+        $agrupados = $registros
+            ->groupBy(fn($r) => $r->paciente_id.'|'.$r->fecha.'|'.$r->momento)
+            ->map->first();
+
+        $totalEntregas = $agrupados->count();
+        $pacientesUnicos = $agrupados->pluck('paciente_id')->unique()->count();
+
+        $porMomento = [
+            'mañana' => 0,
+            'tarde' => 0,
+            'noche' => 0,
+        ];
+        foreach ($agrupados as $r) {
+            $porMomento[$r->momento] = ($porMomento[$r->momento] ?? 0) + 1;
+        }
+
+        $porServicio = $agrupados
+            ->groupBy(fn($r) => optional(optional($r->paciente)->servicio)->nombre ?? 'Sin servicio')
+            ->map->count()
+            ->sortDesc();
+
+        $porRefrigerio = $registros
+            ->groupBy(fn($r) => optional($r->refrigerio)->nombre ?? 'Sin refrigerio')
+            ->map->count()
+            ->sortDesc();
+
+        $totalRefrigerios = $registros->count();
+
+        $hoy = $agrupados->where('fecha', today()->toDateString())->count();
+        $semana = $agrupados->filter(function ($r) {
+            $fecha = Carbon::parse($r->fecha);
+            return $fecha->between(today()->subDays(6), today());
+        })->count();
+
+        // Tendencia últimos 7 días (entregas únicas por día)
+        $tendencia = collect();
+        for ($i = 6; $i >= 0; $i--) {
+            $dia = today()->subDays($i)->toDateString();
+            $cuenta = $agrupados->where('fecha', $dia)->count();
+            $tendencia->push([
+                'fecha' => Carbon::parse($dia)->format('d/m'),
+                'count' => $cuenta,
+            ]);
+        }
+
+        // Porcentaje de uso por servicio respecto al total de entregas
+        $totalServicios = max($totalEntregas, 1);
+
+        return view('registro_refrigerios.estadisticas', [
+            'totalEntregas' => $totalEntregas,
+            'pacientesUnicos' => $pacientesUnicos,
+            'porMomento' => $porMomento,
+            'porServicio' => $porServicio,
+            'porRefrigerio' => $porRefrigerio,
+            'hoy' => $hoy,
+            'semana' => $semana,
+            'tendencia' => $tendencia,
+            'totalServicios' => $totalServicios,
+            'totalRefrigerios' => max($totalRefrigerios, 1),
+        ]);
+    }
+}
