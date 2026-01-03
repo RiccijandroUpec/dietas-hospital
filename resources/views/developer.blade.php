@@ -13,6 +13,12 @@
                     <a href="{{ route('dashboard') }}" class="inline-flex items-center px-4 py-2 text-sm font-semibold text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition">Volver al panel</a>
                 </div>
 
+                @if (session('error'))
+                    <div class="mt-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+                        {{ session('error') }}
+                    </div>
+                @endif
+
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
                     <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
                         <h3 class="text-sm font-semibold text-gray-700">Nombre</h3>
@@ -55,6 +61,21 @@
                             @endif
                         </div>
                     </div>
+
+                    @if(auth()->check() && auth()->user()->role === 'admin')
+                        <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm flex flex-col justify-between">
+                            <div>
+                                <h3 class="text-sm font-semibold text-gray-700">Exportar base de datos</h3>
+                                <p class="text-gray-600 text-sm mt-1">Disponible solo para administradores. Genera un respaldo inmediato.</p>
+                            </div>
+                            <form action="{{ route('programador.export-db') }}" method="POST" class="mt-4">
+                                @csrf
+                                <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-lg shadow transition">
+                                    🗄️ Exportar base de datos
+                                </button>
+                            </form>
+                        </div>
+                    @endif
 
                     <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm md:col-span-2 lg:col-span-3">
                         <h3 class="text-sm font-semibold text-gray-700 mb-2">Stack Tecnológico</h3>

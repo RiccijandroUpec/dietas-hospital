@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UsuarioController;
 use Illuminate\Support\Facades\Artisan;
+use Symfony\Component\Process\Process;
 
 Route::get('/', function () {
     return view('welcome');
@@ -26,6 +27,63 @@ Route::middleware('auth')->group(function () {
 
     // Vista del programador
     Route::view('programador', 'developer')->name('developer');
+    Route::post('programador/export-db', function () {
+        $user = auth()->user();
+        if (!$user || $user->role !== 'admin') {
+            abort(403);
+        }
+
+        $config = config('database.connections.mysql');
+        $host = $config['host'] ?? '127.0.0.1';
+        $userDb = $config['username'] ?? '';
+        $password = $config['password'] ?? '';
+        $database = $config['database'] ?? '';
+
+        if (!$database || !$userDb) {
+            return back()->with('error', 'Configuración de base de datos incompleta.');
+        }
+
+        $mysqldump = env('MYSQLDUMP_PATH', 'mysqldump');
+
+        // Verificar disponibilidad de mysqldump antes de ejecutar el backup
+        $check = new Process([$mysqldump, '--version']);
+        $check->run();
+        if (!$check->isSuccessful()) {
+            return back()->with('error', 'mysqldump no está disponible en el servidor. Define MYSQLDUMP_PATH en .env o agrega el binario al PATH.');
+        }
+
+        $backupDir = storage_path('app/backups');
+        if (!is_dir($backupDir)) {
+            mkdir($backupDir, 0755, true);
+        }
+
+        $filename = 'backup_'.now()->format('Ymd_His').'.sql';
+        $filePath = $backupDir.DIRECTORY_SEPARATOR.$filename;
+
+        $command = [
+            $mysqldump,
+            '-h', $host,
+            '-u', $userDb,
+        ];
+
+        if ($password !== '') {
+            $command[] = '-p'.$password;
+        }
+
+        $command[] = $database;
+
+        $process = new Process($command);
+        $process->setTimeout(120);
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            return back()->with('error', 'No se pudo exportar la base: '.$process->getErrorOutput());
+        }
+
+        file_put_contents($filePath, $process->getOutput());
+
+        return response()->download($filePath, $filename)->deleteFileAfterSend(true);
+    })->name('programador.export-db');
 });
 
 // Servicios and Camas (admin)
