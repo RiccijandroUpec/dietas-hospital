@@ -242,8 +242,29 @@ class PacienteController extends Controller
     public function update(Request $request, Paciente $paciente)
     {
         if (Auth::user() && Auth::user()->role === 'usuario') {
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'No tienes permiso para actualizar pacientes.'], 403);
+            }
             return redirect()->route('pacientes.index')->with('error', 'No tienes permiso para actualizar pacientes.');
         }
+        
+        // Si es petición AJAX para cambiar estado
+        if ($request->expectsJson() && $request->has('estado')) {
+            $data = $request->validate([
+                'estado' => 'required|in:hospitalizado,alta',
+            ]);
+            
+            $paciente->estado = $data['estado'];
+            if ($data['estado'] === 'alta') {
+                $paciente->servicio_id = null;
+                $paciente->cama_id = null;
+            }
+            $paciente->updated_by = auth()->id();
+            $paciente->save();
+            
+            return response()->json(['success' => true, 'message' => 'Paciente actualizado correctamente.']);
+        }
+        
         $data = $request->validate([
             'nombre' => 'required|string|max:255',
             'apellido' => 'required|string|max:255',

@@ -25,6 +25,9 @@ Route::get('pacientes/check-cedula', [App\Http\Controllers\PacienteController::c
 // Servicios and Camas (admin)
 Route::resource('servicios', App\Http\Controllers\ServicioController::class)->middleware('auth');
 Route::resource('camas', App\Http\Controllers\CamaController::class)->middleware('auth');
+
+// Vista gráfica de camas
+Route::get('camas-grafica', [App\Http\Controllers\CamasGraficaController::class, 'index'])->middleware('auth')->name('camas-grafica.index');
 // Dietas live search (public) - MUST be before resource to match correctly
 Route::get('dietas/search', [App\Http\Controllers\DietaController::class, 'search'])->name('dietas.search');
 // Dietas CRUD (index/show public; other actions protected in controller)
