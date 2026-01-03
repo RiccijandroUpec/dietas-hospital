@@ -31,18 +31,23 @@
 
             <!-- Estadísticas Rápidas -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                <!-- Pacientes -->
+                <!-- Pacientes Totales -->
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg hover:shadow-lg transition">
                     <div class="p-6">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-sm font-medium text-gray-600">Pacientes</p>
+                                <p class="text-sm font-medium text-gray-600">Total Pacientes</p>
                                 <p class="text-3xl font-bold text-blue-600 mt-2">
                                     {{ \App\Models\Paciente::count() }}
                                 </p>
-                                <p class="text-xs text-gray-500 mt-2">
-                                    {{ \App\Models\Paciente::where('estado', 'hospitalizado')->count() }} hospitalizados
-                                </p>
+                                <div class="flex gap-3 mt-2">
+                                    <p class="text-xs text-green-600 font-semibold">
+                                        🟢 {{ \App\Models\Paciente::where('estado', 'hospitalizado')->count() }} hospitalizados
+                                    </p>
+                                    <p class="text-xs text-gray-500 font-semibold">
+                                        🔵 {{ \App\Models\Paciente::where('estado', 'alta')->count() }} de alta
+                                    </p>
+                                </div>
                             </div>
                             <div class="bg-blue-100 rounded-full p-3">
                                 <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -135,6 +140,83 @@
                     </div>
                 </div>
                 @endif
+            </div>
+
+            <!-- Sección de Pacientes por Estado -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <!-- Pacientes Hospitalizados -->
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-800">🟢 Pacientes Hospitalizados</h3>
+                            <span class="bg-green-100 text-green-800 text-xs font-semibold px-3 py-1 rounded-full">
+                                {{ \App\Models\Paciente::where('estado', 'hospitalizado')->count() }}
+                            </span>
+                        </div>
+                        <div class="max-h-64 overflow-y-auto">
+                            @php
+                                $hospitalizados = \App\Models\Paciente::where('estado', 'hospitalizado')
+                                    ->with(['servicio', 'cama'])
+                                    ->orderBy('nombre')
+                                    ->get();
+                            @endphp
+                            @forelse($hospitalizados as $paciente)
+                                <div class="flex items-center justify-between py-2 border-b border-gray-100 hover:bg-gray-50 px-2 rounded">
+                                    <div class="flex-1">
+                                        <p class="font-medium text-gray-800">{{ $paciente->nombre }} {{ $paciente->apellido }}</p>
+                                        <p class="text-xs text-gray-500">
+                                            CI: {{ $paciente->cedula }} | 
+                                            {{ $paciente->servicio->nombre ?? 'Sin servicio' }} | 
+                                            Cama: {{ $paciente->cama->codigo ?? 'Sin asignar' }}
+                                        </p>
+                                    </div>
+                                    <a href="{{ route('pacientes.show', $paciente) }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                        Ver →
+                                    </a>
+                                </div>
+                            @empty
+                                <p class="text-gray-500 text-center py-4">No hay pacientes hospitalizados</p>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pacientes de Alta -->
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-800">🔵 Pacientes de Alta</h3>
+                            <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-3 py-1 rounded-full">
+                                {{ \App\Models\Paciente::where('estado', 'alta')->count() }}
+                            </span>
+                        </div>
+                        <div class="max-h-64 overflow-y-auto">
+                            @php
+                                $altas = \App\Models\Paciente::where('estado', 'alta')
+                                    ->with('servicio')
+                                    ->orderBy('updated_at', 'desc')
+                                    ->take(20)
+                                    ->get();
+                            @endphp
+                            @forelse($altas as $paciente)
+                                <div class="flex items-center justify-between py-2 border-b border-gray-100 hover:bg-gray-50 px-2 rounded">
+                                    <div class="flex-1">
+                                        <p class="font-medium text-gray-700">{{ $paciente->nombre }} {{ $paciente->apellido }}</p>
+                                        <p class="text-xs text-gray-500">
+                                            CI: {{ $paciente->cedula }} | 
+                                            {{ $paciente->servicio->nombre ?? 'Sin servicio' }}
+                                        </p>
+                                    </div>
+                                    <a href="{{ route('pacientes.show', $paciente) }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                        Ver →
+                                    </a>
+                                </div>
+                            @empty
+                                <p class="text-gray-500 text-center py-4">No hay pacientes dados de alta</p>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Accesos Rápidos -->
