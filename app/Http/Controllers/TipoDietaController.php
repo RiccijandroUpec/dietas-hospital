@@ -53,7 +53,7 @@ class TipoDietaController extends Controller
 
     public function destroy(TipoDieta $tipo_dieta)
     {
-        if (!Auth::user() || !in_array(Auth::user()->role, ['administrador', 'admin'], true)) {
+        if (!Auth::user() || Auth::user()->role !== 'admin') {
             return redirect()->route('tipos-dieta.index')->with('error', 'No tienes permiso para eliminar tipos de dieta.');
         }
 

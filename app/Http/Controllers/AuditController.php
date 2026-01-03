@@ -15,7 +15,7 @@ class AuditController extends Controller
     public function index(Request $request)
     {
         // Solo administradores pueden ver el historial de auditoría
-        if (auth()->user()->role !== 'administrador' && auth()->user()->role !== 'admin') {
+        if (auth()->user()->role !== 'admin') {
             return redirect()->route('dashboard')->with('error', 'No tienes permiso para acceder al historial de auditoría.');
         }
 
@@ -67,7 +67,7 @@ class AuditController extends Controller
     public function show(Audit $audit)
     {
         // Solo administradores
-        if (auth()->user()->role !== 'administrador' && auth()->user()->role !== 'admin') {
+        if (auth()->user()->role !== 'admin') {
             return redirect()->route('dashboard')->with('error', 'No tienes permiso.');
         }
 

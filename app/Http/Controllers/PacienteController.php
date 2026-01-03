@@ -153,7 +153,7 @@ class PacienteController extends Controller
                     'servicio' => $p->servicio ? $p->servicio->nombre : null,
                     'cama' => $p->cama ? $p->cama->codigo : null,
                     'edit_url' => auth()->user()->role !== 'usuario' ? route('pacientes.edit', $p) : null,
-                    'delete_url' => in_array(auth()->user()->role, ['administrador', 'admin'], true) ? route('pacientes.destroy', $p) : null,
+                    'delete_url' => auth()->user()->role === 'admin' ? route('pacientes.destroy', $p) : null,
                 ];
             })
         ]);
@@ -297,7 +297,7 @@ class PacienteController extends Controller
 
     public function destroy(Paciente $paciente)
     {
-        if (!Auth::user() || !in_array(Auth::user()->role, ['administrador', 'admin'], true)) {
+        if (!Auth::user() || Auth::user()->role !== 'admin') {
             return redirect()->route('pacientes.index')->with('error', 'No tienes permiso para eliminar pacientes.');
         }
         

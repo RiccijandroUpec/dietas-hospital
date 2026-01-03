@@ -58,7 +58,7 @@ class SubtipoDietaController extends Controller
 
     public function destroy(SubtipoDieta $subtipo_dieta)
     {
-        if (!Auth::user() || !in_array(Auth::user()->role, ['administrador', 'admin'], true)) {
+        if (!Auth::user() || Auth::user()->role !== 'admin') {
             return redirect()->route('subtipos-dieta.index')->with('error', 'No tienes permiso para eliminar subtipos de dieta.');
         }
 

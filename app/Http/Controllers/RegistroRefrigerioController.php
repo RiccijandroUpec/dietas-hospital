@@ -239,7 +239,7 @@ class RegistroRefrigerioController extends Controller
     public function destroy(RegistroRefrigerio $registroRefrigerio)
     {
         // Solo administradores pueden eliminar registros
-        if (auth()->user()->role !== 'administrador') {
+        if (auth()->user()->role !== 'admin') {
             return redirect()->route('registro-refrigerios.index')->with('error', 'No tienes permiso para eliminar registros.');
         }
 

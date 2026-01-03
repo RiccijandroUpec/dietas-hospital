@@ -3,6 +3,6 @@
     "builder": "nixpacks"
   },
   "deploy": {
-    "startCommand": "php artisan config:clear && php artisan cache:clear && php artisan view:clear && php artisan route:clear && php artisan migrate --force && php artisan users:reset-passwords --quiet && php artisan db:seed --class=UsersSeeder --force && php artisan config:cache && php -S 0.0.0.0:${PORT:-8080} -t public"
+    "startCommand": "php artisan config:cache && php artisan migrate --force && php artisan db:seed --class=RegistrationScheduleSeeder --force && php artisan view:cache && php -S 0.0.0.0:${PORT:-8080} -t public"
   }
 }
