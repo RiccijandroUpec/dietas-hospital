@@ -24,27 +24,29 @@
 
             @if($servicioId && $camas->count() > 0)
                 <!-- Grid de Camas -->
-                <div class="bg-white dark:bg-gray-900 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="bg-gray-50 overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">
-                        <h3 class="text-lg font-semibold mb-6 text-gray-900 dark:text-gray-100">Camas del Servicio</h3>
+                        <h3 class="text-lg font-semibold mb-6 text-gray-900">Camas del Servicio</h3>
                         
                         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                             @foreach($camas as $cama)
                                 @php
                                     $paciente = $pacientesPorCama->get($cama->id);
                                     $ocupada = $paciente !== null;
+                                    // Extraer solo el número del código (ej: MI1 -> 1, C10 -> 10)
+                                    $numero = preg_replace('/[^0-9]/', '', $cama->codigo);
                                 @endphp
                                 
                                 <!-- Cama Card -->
                                 <div class="relative group">
                                     <button 
-                                        class="w-full aspect-square rounded-lg font-bold text-sm flex flex-col items-center justify-center transition-all duration-200 {{ $ocupada ? 'bg-red-500 hover:bg-red-600 text-white shadow-red-200' : 'bg-green-500 hover:bg-green-600 text-white shadow-green-200' }} shadow-lg hover:shadow-xl"
+                                        class="w-full aspect-square rounded-xl font-bold text-base flex flex-col items-center justify-center transition-all duration-200 {{ $ocupada ? 'bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white border-2 border-red-700' : 'bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white border-2 border-green-700' }} shadow-xl hover:shadow-2xl hover:scale-105"
                                         onclick="toggleMenu({{ $cama->id }}, {{ $ocupada ? 'true' : 'false' }})">
-                                        <span class="text-xl font-bold">{{ $cama->codigo }}</span>
+                                        <span class="text-2xl font-extrabold drop-shadow-md">{{ $numero }}</span>
                                         @if($ocupada)
-                                            <span class="text-xs mt-1 truncate px-1">{{ $paciente->nombre }}</span>
+                                            <span class="text-xs mt-1 truncate px-1 font-semibold drop-shadow">{{ $paciente->nombre }}</span>
                                         @else
-                                            <span class="text-xs mt-1">Libre</span>
+                                            <span class="text-xs mt-1 font-semibold drop-shadow">Libre</span>
                                         @endif
                                     </button>
 
@@ -76,14 +78,14 @@
                         </div>
 
                         <!-- Leyenda -->
-                        <div class="mt-8 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg flex gap-4">
+                        <div class="mt-8 p-4 bg-white rounded-lg shadow-md flex gap-6">
                             <div class="flex items-center gap-2">
-                                <div class="w-6 h-6 bg-green-500 rounded shadow-md"></div>
-                                <span class="text-sm font-medium">Cama Libre</span>
+                                <div class="w-8 h-8 bg-green-500 border-2 border-green-700 rounded shadow-md"></div>
+                                <span class="text-sm font-semibold text-gray-800">Cama Libre</span>
                             </div>
                             <div class="flex items-center gap-2">
-                                <div class="w-6 h-6 bg-red-500 rounded shadow-md"></div>
-                                <span class="text-sm font-medium">Cama Ocupada</span>
+                                <div class="w-8 h-8 bg-red-500 border-2 border-red-700 rounded shadow-md"></div>
+                                <span class="text-sm font-semibold text-gray-800">Cama Ocupada</span>
                             </div>
                         </div>
                     </div>

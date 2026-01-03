@@ -66,7 +66,7 @@
                             <select id="servicio_select" name="servicio_id" class="w-full border-gray-300 rounded-md" required>
                                 <option value="">-- Seleccione --</option>
                                 @foreach($servicios as $servicio)
-                                    <option value="{{ $servicio->id }}" @if(old('servicio_id') == $servicio->id) selected @endif>{{ $servicio->nombre }}</option>
+                                    <option value="{{ $servicio->id }}" @if(old('servicio_id', $servicioId) == $servicio->id) selected @endif>{{ $servicio->nombre }}</option>
                                 @endforeach
                             </select>
                             @error('servicio_id')<div class="text-red-600 text-sm mt-1">⚠️ {{ $message }}</div>@enderror
@@ -75,7 +75,7 @@
                         <!-- Cama -->
                         <div id="cama_wrapper">
                             <label class="block text-sm font-medium text-gray-700 mb-1">🛏️ Cama</label>
-                            <select id="cama_select" name="cama_id" class="w-full border-gray-300 rounded-md" disabled>
+                            <select id="cama_select" name="cama_id" class="w-full border-gray-300 rounded-md" @if($servicioId && !$camaId) required @endif>
                                 <option value="">-- Seleccione servicio primero --</option>
                             </select>
                             @error('cama_id')<div class="text-red-600 text-sm mt-1">⚠️ {{ $message }}</div>@enderror
@@ -194,9 +194,9 @@ document.addEventListener('DOMContentLoaded', function () {
         loadCamas(this.value);
     });
 
-    // Si hay un servicio ya seleccionado (old), cargar camas iniciales
+    // Si hay un servicio ya seleccionado (old o desde parámetro), cargar camas iniciales
     const initialServicio = servicioSelect.value;
-    const oldCama = '{{ old('cama_id') }}';
+    const oldCama = '{{ old('cama_id', $camaId ?? '') }}';
     if (initialServicio) {
         loadCamas(initialServicio, oldCama ? parseInt(oldCama) : null);
     }
@@ -215,11 +215,33 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(res => res.json())
             .then(data => {
                 if (data.exists) {
-                    cedulaFeedback.innerHTML = `<span class="text-red-600">Ya existe un paciente con esa cédula.</span> <a class="text-blue-600 underline" href="${data.edit_url}">Editar</a>`;
-                    submitBtn.disabled = true;
+                    // Llenar campos automáticamente con los datos del paciente
+                    document.querySelector('input[name="nombre"]').value = data.nombre;
+                    document.querySelector('input[name="apellido"]').value = data.apellido;
+                    document.querySelector('input[name="edad"]').value = data.edad || '';
+                    document.getElementById('estado_select').value = data.estado || 'hospitalizado';
+                    
+                    // Marcar condiciones
+                    document.querySelectorAll('input[name="condicion[]"]').forEach(cb => {
+                        cb.checked = data.condicion.includes(cb.value);
+                    });
+                    
+                    // Establecer servicio y cargar camas
+                    if (data.servicio_id) {
+                        servicioSelect.value = data.servicio_id;
+                        loadCamas(data.servicio_id, data.cama_id);
+                    }
+                    
+                    // Mostrar mensaje con opción de editar
+                    cedulaFeedback.innerHTML = `<span class="text-amber-600 font-semibold">ℹ️ Paciente encontrado - Datos cargados automáticamente</span>`;
+                    submitBtn.disabled = false;
                 } else {
                     cedulaFeedback.textContent = '';
                     submitBtn.disabled = false;
+                    // Limpiar campos si no existe
+                    document.querySelector('input[name="nombre"]').value = '';
+                    document.querySelector('input[name="apellido"]').value = '';
+                    document.querySelector('input[name="edad"]').value = '';
                 }
             })
             .catch(() => {
@@ -229,7 +251,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     cedulaInput.addEventListener('input', function () {
-        submitBtn.disabled = true; // prevent quick submit
         clearTimeout(cedulaTimer);
         cedulaTimer = setTimeout(checkCedula, 500);
     });

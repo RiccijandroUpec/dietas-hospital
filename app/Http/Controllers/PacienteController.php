@@ -74,14 +74,19 @@ class PacienteController extends Controller
         return response()->json($camas);
     }
 
-    public function create()
+    public function create(Request $request)
     {
         if (Auth::user() && Auth::user()->role === 'usuario') {
             return redirect()->route('pacientes.index')->with('error', 'No tienes permiso para crear pacientes.');
         }
         $servicios = Servicio::all();
         $camas = Cama::all();
-        return view('pacientes.create', compact('servicios', 'camas'));
+        
+        // Obtener parámetros de cama y servicio si vienen de camas gráfica
+        $camaId = $request->query('cama_id');
+        $servicioId = $request->query('servicio_id');
+        
+        return view('pacientes.create', compact('servicios', 'camas', 'camaId', 'servicioId'));
     }
 
     // Comprueba si existe un paciente por cédula (AJAX)
@@ -97,6 +102,14 @@ class PacienteController extends Controller
             return response()->json([
                 'exists' => true,
                 'id' => $paciente->id,
+                'nombre' => $paciente->nombre,
+                'apellido' => $paciente->apellido,
+                'cedula' => $paciente->cedula,
+                'edad' => $paciente->edad,
+                'condicion' => $paciente->condicion ? explode(',', $paciente->condicion) : [],
+                'servicio_id' => $paciente->servicio_id,
+                'cama_id' => $paciente->cama_id,
+                'estado' => $paciente->estado,
                 'edit_url' => route('pacientes.edit', $paciente),
             ]);
         }
