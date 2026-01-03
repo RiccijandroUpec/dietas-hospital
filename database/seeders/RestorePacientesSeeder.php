@@ -94,21 +94,31 @@ class RestorePacientesSeeder extends Seeder
         $omitidos = 0;
 
         foreach ($pacientes as $data) {
-            // Verificar que el servicio existe antes de insertar
-            $servicio = \App\Models\Servicio::find($data['servicio_id']);
-            
-            if (!$servicio) {
-                $this->command->warn("⚠ Servicio ID {$data['servicio_id']} no existe. Omitiendo paciente {$data['nombre']} {$data['apellido']}");
-                $omitidos++;
-                continue;
-            }
+            // Si el paciente está de alta y el servicio no existe, usar NULL
+            if ($data['estado'] === 'alta') {
+                $servicio = \App\Models\Servicio::find($data['servicio_id']);
+                if (!$servicio) {
+                    $this->command->info("ℹ Paciente de alta {$data['nombre']} {$data['apellido']} - servicio no existe, asignando NULL");
+                    $data['servicio_id'] = null;
+                }
+                $data['cama_id'] = null; // Los pacientes de alta no tienen cama
+            } else {
+                // Para hospitalizados, verificar que el servicio existe
+                $servicio = \App\Models\Servicio::find($data['servicio_id']);
+                
+                if (!$servicio) {
+                    $this->command->warn("⚠ Servicio ID {$data['servicio_id']} no existe. Omitiendo paciente {$data['nombre']} {$data['apellido']}");
+                    $omitidos++;
+                    continue;
+                }
 
-            // Verificar que la cama existe si está asignada
-            if ($data['cama_id']) {
-                $cama = \App\Models\Cama::find($data['cama_id']);
-                if (!$cama) {
-                    $this->command->warn("⚠ Cama ID {$data['cama_id']} no existe. Asignando null a paciente {$data['nombre']} {$data['apellido']}");
-                    $data['cama_id'] = null;
+                // Verificar que la cama existe si está asignada
+                if ($data['cama_id']) {
+                    $cama = \App\Models\Cama::find($data['cama_id']);
+                    if (!$cama) {
+                        $this->command->warn("⚠ Cama ID {$data['cama_id']} no existe. Asignando null a paciente {$data['nombre']} {$data['apellido']}");
+                        $data['cama_id'] = null;
+                    }
                 }
             }
 
