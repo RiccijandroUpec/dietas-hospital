@@ -92,8 +92,8 @@
                     </div>
                 </div>
 
-                <!-- Table -->
-                <div class="w-full overflow-x-auto">
+                <!-- Vista TABLA para Desktop -->
+                <div class="hidden md:block w-full overflow-x-auto">
                     <table class="w-full divide-y divide-gray-200 text-sm">
                         <thead class="bg-gray-50">
                             <tr>
@@ -185,6 +185,116 @@
                     </table>
 
                     <div id="paginationContainer" class="mt-6">
+                        {{ $pacientes->links() }}
+                    </div>
+                </div>
+
+                <!-- Vista TARJETAS para Móvil -->
+                <div class="md:hidden">
+                    @if($pacientes->count() > 0)
+                        <div id="pacientesMobile" class="space-y-4">
+                            @foreach($pacientes as $paciente)
+                                <div class="bg-white rounded-lg shadow-md p-4 border-l-4 border-green-500" data-estado="{{ $paciente->estado }}">
+                                    <!-- Nombre y Cédula -->
+                                    <div class="mb-3 pb-3 border-b border-gray-200">
+                                        <div class="text-base font-bold text-gray-900">
+                                            {{ $paciente->nombre }} {{ $paciente->apellido }}
+                                        </div>
+                                        <div class="text-sm text-gray-600 mt-1 font-mono">CI: {{ $paciente->cedula }}</div>
+                                    </div>
+
+                                    <!-- Estado y Edad -->
+                                    <div class="grid grid-cols-2 gap-3 mb-3">
+                                        <div>
+                                            <div class="text-xs font-semibold text-gray-500 uppercase mb-1">📊 Estado</div>
+                                            @if($paciente->estado === 'hospitalizado')
+                                                <span class="inline-block bg-blue-100 text-blue-800 rounded-full px-3 py-1 text-xs font-semibold">Hospitalizado</span>
+                                            @else
+                                                <span class="inline-block bg-green-100 text-green-800 rounded-full px-3 py-1 text-xs font-semibold">Alta</span>
+                                            @endif
+                                        </div>
+                                        <div>
+                                            <div class="text-xs font-semibold text-gray-500 uppercase mb-1">🎂 Edad</div>
+                                            <div class="text-sm text-gray-900">{{ $paciente->edad ?? '–' }} años</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Condición -->
+                                    <div class="mb-3">
+                                        <div class="text-xs font-semibold text-gray-500 uppercase mb-2">🏥 Condición</div>
+                                        @php
+                                            $cond = $paciente->condicion;
+                                            $labels = [
+                                                'normal' => 'Normal',
+                                                'diabetico' => 'Diabético',
+                                                'hiposodico' => 'Hiposódico',
+                                            ];
+                                            $condArr = $cond ? explode(',', $cond) : [];
+                                        @endphp
+                                        @if($condArr && $condArr[0] !== '')
+                                            <div class="flex flex-wrap gap-2">
+                                                @foreach($condArr as $c)
+                                                    <span class="inline-block bg-yellow-100 text-yellow-800 rounded-full px-3 py-1 text-xs font-semibold">{{ $labels[trim($c)] ?? $c }}</span>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <span class="text-gray-400 text-sm">Sin especificar</span>
+                                        @endif
+                                    </div>
+
+                                    <!-- Servicio y Cama -->
+                                    <div class="mb-3 pb-3 border-b border-gray-100">
+                                        <div class="text-xs font-semibold text-gray-500 uppercase mb-2">🛏️ Ubicación</div>
+                                        <div class="flex flex-wrap gap-2">
+                                            <span class="inline-block bg-sky-100 text-sky-800 rounded-full px-3 py-1 text-xs font-semibold">
+                                                {{ optional($paciente->servicio)->nombre ?? 'Sin servicio' }}
+                                            </span>
+                                            <span class="inline-block bg-violet-100 text-violet-800 rounded-full px-3 py-1 text-xs font-semibold font-mono">
+                                                Cama: {{ optional($paciente->cama)->codigo ?? '–' }}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Última actualización -->
+                                    <div class="mb-4">
+                                        <div class="text-xs font-semibold text-gray-500 uppercase mb-1">🕒 Actualizado</div>
+                                        <div class="text-sm text-gray-700">{{ $paciente->updated_at?->diffForHumans() ?? '–' }}</div>
+                                    </div>
+
+                                    <!-- Acciones -->
+                                    <div class="flex flex-wrap gap-2">
+                                        <a href="{{ route('pacientes.show', $paciente) }}" class="flex-1 text-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition">
+                                            👁️ Ver
+                                        </a>
+                                        @if(auth()->check() && auth()->user()->role !== 'usuario')
+                                            <a href="{{ route('pacientes.edit', $paciente) }}" class="flex-1 text-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition">
+                                                ✏️ Editar
+                                            </a>
+                                        @endif
+                                        @if(auth()->check() && in_array(auth()->user()->role, ['administrador', 'admin']))
+                                            <form action="{{ route('pacientes.destroy', $paciente) }}" method="POST" class="flex-1" onsubmit="return confirm('¿Eliminar este paciente?')">
+                                                @csrf @method('DELETE')
+                                                <button type="submit" class="w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition">🗑️ Eliminar</button>
+                                            </form>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="bg-white rounded-lg shadow-md p-8 text-center">
+                            <div class="text-6xl mb-4">👥</div>
+                            <h3 class="text-lg font-semibold text-gray-800 mb-2">No hay pacientes</h3>
+                            <p class="text-gray-600 mb-4">Comienza creando el primer paciente.</p>
+                            @if(auth()->check() && auth()->user()->role !== 'usuario')
+                                <a href="{{ route('pacientes.create') }}" class="inline-block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+                                    ➕ Crear Paciente
+                                </a>
+                            @endif
+                        </div>
+                    @endif
+
+                    <div id="paginationContainerMobile" class="mt-6">
                         {{ $pacientes->links() }}
                     </div>
                 </div>

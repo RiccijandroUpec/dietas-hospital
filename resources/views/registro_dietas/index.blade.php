@@ -77,8 +77,8 @@
                     </div>
                 </div>
 
-                <!-- Table -->
-                <div class="w-full overflow-x-auto">
+                <!-- Vista TABLA para Desktop -->
+                <div class="hidden md:block w-full overflow-x-auto">
                     @if($registros->count() > 0)
                         <table class="w-full divide-y divide-gray-200 text-sm">
                             <thead class="bg-gray-50">
@@ -189,6 +189,144 @@
                             <div class="text-6xl mb-4">📭</div>
                             <h3 class="text-lg font-semibold text-gray-800 mb-2">No hay registros</h3>
                             <p class="text-gray-600 mb-4">No se encontraron registros de dieta con los criterios de búsqueda.</p>
+                            @if(auth()->user()->role !== 'usuario')
+                                <a href="{{ route('registro-dietas.create') }}" class="inline-block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+                                    ➕ Crear primer registro
+                                </a>
+                            @endif
+                        </div>
+                    @endif
+
+                    <!-- Pagination -->
+                    <div class="mt-6">
+                        {{ $registros->links() }}
+                    </div>
+                </div>
+
+                <!-- Vista TARJETAS para Móvil -->
+                <div class="md:hidden">
+                    @if($registros->count() > 0)
+                        <div class="space-y-4">
+                            @foreach($registros as $r)
+                                <div class="bg-white rounded-lg shadow-md p-4 border-l-4 border-blue-500">
+                                    <!-- Paciente -->
+                                    <div class="mb-3 pb-3 border-b border-gray-200">
+                                        <div class="text-base font-bold text-gray-900">
+                                            {{ optional($r->paciente)->nombre }} {{ optional($r->paciente)->apellido }}
+                                        </div>
+                                        @if($r->paciente)
+                                            <div class="text-sm text-gray-600 mt-1">CI: {{ $r->paciente->cedula }}</div>
+                                        @endif
+                                        @if($r->es_tardia)
+                                            <span class="inline-block mt-2 px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-semibold">🔴 TARDÍA</span>
+                                        @endif
+                                    </div>
+
+                                    <!-- Tipo de Comida y Fecha -->
+                                    <div class="grid grid-cols-2 gap-3 mb-3">
+                                        <div>
+                                            <div class="text-xs font-semibold text-gray-500 uppercase mb-1">🍽️ Tipo</div>
+                                            @php 
+                                                $tipos = [
+                                                    'desayuno' => ['Desayuno', 'bg-yellow-100 text-yellow-800'],
+                                                    'almuerzo' => ['Almuerzo', 'bg-orange-100 text-orange-800'],
+                                                    'merienda' => ['Merienda', 'bg-pink-100 text-pink-800']
+                                                ];
+                                                $tipo = $tipos[$r->tipo_comida] ?? ['', ''];
+                                            @endphp
+                                            <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold {{ $tipo[1] }}">{{ $tipo[0] }}</span>
+                                        </div>
+                                        <div>
+                                            <div class="text-xs font-semibold text-gray-500 uppercase mb-1">📅 Fecha</div>
+                                            <div class="text-sm text-gray-900">{{ \Carbon\Carbon::parse($r->fecha)->format('d/m/Y') }}</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Presentación -->
+                                    <div class="mb-3">
+                                        <div class="text-xs font-semibold text-gray-500 uppercase mb-1">🥄 Presentación</div>
+                                        @php
+                                            $v = $r->vajilla;
+                                            $cls = $v === 'descartable' ? 'bg-gray-100 text-gray-800' : 'bg-green-100 text-green-800';
+                                            $label = $v === 'descartable' ? 'Descartable' : 'Vajilla normal';
+                                        @endphp
+                                        <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold {{ $cls }}">{{ $label }}</span>
+                                    </div>
+
+                                    <!-- Dietas -->
+                                    <div class="mb-3">
+                                        <div class="text-xs font-semibold text-gray-500 uppercase mb-2">🥗 Dietas</div>
+                                        <div class="flex flex-wrap gap-2">
+                                            @foreach($r->dietas as $dieta)
+                                                @php
+                                                    $n = strtolower($dieta->nombre ?? '');
+                                                    $cls = 'bg-indigo-100 text-indigo-800';
+                                                    if (str_contains($n, 'diab')) {
+                                                        $cls = 'bg-rose-100 text-rose-800';
+                                                    } elseif (str_contains($n, 'hiposod') || str_contains($n, 'sodio')) {
+                                                        $cls = 'bg-sky-100 text-sky-800';
+                                                    } elseif (str_contains($n, 'normal')) {
+                                                        $cls = 'bg-green-100 text-green-800';
+                                                    } elseif (str_contains($n, 'bland')) {
+                                                        $cls = 'bg-amber-100 text-amber-800';
+                                                    } elseif (str_contains($n, 'líquid') || str_contains($n, 'liquid')) {
+                                                        $cls = 'bg-cyan-100 text-cyan-800';
+                                                    } elseif (str_contains($n, 'veget')) {
+                                                        $cls = 'bg-emerald-100 text-emerald-800';
+                                                    }
+                                                @endphp
+                                                <span class="inline-block rounded-full px-3 py-1 text-xs font-semibold {{ $cls }}">{{ $dieta->nombre }}</span>
+                                            @endforeach
+                                        </div>
+                                    </div>
+
+                                    <!-- Observaciones -->
+                                    @if($r->observaciones)
+                                        <div class="mb-3 pb-3 border-b border-gray-100">
+                                            <div class="text-xs font-semibold text-gray-500 uppercase mb-1">📝 Observaciones</div>
+                                            <div class="text-sm text-gray-700">{{ $r->observaciones }}</div>
+                                        </div>
+                                    @endif
+
+                                    <!-- Registrado/Actualizado -->
+                                    <div class="grid grid-cols-2 gap-3 mb-4 text-xs">
+                                        <div>
+                                            <div class="font-semibold text-gray-500 uppercase mb-1">👤 Registrado</div>
+                                            <div class="text-gray-700">{{ optional($r->createdBy)->name ?? '—' }}</div>
+                                            <div class="text-gray-500">{{ $r->created_at->format('d/m/Y') }}</div>
+                                        </div>
+                                        <div>
+                                            <div class="font-semibold text-gray-500 uppercase mb-1">🔄 Actualizado</div>
+                                            <div class="text-gray-700">{{ optional($r->updatedBy)->name ?? '—' }}</div>
+                                            <div class="text-gray-500">{{ $r->updated_at->format('d/m/Y') }}</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Acciones -->
+                                    <div class="flex flex-wrap gap-2">
+                                        <a href="{{ route('registro-dietas.show', $r) }}" class="flex-1 text-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition">
+                                            👁️ Ver
+                                        </a>
+                                        @if(auth()->user()->role !== 'usuario')
+                                            <a href="{{ route('registro-dietas.edit', $r) }}" class="flex-1 text-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition">
+                                                ✏️ Editar
+                                            </a>
+                                        @endif
+                                        @if(auth()->user()->role === 'admin')
+                                            <form action="{{ route('registro-dietas.destroy', $r) }}" method="POST" class="flex-1" onsubmit="return confirm('¿Eliminar este registro?')">
+                                                @csrf @method('DELETE')
+                                                <button type="submit" class="w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition">🗑️ Eliminar</button>
+                                            </form>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="bg-white rounded-lg shadow-md p-8 text-center">
+                            <div class="text-6xl mb-4">📭</div>
+                            <h3 class="text-lg font-semibold text-gray-800 mb-2">No hay registros</h3>
+                            <p class="text-gray-600 mb-4">No se encontraron registros de dieta.</p>
                             @if(auth()->user()->role !== 'usuario')
                                 <a href="{{ route('registro-dietas.create') }}" class="inline-block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
                                     ➕ Crear primer registro
