@@ -214,8 +214,12 @@ document.addEventListener('DOMContentLoaded', function () {
         cedulaFeedback.innerHTML = '<span class="text-blue-600">🔍 Buscando...</span>';
 
         fetch(`/pacientes/check-cedula?cedula=${encodeURIComponent(ced)}`)
-            .then(res => res.json())
+            .then(res => {
+                console.log('Response status:', res.status);
+                return res.json();
+            })
             .then(data => {
+                console.log('Data received:', data);
                 if (data.exists) {
                     // Llenar campos automáticamente con los datos del paciente
                     document.querySelector('input[name="nombre"]').value = data.nombre || '';
@@ -227,8 +231,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     estadoSelectElem.value = data.estado || 'hospitalizado';
                     toggleServicioCama(); // Actualizar visibilidad de servicio/cama
                     
-                    // Marcar condiciones (convertir string separado por comas a array)
-                    const condiciones = data.condicion ? data.condicion.split(',') : [];
+                    // Marcar condiciones (ya viene como array desde el backend)
+                    const condiciones = Array.isArray(data.condicion) ? data.condicion : [];
+                    console.log('Condiciones:', condiciones);
                     document.querySelectorAll('input[name="condicion[]"]').forEach(cb => {
                         cb.checked = condiciones.includes(cb.value);
                     });
