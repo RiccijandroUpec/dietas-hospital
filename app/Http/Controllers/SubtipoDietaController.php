@@ -62,8 +62,11 @@ class SubtipoDietaController extends Controller
             return redirect()->route('subtipos-dieta.index')->with('error', 'No tienes permiso para eliminar subtipos de dieta.');
         }
 
-        if ($subtipo_dieta->dietas()->count() > 0) {
-            return back()->withErrors(['error' => 'No se puede eliminar el subtipo porque tiene dietas asociadas.']);
+        $dietasCount = $subtipo_dieta->dietas()->count();
+        if ($dietasCount > 0) {
+            return redirect()
+                ->route('subtipos-dieta.index')
+                ->with('error', "No se puede eliminar el subtipo '{$subtipo_dieta->nombre}' porque tiene {$dietasCount} dieta(s) asociada(s). Primero elimine o reasigne las dietas.");
         }
         
         $subtipo_dieta->delete();

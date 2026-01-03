@@ -82,6 +82,14 @@ class RefrigerioController extends Controller
      */
     public function destroy(Refrigerio $refrigerio)
     {
+        // Verificar si tiene registros asociados
+        $registrosCount = $refrigerio->registros()->count();
+        if ($registrosCount > 0) {
+            return redirect()
+                ->route('refrigerios.index')
+                ->with('error', "No se puede eliminar el refrigerio '{$refrigerio->nombre}' porque tiene {$registrosCount} registro(s) asociado(s). Primero elimine los registros.");
+        }
+
         // Registrar auditoría antes de eliminar
         AuditService::log('delete', "Refrigerio eliminado: {$refrigerio->nombre}", 'Refrigerio', $refrigerio->id);
 

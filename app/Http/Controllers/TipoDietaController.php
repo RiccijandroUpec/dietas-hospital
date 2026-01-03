@@ -57,8 +57,16 @@ class TipoDietaController extends Controller
             return redirect()->route('tipos-dieta.index')->with('error', 'No tienes permiso para eliminar tipos de dieta.');
         }
 
-        if ($tipo_dieta->dietas()->count() > 0 || $tipo_dieta->subtipos()->count() > 0) {
-            return back()->withErrors(['error' => 'No se puede eliminar el tipo porque tiene dietas o subtipos asociados.']);
+        $dietasCount = $tipo_dieta->dietas()->count();
+        $subtiposCount = $tipo_dieta->subtipos()->count();
+        
+        if ($dietasCount > 0 || $subtiposCount > 0) {
+            $mensaje = "No se puede eliminar el tipo de dieta '{$tipo_dieta->nombre}' porque tiene ";
+            $partes = [];
+            if ($dietasCount > 0) $partes[] = "{$dietasCount} dieta(s)";
+            if ($subtiposCount > 0) $partes[] = "{$subtiposCount} subtipo(s)";
+            $mensaje .= implode(' y ', $partes) . " asociado(s). Primero elimine o reasigne estos registros.";
+            return redirect()->route('tipos-dieta.index')->with('error', $mensaje);
         }
         
         $tipo_dieta->delete();

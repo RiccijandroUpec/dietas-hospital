@@ -61,7 +61,15 @@ class CamaController extends Controller
 
     public function destroy(Cama $cama)
     {
+        // Verificar si tiene pacientes asociados
+        $pacientesCount = $cama->pacientes()->count();
+        if ($pacientesCount > 0) {
+            return redirect()
+                ->route('camas.index')
+                ->with('error', "No se puede eliminar la cama '{$cama->codigo}' porque tiene {$pacientesCount} paciente(s) asignado(s). Primero reasigne o dé de alta a los pacientes.");
+        }
+
         $cama->delete();
-        return redirect()->route('camas.index')->with('success', 'Cama eliminada.');
+        return redirect()->route('camas.index')->with('success', 'Cama eliminada correctamente.');
     }
 }

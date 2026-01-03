@@ -115,7 +115,23 @@ class ServicioController extends Controller
 
     public function destroy(Servicio $servicio)
     {
+        // Verificar si tiene camas asociadas
+        $camasCount = $servicio->camas()->count();
+        if ($camasCount > 0) {
+            return redirect()
+                ->route('servicios.index')
+                ->with('error', "No se puede eliminar el servicio '{$servicio->nombre}' porque tiene {$camasCount} cama(s) asociada(s). Primero elimine o reasigne las camas.");
+        }
+
+        // Verificar si tiene pacientes asociados
+        $pacientesCount = $servicio->pacientes()->count();
+        if ($pacientesCount > 0) {
+            return redirect()
+                ->route('servicios.index')
+                ->with('error', "No se puede eliminar el servicio '{$servicio->nombre}' porque tiene {$pacientesCount} paciente(s) asociado(s). Primero reasigne los pacientes a otro servicio.");
+        }
+
         $servicio->delete();
-        return redirect()->route('servicios.index')->with('success', 'Servicio eliminado.');
+        return redirect()->route('servicios.index')->with('success', 'Servicio eliminado correctamente.');
     }
 }
