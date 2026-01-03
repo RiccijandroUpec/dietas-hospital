@@ -27,6 +27,23 @@
                 <div class="bg-gray-50 overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6">
                         <h3 class="text-lg font-semibold mb-6 text-gray-900">Camas del Servicio</h3>
+
+                        @php
+                            $ocupadas = $pacientesPorCama->count();
+                            $totales = $camas->count();
+                            $libres = max($totales - $ocupadas, 0);
+                        @endphp
+                        <div class="flex flex-wrap gap-3 mb-6 text-sm">
+                            <span class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-red-50 text-red-700 border border-red-200">
+                                🔴 Ocupadas: <strong>{{ $ocupadas }}</strong>
+                            </span>
+                            <span class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-green-50 text-green-700 border border-green-200">
+                                🟢 Disponibles: <strong>{{ $libres }}</strong>
+                            </span>
+                            <span class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-50 text-gray-700 border border-gray-200">
+                                🛏️ Total: <strong>{{ $totales }}</strong>
+                            </span>
+                        </div>
                         
                         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                             @foreach($camas as $cama)
@@ -51,23 +68,23 @@
                                     </button>
 
                                     <!-- Menú Flotante -->
-                                    <div class="hidden absolute top-full mt-2 left-0 right-0 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-xl z-50 min-w-max" id="menu-{{ $cama->id }}">
-                                        <div class="p-2 space-y-1">
+                                    <div class="hidden absolute top-full mt-2 left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-2xl z-50 min-w-max" id="menu-{{ $cama->id }}">
+                                        <div class="p-2 space-y-1 text-gray-800">
                                             @if($ocupada)
-                                                <a href="{{ route('pacientes.show', $paciente->id) }}" class="block w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 rounded">
+                                                <a href="{{ route('pacientes.show', $paciente->id) }}" class="block w-full text-left px-3 py-2 text-sm hover:bg-gray-100 rounded">
                                                     👤 Ver Paciente
                                                 </a>
-                                                <a href="{{ route('registro-dietas.create') }}?paciente_id={{ $paciente->id }}" class="block w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 rounded">
+                                                <a href="{{ route('registro-dietas.create') }}?paciente_id={{ $paciente->id }}" class="block w-full text-left px-3 py-2 text-sm hover:bg-gray-100 rounded">
                                                     🍽️ Registrar Dieta
                                                 </a>
-                                                <a href="{{ route('registro-refrigerios.create') }}?paciente_id={{ $paciente->id }}" class="block w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 rounded">
+                                                <a href="{{ route('registro-refrigerios.create') }}?paciente_id={{ $paciente->id }}" class="block w-full text-left px-3 py-2 text-sm hover:bg-gray-100 rounded">
                                                     ☕ Registrar Refrigerio
                                                 </a>
-                                                <button onclick="darDeAlta({{ $paciente->id }}, '{{ $paciente->nombre }}')" class="block w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded">
+                                                <button onclick="darDeAlta({{ $paciente->id }}, '{{ $paciente->nombre }}')" class="block w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded">
                                                     ❌ Dar de Alta
                                                 </button>
                                             @else
-                                                <a href="{{ route('pacientes.create') }}?cama_id={{ $cama->id }}&servicio_id={{ $servicioId }}" class="block w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600 rounded">
+                                                <a href="{{ route('pacientes.create') }}?cama_id={{ $cama->id }}&servicio_id={{ $servicioId }}" class="block w-full text-left px-3 py-2 text-sm hover:bg-gray-100 rounded">
                                                     ➕ Agregar Paciente
                                                 </a>
                                             @endif
@@ -144,17 +161,24 @@
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                     },
                     body: JSON.stringify({ estado: 'alta' })
                 })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
+                .then(async response => {
+                    const data = await response.json().catch(() => null);
+                    if (!response.ok) {
+                        const msg = data?.message || data?.error || 'Error al procesar la solicitud';
+                        throw new Error(msg);
+                    }
+                    if (data && data.success) {
                         alert('Paciente dado de alta correctamente');
                         location.reload();
                     } else {
-                        alert('Error al dar de alta: ' + (data.message || 'Error desconocido'));
+                        const msg = data?.message || 'Error desconocido';
+                        throw new Error(msg);
                     }
                 })
                 .catch(error => {

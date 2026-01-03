@@ -68,6 +68,28 @@
                             </svg>
                         </div>
                     </div>
+                    <div class="mt-2 text-xs text-gray-500">Tip: escribe “alta” o “hospitalizado” para filtrar rápido.</div>
+                </div>
+
+                <!-- Filtros -->
+                <div class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <select 
+                            id="estadoFilter"
+                            class="w-full sm:w-auto border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
+                        >
+                            <option value="">Todos los estados</option>
+                            <option value="hospitalizado">Hospitalizado</option>
+                            <option value="alta">Alta</option>
+                        </select>
+                        <button 
+                            id="limpiarFiltros"
+                            class="flex items-center gap-1 px-3 py-2 text-sm border border-gray-200 rounded-lg text-gray-600 hover:text-emerald-700 hover:border-emerald-300 transition"
+                            type="button"
+                        >
+                            <span>Limpiar</span>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Table -->
@@ -80,15 +102,15 @@
                                 <th class="px-4 py-3 text-left font-semibold text-gray-700">Estado</th>
                                 <th class="px-4 py-3 text-left font-semibold text-gray-700">Edad</th>
                                 <th class="px-4 py-3 text-left font-semibold text-gray-700">Condición</th>
-                                <th class="px-4 py-3 text-left font-semibold text-gray-700">Servicio</th>
-                                <th class="px-4 py-3 text-left font-semibold text-gray-700">Cama</th>
+                                <th class="px-4 py-3 text-left font-semibold text-gray-700">Servicio / Cama</th>
+                                <th class="px-4 py-3 text-left font-semibold text-gray-700">Actualizado</th>
                                 <th class="px-4 py-3 text-center font-semibold text-gray-700">Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="pacientesTbody" class="bg-white divide-y divide-gray-200">
                         @if($pacientes->count() > 0)
                             @foreach($pacientes as $paciente)
-                            <tr class="hover:bg-gray-50 transition">
+                            <tr class="hover:bg-gray-50 transition" data-estado="{{ $paciente->estado }}">
                                 <td class="px-4 py-3 font-medium text-gray-900">
                                     {{ $paciente->nombre }} {{ $paciente->apellido }}
                                 </td>
@@ -121,8 +143,13 @@
                                         <span class="text-gray-400">–</span>
                                     @endif
                                 </td>
-                                <td class="px-4 py-3 text-gray-600">{{ optional($paciente->servicio)->nombre ?? '–' }}</td>
-                                <td class="px-4 py-3 text-gray-600 font-mono">{{ optional($paciente->cama)->codigo ?? '–' }}</td>
+                                <td class="px-4 py-3 text-gray-600">
+                                    <div class="flex flex-wrap gap-1">
+                                        <span class="inline-block bg-sky-50 text-sky-800 rounded-full px-2.5 py-0.5 text-xs font-semibold">{{ optional($paciente->servicio)->nombre ?? '–' }}</span>
+                                        <span class="inline-block bg-violet-50 text-violet-800 rounded-full px-2.5 py-0.5 text-xs font-semibold font-mono">{{ optional($paciente->cama)->codigo ?? '–' }}</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-gray-500 text-xs">{{ $paciente->updated_at?->diffForHumans() ?? '–' }}</td>
                                 <td class="px-4 py-3 text-center">
                                     <div class="flex justify-center gap-2">
                                         <a href="{{ route('pacientes.show', $paciente) }}" class="px-3 py-1 bg-indigo-100 text-indigo-700 hover:bg-indigo-200 rounded text-xs font-medium transition">👁️ Ver</a>
@@ -176,11 +203,28 @@ const paginationContainer = document.getElementById('paginationContainer');
 const searchUrl = "{{ route('pacientes.search') }}";
 const isUsuario = {{ auth()->user()->role === 'usuario' ? 'true' : 'false' }};
 const isAdmin = {{ in_array(auth()->user()->role, ['administrador', 'admin']) ? 'true' : 'false' }};
+const estadoFilter = document.getElementById('estadoFilter');
+const limpiarFiltros = document.getElementById('limpiarFiltros');
 
 if (searchInput && tbody) {
     searchInput.addEventListener('input', function() {
         const query = this.value.trim();
         fetchPacientes(query);
+    });
+}
+
+if (estadoFilter) {
+    estadoFilter.addEventListener('change', applyFilters);
+}
+
+if (limpiarFiltros) {
+    limpiarFiltros.addEventListener('click', () => {
+        if (estadoFilter) estadoFilter.value = '';
+        if (searchInput) {
+            searchInput.value = '';
+            fetchPacientes('');
+        }
+        applyFilters();
     });
 }
 
@@ -269,18 +313,38 @@ function renderRows(pacientes) {
         `;
 
         return `
-            <tr class="hover:bg-gray-50 transition">
+            <tr class="hover:bg-gray-50 transition" data-estado="${p.estado}">
                 <td class="px-4 py-3 font-medium text-gray-900">${p.nombre} ${p.apellido}</td>
                 <td class="px-4 py-3 text-gray-600 font-mono text-sm">${p.cedula}</td>
                 <td class="px-4 py-3">${estadoBadge}</td>
                 <td class="px-4 py-3 text-gray-600">${p.edad || '–'} años</td>
                 <td class="px-4 py-3"><div class="flex flex-wrap gap-1">${condBadges}</div></td>
-                <td class="px-4 py-3 text-gray-600">${p.servicio || '–'}</td>
-                <td class="px-4 py-3 text-gray-600 font-mono">${p.cama || '–'}</td>
+                <td class="px-4 py-3 text-gray-600">
+                    <div class="flex flex-wrap gap-1">
+                        <span class="inline-block bg-sky-50 text-sky-800 rounded-full px-2.5 py-0.5 text-xs font-semibold">${p.servicio || '–'}</span>
+                        <span class="inline-block bg-violet-50 text-violet-800 rounded-full px-2.5 py-0.5 text-xs font-semibold font-mono">${p.cama || '–'}</span>
+                    </div>
+                </td>
+                <td class="px-4 py-3 text-gray-500 text-xs">${p.updated_at_human || p.updated_at || '–'}</td>
                 <td class="px-4 py-3 text-center">${acciones}</td>
             </tr>
         `;
     }).join('');
+
+    applyFilters();
+}
+
+function applyFilters() {
+    if (!tbody) return;
+    const estadoValue = estadoFilter ? estadoFilter.value : '';
+    const rows = Array.from(tbody.querySelectorAll('tr[data-estado]'));
+    if (!estadoValue) {
+        rows.forEach(row => row.style.display = '');
+        return;
+    }
+    rows.forEach(row => {
+        row.style.display = row.dataset.estado === estadoValue ? '' : 'none';
+    });
 }
 </script>
 @endpush

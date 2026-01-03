@@ -31,26 +31,26 @@
 
             <!-- Estadísticas Rápidas -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                <!-- Pacientes Totales -->
+                <!-- Pacientes: Hospitalizados vs Total -->
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg hover:shadow-lg transition">
                     <div class="p-6">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-sm font-medium text-gray-600">Total Pacientes</p>
-                                <p class="text-3xl font-bold text-blue-600 mt-2">
-                                    {{ \App\Models\Paciente::count() }}
+                                <p class="text-sm font-medium text-gray-600">Pacientes Hospitalizados</p>
+                                <p class="text-4xl font-bold text-green-600 mt-2">
+                                    {{ \App\Models\Paciente::where('estado', 'hospitalizado')->count() }}
                                 </p>
-                                <div class="flex gap-3 mt-2">
-                                    <p class="text-xs text-green-600 font-semibold">
-                                        🟢 {{ \App\Models\Paciente::where('estado', 'hospitalizado')->count() }} hospitalizados
+                                <div class="flex gap-3 mt-3 flex-col">
+                                    <p class="text-xs text-gray-600 font-medium">
+                                        📊 Total: <span class="font-bold text-blue-600">{{ \App\Models\Paciente::count() }}</span>
                                     </p>
-                                    <p class="text-xs text-gray-500 font-semibold">
+                                    <p class="text-xs text-gray-500">
                                         🔵 {{ \App\Models\Paciente::where('estado', 'alta')->count() }} de alta
                                     </p>
                                 </div>
                             </div>
-                            <div class="bg-blue-100 rounded-full p-3">
-                                <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="bg-green-100 rounded-full p-3">
+                                <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                                 </svg>
                             </div>
@@ -145,52 +145,88 @@
             <!-- Sección de Pacientes por Estado -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 <!-- Pacientes Hospitalizados -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-lg font-semibold text-gray-800">🟢 Pacientes Hospitalizados</h3>
-                            <span class="bg-green-100 text-green-800 text-xs font-semibold px-3 py-1 rounded-full">
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg hover:shadow-md transition">
+                    <div class="bg-gradient-to-r from-green-50 to-emerald-50 p-4 border-b border-green-200">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-bold text-green-900">🟢 Pacientes Hospitalizados</h3>
+                            <span class="bg-green-600 text-white text-sm font-bold px-4 py-1 rounded-full">
                                 {{ \App\Models\Paciente::where('estado', 'hospitalizado')->count() }}
                             </span>
                         </div>
-                        <div class="max-h-64 overflow-y-auto">
+                    </div>
+                    <div class="p-6">
+                        <div class="max-h-96 overflow-y-auto space-y-2">
                             @php
                                 $hospitalizados = \App\Models\Paciente::where('estado', 'hospitalizado')
                                     ->with(['servicio', 'cama'])
-                                    ->orderBy('nombre')
+                                    ->orderBy('updated_at', 'desc')
                                     ->get();
                             @endphp
                             @forelse($hospitalizados as $paciente)
-                                <div class="flex items-center justify-between py-2 border-b border-gray-100 hover:bg-gray-50 px-2 rounded">
-                                    <div class="flex-1">
-                                        <p class="font-medium text-gray-800">{{ $paciente->nombre }} {{ $paciente->apellido }}</p>
-                                        <p class="text-xs text-gray-500">
-                                            CI: {{ $paciente->cedula }} | 
-                                            {{ $paciente->servicio->nombre ?? 'Sin servicio' }} | 
-                                            Cama: {{ $paciente->cama->codigo ?? 'Sin asignar' }}
-                                        </p>
+                                <div class="group border-l-4 border-green-400 bg-gradient-to-r from-green-50 to-white p-3 rounded hover:shadow-md transition hover:from-green-100">
+                                    <div class="flex items-start justify-between gap-3">
+                                        <div class="flex-1 min-w-0">
+                                            <p class="font-semibold text-gray-900 group-hover:text-green-700 transition truncate">
+                                                {{ $paciente->nombre }} {{ $paciente->apellido }}
+                                                @if($paciente->edad)
+                                                    <span class="text-xs text-gray-600 font-normal">{{ $paciente->edad }} años</span>
+                                                @endif
+                                            </p>
+                                            <div class="text-xs text-gray-600 mt-1 space-y-1">
+                                                <p>CI: <span class="font-mono font-semibold">{{ $paciente->cedula }}</span></p>
+                                                <p>
+                                                    <span class="inline-block bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs font-medium">
+                                                        {{ $paciente->servicio->nombre ?? 'Sin servicio' }}
+                                                    </span>
+                                                    @if($paciente->cama)
+                                                        <span class="inline-block bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded text-xs font-medium ml-1">
+                                                            Cama: {{ $paciente->cama->codigo }}
+                                                        </span>
+                                                    @else
+                                                        <span class="inline-block bg-red-100 text-red-800 px-2 py-0.5 rounded text-xs font-medium ml-1">
+                                                            Sin cama
+                                                        </span>
+                                                    @endif
+                                                </p>
+                                                @if($paciente->condicion)
+                                                    <p class="text-xs">Condición: <span class="font-semibold">{{ str_replace(',', ', ', $paciente->condicion) }}</span></p>
+                                                @endif
+                                                <p class="text-xs text-gray-500">
+                                                    Actualizado: {{ $paciente->updated_at->locale('es')->diffForHumans() }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="flex gap-1 flex-shrink-0">
+                                            <a href="{{ route('pacientes.edit', $paciente) }}" class="p-2 text-gray-500 hover:text-orange-600 hover:bg-orange-50 rounded transition" title="Editar">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-7-4l7-7m0 0l-7 7"></path></svg>
+                                            </a>
+                                            <a href="{{ route('pacientes.show', $paciente) }}" class="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition" title="Ver">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                            </a>
+                                        </div>
                                     </div>
-                                    <a href="{{ route('pacientes.show', $paciente) }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                                        Ver →
-                                    </a>
                                 </div>
                             @empty
-                                <p class="text-gray-500 text-center py-4">No hay pacientes hospitalizados</p>
+                                <div class="text-center py-8">
+                                    <p class="text-gray-500 text-sm">✓ No hay pacientes hospitalizados</p>
+                                </div>
                             @endforelse
                         </div>
                     </div>
                 </div>
 
                 <!-- Pacientes de Alta -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-lg font-semibold text-gray-800">🔵 Pacientes de Alta</h3>
-                            <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-3 py-1 rounded-full">
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg hover:shadow-md transition">
+                    <div class="bg-gradient-to-r from-blue-50 to-cyan-50 p-4 border-b border-blue-200">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-bold text-blue-900">🔵 Pacientes de Alta</h3>
+                            <span class="bg-blue-600 text-white text-sm font-bold px-4 py-1 rounded-full">
                                 {{ \App\Models\Paciente::where('estado', 'alta')->count() }}
                             </span>
                         </div>
-                        <div class="max-h-64 overflow-y-auto">
+                    </div>
+                    <div class="p-6">
+                        <div class="max-h-96 overflow-y-auto space-y-2">
                             @php
                                 $altas = \App\Models\Paciente::where('estado', 'alta')
                                     ->with('servicio')
@@ -199,27 +235,51 @@
                                     ->get();
                             @endphp
                             @forelse($altas as $paciente)
-                                <div class="flex items-center justify-between py-2 border-b border-gray-100 hover:bg-gray-50 px-2 rounded">
-                                    <div class="flex-1">
-                                        <p class="font-medium text-gray-700">{{ $paciente->nombre }} {{ $paciente->apellido }}</p>
-                                        <p class="text-xs text-gray-500">
-                                            CI: {{ $paciente->cedula }} | 
-                                            {{ $paciente->servicio->nombre ?? 'Sin servicio' }}
-                                        </p>
+                                <div class="group border-l-4 border-blue-400 bg-gradient-to-r from-blue-50 to-white p-3 rounded hover:shadow-md transition hover:from-blue-100">
+                                    <div class="flex items-start justify-between gap-3">
+                                        <div class="flex-1 min-w-0">
+                                            <p class="font-semibold text-gray-900 group-hover:text-blue-700 transition truncate">
+                                                {{ $paciente->nombre }} {{ $paciente->apellido }}
+                                                @if($paciente->edad)
+                                                    <span class="text-xs text-gray-600 font-normal">{{ $paciente->edad }} años</span>
+                                                @endif
+                                            </p>
+                                            <div class="text-xs text-gray-600 mt-1 space-y-1">
+                                                <p>CI: <span class="font-mono font-semibold">{{ $paciente->cedula }}</span></p>
+                                                <p>
+                                                    <span class="inline-block bg-purple-100 text-purple-800 px-2 py-0.5 rounded text-xs font-medium">
+                                                        {{ $paciente->servicio->nombre ?? 'Sin servicio' }}
+                                                    </span>
+                                                </p>
+                                                @if($paciente->condicion)
+                                                    <p class="text-xs">Condición: <span class="font-semibold">{{ str_replace(',', ', ', $paciente->condicion) }}</span></p>
+                                                @endif
+                                                <p class="text-xs text-gray-500">
+                                                    Alta: {{ $paciente->updated_at->locale('es')->diffForHumans() }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="flex gap-1 flex-shrink-0">
+                                            <a href="{{ route('pacientes.edit', $paciente) }}" class="p-2 text-gray-500 hover:text-orange-600 hover:bg-orange-50 rounded transition" title="Editar">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-7-4l7-7m0 0l-7 7"></path></svg>
+                                            </a>
+                                            <a href="{{ route('pacientes.show', $paciente) }}" class="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition" title="Ver">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                            </a>
+                                        </div>
                                     </div>
-                                    <a href="{{ route('pacientes.show', $paciente) }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                                        Ver →
-                                    </a>
                                 </div>
                             @empty
-                                <p class="text-gray-500 text-center py-4">No hay pacientes dados de alta</p>
+                                <div class="text-center py-8">
+                                    <p class="text-gray-500 text-sm">✓ No hay pacientes de alta recientemente</p>
+                                </div>
                             @endforelse
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Accesos Rápidos -->
+            <!-- Sección de Auditoría / Actividad Reciente -->            <!-- Accesos Rápidos -->
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-4">⚡ Accesos Rápidos</h3>
