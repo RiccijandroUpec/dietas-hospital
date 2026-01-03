@@ -47,6 +47,7 @@ class ServicioController extends Controller
     {
         $data = $request->validate([
             'nombre' => 'required|string|max:255|unique:servicios,nombre',
+            'prefijo' => 'required|string|max:10|regex:/^[A-Z0-9]+$/|unique:servicios,prefijo',
             'descripcion' => 'nullable|string|max:1000',
             'cantidad_camas' => 'nullable|integer|min:0|max:500',
         ]);
@@ -56,23 +57,23 @@ class ServicioController extends Controller
         $servicio = DB::transaction(function () use ($data, $cantidadCamas) {
             $servicio = Servicio::create([
                 'nombre' => $data['nombre'],
+                'prefijo' => $data['prefijo'],
                 'descripcion' => $data['descripcion'] ?? null,
             ]);
 
             if ($cantidadCamas > 0) {
-                $prefix = strtoupper(Str::slug($servicio->nombre, '_'));
-                $prefix = $prefix !== '' ? $prefix : 'SERVICIO_' . $servicio->id;
+                $prefix = $servicio->prefijo;
 
                 $start = Cama::where('servicio_id', $servicio->id)->count() + 1;
 
                 for ($i = 0; $i < $cantidadCamas; $i++) {
                     $counter = $start + $i;
-                    $codigo = $prefix . '-' . $counter;
+                    $codigo = $prefix . $counter;
 
                     // Garantiza unicidad global del código de cama
                     while (Cama::where('codigo', $codigo)->exists()) {
                         $counter++;
-                        $codigo = $prefix . '-' . $counter;
+                        $codigo = $prefix . $counter;
                     }
 
                     Cama::create([
@@ -104,6 +105,7 @@ class ServicioController extends Controller
     {
         $data = $request->validate([
             'nombre' => 'required|string|max:255|unique:servicios,nombre,' . $servicio->id,
+            'prefijo' => 'required|string|max:10|regex:/^[A-Z0-9]+$/|unique:servicios,prefijo,' . $servicio->id,
             'descripcion' => 'nullable|string|max:1000',
         ]);
 
