@@ -38,7 +38,7 @@
                                 <!-- Cama Card -->
                                 <div class="relative group">
                                     <button 
-                                        class="w-full aspect-square rounded-lg font-bold text-sm flex flex-col items-center justify-center transition-all duration-200 {{ $ocupada ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-green-600 hover:bg-green-700 text-white' }} shadow-md hover:shadow-lg"
+                                        class="w-full aspect-square rounded-lg font-bold text-sm flex flex-col items-center justify-center transition-all duration-200 {{ $ocupada ? 'bg-red-500 hover:bg-red-600 text-white shadow-red-200' : 'bg-green-500 hover:bg-green-600 text-white shadow-green-200' }} shadow-lg hover:shadow-xl"
                                         onclick="toggleMenu({{ $cama->id }}, {{ $ocupada ? 'true' : 'false' }})">
                                         <span class="text-xl font-bold">{{ $cama->codigo }}</span>
                                         @if($ocupada)
@@ -78,12 +78,12 @@
                         <!-- Leyenda -->
                         <div class="mt-8 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg flex gap-4">
                             <div class="flex items-center gap-2">
-                                <div class="w-6 h-6 bg-green-600 rounded"></div>
-                                <span class="text-sm">Cama Libre</span>
+                                <div class="w-6 h-6 bg-green-500 rounded shadow-md"></div>
+                                <span class="text-sm font-medium">Cama Libre</span>
                             </div>
                             <div class="flex items-center gap-2">
-                                <div class="w-6 h-6 bg-red-600 rounded"></div>
-                                <span class="text-sm">Cama Ocupada</span>
+                                <div class="w-6 h-6 bg-red-500 rounded shadow-md"></div>
+                                <span class="text-sm font-medium">Cama Ocupada</span>
                             </div>
                         </div>
                     </div>
