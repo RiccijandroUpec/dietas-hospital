@@ -15,6 +15,20 @@
                     </div>
                 @endif
 
+                @php
+                    $servicioDesdeGrafica = $servicios->firstWhere('id', $servicioId ?? null);
+                    $camaDesdeGrafica = $camas->firstWhere('id', $camaId ?? null);
+                @endphp
+                @if($camaDesdeGrafica)
+                    <div class="mb-4 p-4 bg-blue-50 border border-blue-200 text-blue-900 rounded-md">
+                        <div class="font-semibold">Asignando desde Camas gráficas</div>
+                        <div class="text-sm mt-1 flex gap-3 flex-wrap">
+                            <span>Servicio: <strong>{{ $servicioDesdeGrafica->nombre ?? 'N/D' }}</strong></span>
+                            <span>Cama: <strong>{{ $camaDesdeGrafica->codigo }}</strong></span>
+                            <span class="text-gray-600">Solo se llenan nombre, apellido y edad; la cama se mantiene.</span>
+                        </div>
+                    </div>
+                @endif
                 <form action="{{ route('pacientes.store') }}" method="POST">
                     @csrf
 
@@ -123,6 +137,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const cedulaInput = document.getElementById('cedula_input');
     const cedulaFeedback = document.getElementById('cedula_feedback');
     const submitBtn = document.getElementById('submit_btn');
+    const camaIdParam = @json($camaId);
+    const servicioIdParam = @json($servicioId);
+    const fromCamasGrafica = Boolean(camaIdParam || servicioIdParam);
+    const form = document.querySelector('form');
+    const pacienteStoreUrl = @json(route('pacientes.store'));
+    const pacienteUpdateBase = @json(url('pacientes'));
+    const servicioHidden = document.createElement('input');
+    const camaHidden = document.createElement('input');
 
     function toggleServicioCama() {
         const estado = estadoSelect.value;
@@ -201,6 +223,29 @@ document.addEventListener('DOMContentLoaded', function () {
         loadCamas(initialServicio, oldCama ? parseInt(oldCama) : null);
     }
 
+    // Si venimos de camas gráficas, bloquear cambios de servicio/cama pero enviar valores
+    if (fromCamasGrafica) {
+        servicioHidden.type = 'hidden';
+        servicioHidden.name = 'servicio_id';
+        servicioHidden.value = servicioIdParam || '';
+        form.appendChild(servicioHidden);
+
+        camaHidden.type = 'hidden';
+        camaHidden.name = 'cama_id';
+        camaHidden.value = camaIdParam || '';
+        form.appendChild(camaHidden);
+
+        if (servicioIdParam) {
+            servicioSelect.value = servicioIdParam;
+            loadCamas(servicioIdParam, camaIdParam);
+        }
+
+        servicioSelect.disabled = true;
+        camaSelect.disabled = true;
+        servicioWrapper.classList.add('opacity-70');
+        camaWrapper.classList.add('opacity-70');
+    }
+
     // Verificar cedula (debounce)
     let cedulaTimer = null;
     // URL relativa para evitar problemas con APP_URL o dominios diferentes
@@ -245,30 +290,41 @@ document.addEventListener('DOMContentLoaded', function () {
                     document.querySelector('input[name="nombre"]').value = data.nombre || '';
                     document.querySelector('input[name="apellido"]').value = data.apellido || '';
                     document.querySelector('input[name="edad"]').value = data.edad || '';
-                    
-                    // Establecer estado
-                    const estadoSelectElem = document.getElementById('estado_select');
-                    estadoSelectElem.value = data.estado || 'hospitalizado';
-                    toggleServicioCama(); // Actualizar visibilidad de servicio/cama
-                    
-                    // Marcar condiciones (ya viene como array desde el backend)
-                    const condiciones = Array.isArray(data.condicion) ? data.condicion : [];
-                    console.log('Condiciones:', condiciones);
-                    document.querySelectorAll('input[name="condicion[]"]').forEach(cb => {
-                        cb.checked = condiciones.includes(cb.value);
-                    });
-                    
-                    // Establecer servicio y cargar camas
-                    if (data.servicio_id && estadoSelectElem.value === 'hospitalizado') {
-                        servicioSelect.value = data.servicio_id;
-                        // Esperar un momento para que el select se actualice
-                        setTimeout(() => {
-                            loadCamas(data.servicio_id, data.cama_id);
-                        }, 100);
+
+                    // Enviar como PATCH al paciente existente (evita error de duplicado)
+                    let methodInput = form.querySelector('input[name="_method"]');
+                    if (!methodInput) {
+                        methodInput = document.createElement('input');
+                        methodInput.type = 'hidden';
+                        methodInput.name = '_method';
+                        form.appendChild(methodInput);
                     }
+                    methodInput.value = 'PATCH';
+                    form.action = `${pacienteUpdateBase}/${data.id}`;
                     
-                    // Mostrar mensaje informativo
-                    cedulaFeedback.innerHTML = `<span class="text-green-600 font-semibold">✓ Paciente encontrado - Puedes actualizar los datos y guardar</span>`;
+                    if (!fromCamasGrafica) {
+                        // Solo en flujo normal: estado, condiciones, servicio y cama del paciente existente
+                        const estadoSelectElem = document.getElementById('estado_select');
+                        estadoSelectElem.value = data.estado || 'hospitalizado';
+                        toggleServicioCama();
+
+                        const condiciones = Array.isArray(data.condicion) ? data.condicion : [];
+                        document.querySelectorAll('input[name="condicion[]"]').forEach(cb => {
+                            cb.checked = condiciones.includes(cb.value);
+                        });
+
+                        if (data.servicio_id && estadoSelectElem.value === 'hospitalizado') {
+                            servicioSelect.value = data.servicio_id;
+                            setTimeout(() => {
+                                loadCamas(data.servicio_id, data.cama_id);
+                            }, 100);
+                        }
+
+                        cedulaFeedback.innerHTML = `<span class="text-green-600 font-semibold">✓ Paciente encontrado - Puedes actualizar los datos y guardar</span>`;
+                    } else {
+                        // Enviado desde camas gráficas: preservar cama/servicio elegidos allí
+                        cedulaFeedback.innerHTML = `<span class="text-green-600 font-semibold">✓ Paciente encontrado - Se cargaron nombre, apellido y edad. La cama se mantiene.</span>`;
+                    }
                     submitBtn.disabled = false;
                     submitBtn.textContent = '✓ Actualizar Paciente';
                     submitBtn.classList.remove('bg-blue-300', 'hover:bg-blue-400');
@@ -280,6 +336,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     submitBtn.textContent = '✓ Guardar Paciente';
                     submitBtn.classList.remove('bg-green-500', 'hover:bg-green-600', 'text-white');
                     submitBtn.classList.add('bg-blue-300', 'hover:bg-blue-400', 'text-blue-900');
+
+                    // Volver a POST de creación
+                    const methodInput = form.querySelector('input[name="_method"]');
+                    if (methodInput) {
+                        methodInput.remove();
+                    }
+                    form.action = pacienteStoreUrl;
                 }
             })
             .catch((err) => {
