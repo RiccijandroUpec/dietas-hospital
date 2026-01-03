@@ -357,4 +357,106 @@ class PacienteController extends Controller
     {
         return Excel::download(new PacientesExport(), 'pacientes_' . now()->format('Y-m-d_H-i-s') . '.xlsx');
     }
+
+    public function estadisticas()
+    {
+        // Total de pacientes
+        $totalPacientes = Paciente::count();
+        $hospitalizados = Paciente::where('estado', 'hospitalizado')->count();
+        $altas = Paciente::where('estado', 'alta')->count();
+
+        // Estadísticas de edad
+        $edadPromedio = Paciente::whereNotNull('edad')->avg('edad');
+        $edadMin = Paciente::whereNotNull('edad')->min('edad');
+        $edadMax = Paciente::whereNotNull('edad')->max('edad');
+        
+        // Distribución por rangos de edad
+        $rangosEdad = [
+            '0-17' => Paciente::whereBetween('edad', [0, 17])->count(),
+            '18-30' => Paciente::whereBetween('edad', [18, 30])->count(),
+            '31-50' => Paciente::whereBetween('edad', [31, 50])->count(),
+            '51-70' => Paciente::whereBetween('edad', [51, 70])->count(),
+            '71+' => Paciente::where('edad', '>', 70)->count(),
+        ];
+
+        // Distribución por condición
+        $allPacientes = Paciente::all();
+        $condiciones = [];
+        foreach ($allPacientes as $p) {
+            if ($p->condicion) {
+                $conds = explode(',', $p->condicion);
+                foreach ($conds as $c) {
+                    $c = trim($c);
+                    $condiciones[$c] = ($condiciones[$c] ?? 0) + 1;
+                }
+            } else {
+                $condiciones['normal'] = ($condiciones['normal'] ?? 0) + 1;
+            }
+        }
+
+        // Distribución por servicio con estadísticas adicionales
+        $servicios = Servicio::withCount(['pacientes' => function($q) {
+            $q->where('estado', 'hospitalizado');
+        }])->get();
+
+        // Calcular edad promedio por servicio
+        $serviciosConEstadisticas = Servicio::all()->map(function($servicio) {
+            $pacientesServicio = Paciente::where('servicio_id', $servicio->id)
+                ->where('estado', 'hospitalizado')
+                ->get();
+            
+            return [
+                'id' => $servicio->id,
+                'nombre' => $servicio->nombre,
+                'total_pacientes' => $pacientesServicio->count(),
+                'edad_promedio' => $pacientesServicio->avg('edad') ?? 0,
+                'con_condiciones' => $pacientesServicio->filter(function($p) {
+                    return !empty($p->condicion);
+                })->count(),
+            ];
+        });
+
+        // Ocupación de camas
+        $totalCamas = Cama::count();
+        $camasOcupadas = Paciente::where('estado', 'hospitalizado')
+            ->whereNotNull('cama_id')
+            ->count();
+        $camasDisponibles = $totalCamas - $camasOcupadas;
+        $porcentajeOcupacion = $totalCamas > 0 ? ($camasOcupadas / $totalCamas) * 100 : 0;
+
+        // Pacientes sin cama asignada (hospitalizados)
+        $hospitalizadosSinCama = Paciente::where('estado', 'hospitalizado')
+            ->whereNull('cama_id')
+            ->count();
+
+        // Tendencias (últimos 7 días) - pacientes creados
+        $tendenciaCreados = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $fecha = now()->subDays($i)->format('Y-m-d');
+            $count = Paciente::whereDate('created_at', $fecha)->count();
+            $tendenciaCreados[] = [
+                'fecha' => now()->subDays($i)->format('d/m'),
+                'count' => $count
+            ];
+        }
+
+        return view('pacientes.estadisticas', compact(
+            'totalPacientes',
+            'hospitalizados',
+            'altas',
+            'edadPromedio',
+            'edadMin',
+            'edadMax',
+            'rangosEdad',
+            'condiciones',
+            'servicios',
+            'serviciosConEstadisticas',
+            'totalCamas',
+            'camasOcupadas',
+            'camasDisponibles',
+            'porcentajeOcupacion',
+            'hospitalizadosSinCama',
+            'tendenciaCreados'
+        ));
+    }
 }

@@ -19,6 +19,7 @@ Route::middleware('auth')->group(function () {
     Route::get('servicios/{servicio}/camas-available', [App\Http\Controllers\PacienteController::class, 'availableCamas']);
 
     Route::get('pacientes/reporte', [App\Http\Controllers\PacienteController::class, 'reporte'])->name('pacientes.reporte');
+    Route::get('pacientes/estadisticas', [App\Http\Controllers\PacienteController::class, 'estadisticas'])->name('pacientes.estadisticas');
     Route::get('pacientes/search', [App\Http\Controllers\PacienteController::class, 'search'])->name('pacientes.search');
     Route::get('pacientes/exportar', [App\Http\Controllers\PacienteController::class, 'exportar'])->name('pacientes.exportar');
     Route::resource('pacientes', App\Http\Controllers\PacienteController::class);
