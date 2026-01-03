@@ -211,41 +211,55 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
+        cedulaFeedback.innerHTML = '<span class="text-blue-600">🔍 Buscando...</span>';
+
         fetch(`/pacientes/check-cedula?cedula=${encodeURIComponent(ced)}`)
             .then(res => res.json())
             .then(data => {
                 if (data.exists) {
                     // Llenar campos automáticamente con los datos del paciente
-                    document.querySelector('input[name="nombre"]').value = data.nombre;
-                    document.querySelector('input[name="apellido"]').value = data.apellido;
+                    document.querySelector('input[name="nombre"]').value = data.nombre || '';
+                    document.querySelector('input[name="apellido"]').value = data.apellido || '';
                     document.querySelector('input[name="edad"]').value = data.edad || '';
-                    document.getElementById('estado_select').value = data.estado || 'hospitalizado';
                     
-                    // Marcar condiciones
+                    // Establecer estado
+                    const estadoSelectElem = document.getElementById('estado_select');
+                    estadoSelectElem.value = data.estado || 'hospitalizado';
+                    toggleServicioCama(); // Actualizar visibilidad de servicio/cama
+                    
+                    // Marcar condiciones (convertir string separado por comas a array)
+                    const condiciones = data.condicion ? data.condicion.split(',') : [];
                     document.querySelectorAll('input[name="condicion[]"]').forEach(cb => {
-                        cb.checked = data.condicion.includes(cb.value);
+                        cb.checked = condiciones.includes(cb.value);
                     });
                     
                     // Establecer servicio y cargar camas
-                    if (data.servicio_id) {
+                    if (data.servicio_id && estadoSelectElem.value === 'hospitalizado') {
                         servicioSelect.value = data.servicio_id;
-                        loadCamas(data.servicio_id, data.cama_id);
+                        // Esperar un momento para que el select se actualice
+                        setTimeout(() => {
+                            loadCamas(data.servicio_id, data.cama_id);
+                        }, 100);
                     }
                     
-                    // Mostrar mensaje con opción de editar
-                    cedulaFeedback.innerHTML = `<span class="text-amber-600 font-semibold">ℹ️ Paciente encontrado - Datos cargados automáticamente</span>`;
+                    // Mostrar mensaje informativo
+                    cedulaFeedback.innerHTML = `<span class="text-green-600 font-semibold">✓ Paciente encontrado - Puedes actualizar los datos y guardar</span>`;
                     submitBtn.disabled = false;
+                    submitBtn.textContent = '✓ Actualizar Paciente';
+                    submitBtn.classList.remove('bg-blue-300', 'hover:bg-blue-400');
+                    submitBtn.classList.add('bg-green-500', 'hover:bg-green-600', 'text-white');
                 } else {
-                    cedulaFeedback.textContent = '';
+                    // Paciente nuevo
+                    cedulaFeedback.innerHTML = '<span class="text-blue-600">ℹ️ Cédula disponible - Nuevo paciente</span>';
                     submitBtn.disabled = false;
-                    // Limpiar campos si no existe
-                    document.querySelector('input[name="nombre"]').value = '';
-                    document.querySelector('input[name="apellido"]').value = '';
-                    document.querySelector('input[name="edad"]').value = '';
+                    submitBtn.textContent = '✓ Guardar Paciente';
+                    submitBtn.classList.remove('bg-green-500', 'hover:bg-green-600', 'text-white');
+                    submitBtn.classList.add('bg-blue-300', 'hover:bg-blue-400', 'text-blue-900');
                 }
             })
-            .catch(() => {
-                cedulaFeedback.textContent = '';
+            .catch((err) => {
+                console.error('Error checking cedula:', err);
+                cedulaFeedback.innerHTML = '<span class="text-red-600">⚠️ Error al verificar cédula</span>';
                 submitBtn.disabled = false;
             });
     }
