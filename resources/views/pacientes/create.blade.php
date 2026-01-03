@@ -29,8 +29,11 @@
                         </div>
                     </div>
                 @endif
-                <form action="{{ route('pacientes.store') }}" method="POST">
+                <form action="{{ route('pacientes.store') }}" method="POST" id="paciente-form">
                     @csrf
+                    <!-- Input oculto para method spoofing en Laravel (PATCH/PUT) -->
+                    <input type="hidden" name="_method" id="form_method" value="POST">
+
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <!-- Nombre -->
@@ -140,11 +143,18 @@ document.addEventListener('DOMContentLoaded', function () {
     const camaIdParam = @json($camaId);
     const servicioIdParam = @json($servicioId);
     const fromCamasGrafica = Boolean(camaIdParam || servicioIdParam);
-    const form = document.querySelector('form');
+    const form = document.getElementById('paciente-form');
     const pacienteStoreUrl = @json(route('pacientes.store'));
     const pacienteUpdateBase = @json(url('pacientes'));
+    const formMethod = document.getElementById('form_method');
     const servicioHidden = document.createElement('input');
     const camaHidden = document.createElement('input');
+
+    // Listener al submit para verificar estado del formulario
+    form.addEventListener('submit', function(e) {
+        console.log('Form submitted - Action:', form.action, 'Method:', formMethod.value, '_method value:', formMethod.value);
+        console.log('Form data:', new FormData(form));
+    });
 
     function toggleServicioCama() {
         const estado = estadoSelect.value;
@@ -225,15 +235,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Si venimos de camas gráficas, bloquear cambios de servicio/cama pero enviar valores
     if (fromCamasGrafica) {
-        servicioHidden.type = 'hidden';
-        servicioHidden.name = 'servicio_id';
-        servicioHidden.value = servicioIdParam || '';
-        form.appendChild(servicioHidden);
+        // Solo crear inputs si no existen ya (para evitar duplicados)
+        if (!form.querySelector('input[type="hidden"][name="servicio_id"]')) {
+            servicioHidden.type = 'hidden';
+            servicioHidden.name = 'servicio_id';
+            servicioHidden.value = servicioIdParam || '';
+            form.appendChild(servicioHidden);
+        }
 
-        camaHidden.type = 'hidden';
-        camaHidden.name = 'cama_id';
-        camaHidden.value = camaIdParam || '';
-        form.appendChild(camaHidden);
+        if (!form.querySelector('input[type="hidden"][name="cama_id"]')) {
+            camaHidden.type = 'hidden';
+            camaHidden.name = 'cama_id';
+            camaHidden.value = camaIdParam || '';
+            form.appendChild(camaHidden);
+        }
 
         if (servicioIdParam) {
             servicioSelect.value = servicioIdParam;
@@ -300,8 +315,24 @@ document.addEventListener('DOMContentLoaded', function () {
                         form.appendChild(methodInput);
                     }
                     methodInput.value = 'PATCH';
+                    formMethod.value = 'PATCH';
                     form.action = `${pacienteUpdateBase}/${data.id}`;
+                    console.log('Form action cambiado a:', form.action, 'Method:', formMethod.value);
                     
+                    // Si venimos de camas gráficas, asegurar estado hospitalizado
+                    if (fromCamasGrafica) {
+                        document.getElementById('estado_select').value = 'hospitalizado';
+                        // Actualizar inputs ocultos para evitar duplicados
+                        let existingServicio = form.querySelector('input[type="hidden"][name="servicio_id"]');
+                        if (existingServicio) {
+                            existingServicio.value = servicioIdParam;
+                        }
+                        let existingCama = form.querySelector('input[type="hidden"][name="cama_id"]');
+                        if (existingCama) {
+                            existingCama.value = camaIdParam;
+                        }
+                    }
+
                     if (!fromCamasGrafica) {
                         // Solo en flujo normal: estado, condiciones, servicio y cama del paciente existente
                         const estadoSelectElem = document.getElementById('estado_select');
@@ -338,11 +369,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     submitBtn.classList.add('bg-blue-300', 'hover:bg-blue-400', 'text-blue-900');
 
                     // Volver a POST de creación
+                    formMethod.value = 'POST';
+                    form.action = pacienteStoreUrl;
                     const methodInput = form.querySelector('input[name="_method"]');
-                    if (methodInput) {
+                    if (methodInput && methodInput !== formMethod) {
                         methodInput.remove();
                     }
-                    form.action = pacienteStoreUrl;
+                    console.log('Form action reseteado a:', form.action, 'Method:', formMethod.value);
                 }
             })
             .catch((err) => {
