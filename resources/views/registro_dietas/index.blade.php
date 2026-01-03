@@ -12,15 +12,18 @@
                         <p class="text-gray-600 text-sm mt-1">Gestión de registros dietéticos de pacientes</p>
                     </div>
                     <div class="flex gap-2">
-                        <a href="{{ route('registro-dietas.dashboard') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition">
-                            📊 Dashboard
+                        <a href="{{ route('registro-dietas.dashboard') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition" title="Dashboard">
+                            <span class="hidden md:inline">📊 Dashboard</span>
+                            <span class="md:hidden text-lg">📊</span>
                         </a>
-                        <a href="{{ route('registro-dietas.reporte') }}" class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition">
-                            📄 Reporte
+                        <a href="{{ route('registro-dietas.reporte') }}" class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition" title="Reporte">
+                            <span class="hidden md:inline">📄 Reporte</span>
+                            <span class="md:hidden text-lg">📄</span>
                         </a>
                         @if(auth()->user()->role !== 'usuario')
-                            <a href="{{ route('registro-dietas.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition">
-                                ➕ Nuevo Registro
+                            <a href="{{ route('registro-dietas.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition" title="Nuevo Registro">
+                                <span class="hidden md:inline">➕ Nuevo Registro</span>
+                                <span class="md:hidden text-lg">➕</span>
                             </a>
                         @endif
                     </div>
@@ -303,19 +306,19 @@
                                     </div>
 
                                     <!-- Acciones -->
-                                    <div class="flex flex-wrap gap-2">
-                                        <a href="{{ route('registro-dietas.show', $r) }}" class="flex-1 text-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition">
-                                            👁️ Ver
+                                    <div class="flex justify-center gap-2">
+                                        <a href="{{ route('registro-dietas.show', $r) }}" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-lg rounded-lg transition" title="Ver">
+                                            👁️
                                         </a>
                                         @if(auth()->user()->role !== 'usuario')
-                                            <a href="{{ route('registro-dietas.edit', $r) }}" class="flex-1 text-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition">
-                                                ✏️ Editar
+                                            <a href="{{ route('registro-dietas.edit', $r) }}" class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-lg rounded-lg transition" title="Editar">
+                                                ✏️
                                             </a>
                                         @endif
                                         @if(auth()->user()->role === 'admin')
-                                            <form action="{{ route('registro-dietas.destroy', $r) }}" method="POST" class="flex-1" onsubmit="return confirm('¿Eliminar este registro?')">
+                                            <form action="{{ route('registro-dietas.destroy', $r) }}" method="POST" class="inline-block" onsubmit="return confirm('¿Eliminar este registro?')">
                                                 @csrf @method('DELETE')
-                                                <button type="submit" class="w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition">🗑️ Eliminar</button>
+                                                <button type="submit" class="px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-lg rounded-lg transition" title="Eliminar">🗑️</button>
                                             </form>
                                         @endif
                                     </div>

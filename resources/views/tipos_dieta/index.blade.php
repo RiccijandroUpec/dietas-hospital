@@ -12,12 +12,14 @@
                         <p class="text-gray-600 text-sm mt-1">Gestión de categorías principales de dietas</p>
                     </div>
                     <div class="flex gap-2">
-                        <a href="{{ route('subtipos-dieta.index') }}" class="inline-flex items-center px-4 py-2 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-md transition">
-                            🔖 Ver Subtipos
+                        <a href="{{ route('subtipos-dieta.index') }}" class="inline-flex items-center px-4 py-2 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-md transition" title="Ver Subtipos">
+                            <span class="hidden md:inline">🔖 Ver Subtipos</span>
+                            <span class="md:hidden text-lg">🔖</span>
                         </a>
                         @if(auth()->user()->role === 'admin' || auth()->user()->role === 'nutricionista')
-                            <a href="{{ route('tipos-dieta.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition">
-                                ➕ Nuevo Tipo
+                            <a href="{{ route('tipos-dieta.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition" title="Nuevo Tipo">
+                                <span class="hidden md:inline">➕ Nuevo Tipo</span>
+                                <span class="md:hidden text-lg">➕</span>
                             </a>
                         @endif
                     </div>
@@ -41,8 +43,8 @@
                     </div>
                 @endif
 
-                <!-- Table -->
-                <div class="w-full overflow-x-auto">
+                <!-- Vista TABLA para Desktop -->
+                <div class="hidden md:block w-full overflow-x-auto">
                     @if($tipos->count() > 0)
                         <table class="w-full divide-y divide-gray-200 text-sm">
                             <thead class="bg-gray-50">
@@ -104,6 +106,77 @@
                     <div class="mt-6">
                         {{ $tipos->links() }}
                     </div>
+                </div>
+
+                <!-- Vista TARJETAS para Móvil -->
+                <div class="md:hidden">
+                    @if($tipos->count() > 0)
+                        <div class="space-y-4">
+                            @foreach($tipos as $tipo)
+                                <div class="bg-white rounded-lg shadow-md p-4 border-l-4 border-blue-500">
+                                    <!-- Nombre -->
+                                    <div class="mb-3 pb-3 border-b border-gray-200">
+                                        <div class="text-base font-bold text-gray-900">{{ $tipo->nombre }}</div>
+                                    </div>
+
+                                    <!-- Descripción -->
+                                    @if($tipo->descripcion)
+                                        <div class="mb-3">
+                                            <div class="text-xs font-semibold text-gray-500 uppercase mb-1">📝 Descripción</div>
+                                            <div class="text-sm text-gray-700">{{ $tipo->descripcion }}</div>
+                                        </div>
+                                    @endif
+
+                                    <!-- Contadores -->
+                                    <div class="grid grid-cols-2 gap-3 mb-4">
+                                        <div>
+                                            <div class="text-xs font-semibold text-gray-500 uppercase mb-1">🔖 Subtipos</div>
+                                            <span class="inline-block bg-blue-100 text-blue-800 rounded-full px-3 py-1 text-sm font-semibold">
+                                                {{ $tipo->subtipos_count }}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <div class="text-xs font-semibold text-gray-500 uppercase mb-1">🥗 Dietas</div>
+                                            <span class="inline-block bg-purple-100 text-purple-800 rounded-full px-3 py-1 text-sm font-semibold">
+                                                {{ $tipo->dietas_count }}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Acciones -->
+                                    <div class="flex justify-center gap-2">
+                                        @if(auth()->user()->role === 'admin' || auth()->user()->role === 'nutricionista')
+                                            <a href="{{ route('tipos-dieta.edit', $tipo) }}" class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-lg rounded-lg transition" title="Editar">
+                                                ✏️
+                                            </a>
+                                        @endif
+                                        @if(auth()->user()->role === 'admin' || auth()->user()->role === 'administrador')
+                                            <form action="{{ route('tipos-dieta.destroy', $tipo) }}" method="POST" class="inline-block" onsubmit="return confirm('¿Eliminar este tipo de dieta?')">
+                                                @csrf @method('DELETE')
+                                                <button type="submit" class="px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-lg rounded-lg transition" title="Eliminar">🗑️</button>
+                                            </form>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <!-- Pagination -->
+                        <div class="mt-6">
+                            {{ $tipos->links() }}
+                        </div>
+                    @else
+                        <div class="bg-white rounded-lg shadow-md p-8 text-center">
+                            <div class="text-6xl mb-4">📭</div>
+                            <h3 class="text-lg font-semibold text-gray-800 mb-2">No hay tipos de dieta</h3>
+                            <p class="text-gray-600 mb-4">Comienza creando el primer tipo de dieta.</p>
+                            @if(auth()->user()->role === 'admin' || auth()->user()->role === 'nutricionista')
+                                <a href="{{ route('tipos-dieta.create') }}" class="inline-block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+                                    ➕ Crear primer tipo
+                                </a>
+                            @endif
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

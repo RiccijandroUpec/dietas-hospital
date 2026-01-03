@@ -12,12 +12,14 @@
                         <p class="text-gray-600 text-sm mt-1">Gestión de subcategorías de dietas</p>
                     </div>
                     <div class="flex gap-2">
-                        <a href="{{ route('tipos-dieta.index') }}" class="inline-flex items-center px-4 py-2 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-md transition">
-                            🏷️ Ver Tipos
+                        <a href="{{ route('tipos-dieta.index') }}" class="inline-flex items-center px-4 py-2 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-md transition" title="Ver Tipos">
+                            <span class="hidden md:inline">🏷️ Ver Tipos</span>
+                            <span class="md:hidden text-lg">🏷️</span>
                         </a>
                         @if(auth()->user()->role === 'admin' || auth()->user()->role === 'nutricionista')
-                            <a href="{{ route('subtipos-dieta.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition">
-                                ➕ Nuevo Subtipo
+                            <a href="{{ route('subtipos-dieta.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition" title="Nuevo Subtipo">
+                                <span class="hidden md:inline">➕ Nuevo Subtipo</span>
+                                <span class="md:hidden text-lg">➕</span>
                             </a>
                         @endif
                     </div>
@@ -41,8 +43,8 @@
                     </div>
                 @endif
 
-                <!-- Table -->
-                <div class="w-full overflow-x-auto">
+                <!-- Vista TABLA para Desktop -->
+                <div class="hidden md:block w-full overflow-x-auto">
                     @if($subtipos->count() > 0)
                         <table class="w-full divide-y divide-gray-200 text-sm">
                             <thead class="bg-gray-50">
@@ -104,6 +106,77 @@
                     <div class="mt-6">
                         {{ $subtipos->links() }}
                     </div>
+                </div>
+
+                <!-- Vista TARJETAS para Móvil -->
+                <div class="md:hidden">
+                    @if($subtipos->count() > 0)
+                        <div class="space-y-4">
+                            @foreach($subtipos as $subtipo)
+                                <div class="bg-white rounded-lg shadow-md p-4 border-l-4 border-purple-500">
+                                    <!-- Tipo -->
+                                    <div class="mb-3">
+                                        <div class="text-xs font-semibold text-gray-500 uppercase mb-1">🏷️ Tipo</div>
+                                        <span class="inline-block bg-indigo-100 text-indigo-800 rounded-full px-3 py-1 text-sm font-semibold">
+                                            {{ optional($subtipo->tipo)->nombre ?? 'Sin tipo' }}
+                                        </span>
+                                    </div>
+
+                                    <!-- Nombre -->
+                                    <div class="mb-3 pb-3 border-b border-gray-200">
+                                        <div class="text-base font-bold text-gray-900">{{ $subtipo->nombre }}</div>
+                                    </div>
+
+                                    <!-- Descripción -->
+                                    @if($subtipo->descripcion)
+                                        <div class="mb-3">
+                                            <div class="text-xs font-semibold text-gray-500 uppercase mb-1">📝 Descripción</div>
+                                            <div class="text-sm text-gray-700">{{ $subtipo->descripcion }}</div>
+                                        </div>
+                                    @endif
+
+                                    <!-- Contador de Dietas -->
+                                    <div class="mb-4">
+                                        <div class="text-xs font-semibold text-gray-500 uppercase mb-1">🥗 Dietas</div>
+                                        <span class="inline-block bg-purple-100 text-purple-800 rounded-full px-3 py-1 text-sm font-semibold">
+                                            {{ $subtipo->dietas_count }}
+                                        </span>
+                                    </div>
+
+                                    <!-- Acciones -->
+                                    <div class="flex justify-center gap-2">
+                                        @if(auth()->user()->role === 'admin' || auth()->user()->role === 'nutricionista')
+                                            <a href="{{ route('subtipos-dieta.edit', $subtipo) }}" class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-lg rounded-lg transition" title="Editar">
+                                                ✏️
+                                            </a>
+                                        @endif
+                                        @if(auth()->user()->role === 'admin' || auth()->user()->role === 'administrador')
+                                            <form action="{{ route('subtipos-dieta.destroy', $subtipo) }}" method="POST" class="inline-block" onsubmit="return confirm('¿Eliminar este subtipo de dieta?')">
+                                                @csrf @method('DELETE')
+                                                <button type="submit" class="px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-lg rounded-lg transition" title="Eliminar">🗑️</button>
+                                            </form>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <!-- Pagination -->
+                        <div class="mt-6">
+                            {{ $subtipos->links() }}
+                        </div>
+                    @else
+                        <div class="bg-white rounded-lg shadow-md p-8 text-center">
+                            <div class="text-6xl mb-4">📭</div>
+                            <h3 class="text-lg font-semibold text-gray-800 mb-2">No hay subtipos de dieta</h3>
+                            <p class="text-gray-600 mb-4">Comienza creando el primer subtipo de dieta.</p>
+                            @if(auth()->user()->role === 'admin' || auth()->user()->role === 'nutricionista')
+                                <a href="{{ route('subtipos-dieta.create') }}" class="inline-block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+                                    ➕ Crear primer subtipo
+                                </a>
+                            @endif
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

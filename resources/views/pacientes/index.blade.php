@@ -12,12 +12,21 @@
                         <p class="text-gray-600 text-sm mt-1">Gestión de pacientes hospitalizados</p>
                     </div>
                     <div class="flex gap-2">
-                        <a href="{{ route('pacientes.reporte') }}" class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition">📊 Reporte</a>
+                        <a href="{{ route('pacientes.reporte') }}" class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition" title="Reporte">
+                            <span class="hidden md:inline">📊 Reporte</span>
+                            <span class="md:hidden text-lg">📊</span>
+                        </a>
                         @if(auth()->check() && auth()->user()->role !== 'usuario')
-                            <a href="{{ route('pacientes.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition">➕ Nuevo</a>
+                            <a href="{{ route('pacientes.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition" title="Nuevo Paciente">
+                                <span class="hidden md:inline">➕ Nuevo</span>
+                                <span class="md:hidden text-lg">➕</span>
+                            </a>
                         @endif
                         @if(auth()->check() && auth()->user()->role !== 'usuario')
-                            <a href="{{ route('registro-dietas.create') }}" class="inline-flex items-center px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white rounded-md transition">🥗 Dieta</a>
+                            <a href="{{ route('registro-dietas.create') }}" class="inline-flex items-center px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white rounded-md transition" title="Registrar Dieta">
+                                <span class="hidden md:inline">🥗 Dieta</span>
+                                <span class="md:hidden text-lg">🥗</span>
+                            </a>
                         @endif
                     </div>
                 </div>
