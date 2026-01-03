@@ -13,40 +13,57 @@ class UpdateMedicinaInternaSeeder extends Seeder
      */
     public function run(): void
     {
-        // Buscar servicio MEDICINA INTERNA
-        $servicio = Servicio::where('nombre', 'LIKE', '%MEDICINA%INTERNA%')
-            ->orWhere('nombre', 'LIKE', '%Medicina%Interna%')
-            ->first();
+        // Mapeo de servicios a prefijos
+        $servicios = [
+            'MEDICINA INTERNA' => 'MI',
+            'CIRUGIA' => 'C',
+            'PEDIATRIA' => 'P',
+            'GINECOLOGIA' => 'GO',
+            'TRAUMATOLOGIA' => 'T',
+            'DIALISIS' => 'D',
+            'EMERGENCIA' => 'E',
+        ];
 
-        if (!$servicio) {
-            $this->command->warn('Servicio MEDICINA INTERNA no encontrado');
-            return;
+        foreach ($servicios as $nombreServicio => $prefijo) {
+            $servicio = Servicio::where('nombre', 'LIKE', "%{$nombreServicio}%")
+                ->orWhere('nombre', 'LIKE', "%" . ucfirst(strtolower($nombreServicio)) . "%")
+                ->first();
+
+            if (!$servicio) {
+                $this->command->warn("Servicio {$nombreServicio} no encontrado");
+                continue;
+            }
+
+            $this->command->info("Actualizando: {$servicio->nombre} → {$prefijo}");
+
+            // Actualizar prefijo del servicio
+            $servicio->prefijo = $prefijo;
+            $servicio->save();
+
+            // Obtener todas las camas del servicio ordenadas por ID
+            $camas = Cama::where('servicio_id', $servicio->id)
+                ->orderBy('id')
+                ->get();
+
+            if ($camas->isEmpty()) {
+                $this->command->line("  Sin camas para actualizar");
+                continue;
+            }
+
+            // Renumerar camas con nuevo prefijo
+            $counter = 1;
+            foreach ($camas as $cama) {
+                $oldCodigo = $cama->codigo;
+                $cama->codigo = $prefijo . $counter;
+                $cama->save();
+                
+                $this->command->line("  {$oldCodigo} → {$cama->codigo}");
+                $counter++;
+            }
+
+            $this->command->info("✓ {$camas->count()} cama(s) actualizadas");
         }
 
-        $this->command->info("Actualizando servicio: {$servicio->nombre}");
-
-        // Actualizar prefijo del servicio
-        $servicio->prefijo = 'MI';
-        $servicio->save();
-
-        // Obtener todas las camas del servicio ordenadas por ID
-        $camas = Cama::where('servicio_id', $servicio->id)
-            ->orderBy('id')
-            ->get();
-
-        $this->command->info("Camas encontradas: " . $camas->count());
-
-        // Renumerar camas con nuevo prefijo
-        $counter = 1;
-        foreach ($camas as $cama) {
-            $oldCodigo = $cama->codigo;
-            $cama->codigo = 'MI' . $counter;
-            $cama->save();
-            
-            $this->command->line("  {$oldCodigo} → {$cama->codigo}");
-            $counter++;
-        }
-
-        $this->command->info("✓ Servicio y camas actualizados correctamente");
+        $this->command->info("✓✓✓ Proceso completado");
     }
 }
