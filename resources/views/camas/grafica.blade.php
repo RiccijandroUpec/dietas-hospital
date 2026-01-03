@@ -24,9 +24,9 @@
 
             @if($servicioId && $camas->count() > 0)
                 <!-- Grid de Camas -->
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6 text-gray-900 dark:text-gray-100">
-                        <h3 class="text-lg font-semibold mb-6">Camas del Servicio</h3>
+                <div class="bg-white dark:bg-gray-900 overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-6">
+                        <h3 class="text-lg font-semibold mb-6 text-gray-900 dark:text-gray-100">Camas del Servicio</h3>
                         
                         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                             @foreach($camas as $cama)
