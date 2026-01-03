@@ -203,7 +203,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Verificar cedula (debounce)
     let cedulaTimer = null;
-    const checkCedulaUrl = '{{ url('/pacientes/check-cedula') }}';
+    // URL relativa para evitar problemas con APP_URL o dominios diferentes
+    const checkCedulaUrl = '/pacientes/check-cedula';
     
     function checkCedula() {
         const ced = cedulaInput.value.trim();
@@ -215,7 +216,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
         cedulaFeedback.innerHTML = '<span class="text-blue-600">🔍 Buscando...</span>';
 
-        fetch(`${checkCedulaUrl}?cedula=${encodeURIComponent(ced)}`)
+        fetch(`${checkCedulaUrl}?cedula=${encodeURIComponent(ced)}`, {
+            credentials: 'same-origin',
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
             .then(res => {
                 console.log('Response status:', res.status);
                 console.log('Response headers:', res.headers.get('content-type'));

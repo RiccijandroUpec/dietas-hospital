@@ -9,18 +9,19 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Pacientes resource
+// Pacientes resource y endpoints AJAX (orden: primero AJAX, luego resource)
 Route::middleware('auth')->group(function () {
+    // Endpoint para verificar existencia de paciente por cédula
+    Route::get('pacientes/check-cedula', [App\Http\Controllers\PacienteController::class, 'checkCedula'])
+        ->name('pacientes.check-cedula');
+
+    // Endpoint para camas disponibles por servicio (AJAX)
+    Route::get('servicios/{servicio}/camas-available', [App\Http\Controllers\PacienteController::class, 'availableCamas']);
+
     Route::get('pacientes/reporte', [App\Http\Controllers\PacienteController::class, 'reporte'])->name('pacientes.reporte');
     Route::get('pacientes/search', [App\Http\Controllers\PacienteController::class, 'search'])->name('pacientes.search');
     Route::resource('pacientes', App\Http\Controllers\PacienteController::class);
 });
-
-// Endpoint para camas disponibles por servicio (AJAX)
-Route::get('servicios/{servicio}/camas-available', [App\Http\Controllers\PacienteController::class, 'availableCamas'])->middleware('auth');
-
-// Endpoint para verificar existencia de paciente por cédula
-Route::get('pacientes/check-cedula', [App\Http\Controllers\PacienteController::class, 'checkCedula'])->middleware('auth');
 
 // Servicios and Camas (admin)
 Route::resource('servicios', App\Http\Controllers\ServicioController::class)->middleware('auth');
