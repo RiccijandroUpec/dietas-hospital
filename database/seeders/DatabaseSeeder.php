@@ -24,7 +24,5 @@ class DatabaseSeeder extends Seeder
         // Seed registration schedules
         $this->call(\Database\Seeders\RegistrationScheduleSeeder::class);
 
-        // Limpiar condicion "normal" de pacientes
-        $this->call(\Database\Seeders\RemoveNormalCondicionSeeder::class);
     }
 }
