@@ -156,6 +156,9 @@
                                                 $c = trim($c);
                                                 $condiciones[$c] = ($condiciones[$c] ?? 0) + 1;
                                             }
+                                        } else {
+                                            // Sin condición explícita => Normal
+                                            $condiciones['normal'] = ($condiciones['normal'] ?? 0) + 1;
                                         }
                                     }
                                     $labels = [
@@ -250,13 +253,14 @@
                                             ];
                                             $condArr = $cond ? explode(',', $cond) : [];
                                         @endphp
-                                        @if($condArr && $condArr[0] !== '')
-                                            @foreach($condArr as $c)
-                                                <span class="inline-block bg-gray-100 text-gray-800 rounded px-2 py-0.5 mr-1 text-xs">{{ $labels[trim($c)] ?? $c }}</span>
-                                            @endforeach
-                                        @else
-                                            <span class="text-gray-400">–</span>
-                                        @endif
+                                        @php
+                                            if (!$condArr || $condArr[0] === '') {
+                                                $condArr = ['normal'];
+                                            }
+                                        @endphp
+                                        @foreach($condArr as $c)
+                                            <span class="inline-block bg-gray-100 text-gray-800 rounded px-2 py-0.5 mr-1 text-xs">{{ $labels[trim($c)] ?? $c }}</span>
+                                        @endforeach
                                     </td>
                                     <td class="px-3 py-2">{{ optional($p->servicio)->nombre }}</td>
                                     <td class="px-3 py-2">{{ optional($p->cama)->codigo ?? '–' }}</td>
@@ -300,25 +304,26 @@
                                 </div>
                             </div>
 
-                            @if($p->condicion)
-                                <div class="mt-2">
-                                    <p class="text-xs font-medium text-gray-600 mb-1">Condición:</p>
-                                    <div class="flex flex-wrap gap-1">
-                                        @php
-                                            $cond = $p->condicion;
-                                            $labels = [
-                                                'normal' => 'Normal',
-                                                'diabetico' => 'Diabético',
-                                                'hiposodico' => 'Hiposódico',
-                                            ];
-                                            $condArr = $cond ? explode(',', $cond) : [];
-                                        @endphp
-                                        @foreach($condArr as $c)
-                                            <span class="inline-block bg-gray-100 text-gray-800 rounded px-2 py-0.5 text-xs">{{ $labels[trim($c)] ?? $c }}</span>
-                                        @endforeach
-                                    </div>
+                            <div class="mt-2">
+                                <p class="text-xs font-medium text-gray-600 mb-1">Condición:</p>
+                                <div class="flex flex-wrap gap-1">
+                                    @php
+                                        $cond = $p->condicion;
+                                        $labels = [
+                                            'normal' => 'Normal',
+                                            'diabetico' => 'Diabético',
+                                            'hiposodico' => 'Hiposódico',
+                                        ];
+                                        $condArr = $cond ? explode(',', $cond) : [];
+                                        if (!$condArr || $condArr[0] === '') {
+                                            $condArr = ['normal'];
+                                        }
+                                    @endphp
+                                    @foreach($condArr as $c)
+                                        <span class="inline-block bg-gray-100 text-gray-800 rounded px-2 py-0.5 text-xs">{{ $labels[trim($c)] ?? $c }}</span>
+                                    @endforeach
                                 </div>
-                            @endif
+                            </div>
 
                             @if($p->cama)
                                 <div class="mt-2 p-2 bg-yellow-50 rounded border border-yellow-200">
@@ -415,10 +420,11 @@ function renderRows(pacientes) {
     };
 
     tbody.innerHTML = pacientes.map(p => {
-        const conds = (p.condicion || '').split(',').filter(Boolean);
-        const condBadges = conds.length
-            ? conds.map(c => `<span class="inline-block bg-gray-100 text-gray-800 rounded px-2 py-0.5 mr-1 text-xs">${labels[c.trim()] || c}</span>`).join('')
-            : '<span class="text-gray-400">–</span>';
+        let conds = (p.condicion || '').split(',').filter(Boolean);
+        if (!conds.length) conds = ['normal'];
+        const condBadges = conds
+            .map(c => `<span class="inline-block bg-gray-100 text-gray-800 rounded px-2 py-0.5 mr-1 text-xs">${labels[c.trim()] || c}</span>`)
+            .join('');
 
         const estadoBadge = p.estado === 'hospitalizado'
             ? '<span class="inline-block bg-blue-100 text-blue-800 rounded px-2 py-1 text-xs font-semibold">Hospitalizado</span>'
@@ -457,10 +463,11 @@ function renderMobileCards(pacientes) {
     };
 
     mobileContainer.innerHTML = pacientes.map(p => {
-        const conds = (p.condicion || '').split(',').filter(Boolean);
-        const condBadges = conds.length
-            ? conds.map(c => `<span class="inline-block bg-gray-100 text-gray-800 rounded px-2 py-0.5 text-xs">${labels[c.trim()] || c}</span>`).join('')
-            : '';
+        let conds = (p.condicion || '').split(',').filter(Boolean);
+        if (!conds.length) conds = ['normal'];
+        const condBadges = conds
+            .map(c => `<span class="inline-block bg-gray-100 text-gray-800 rounded px-2 py-0.5 text-xs">${labels[c.trim()] || c}</span>`)
+            .join('');
 
         const estadoBadge = p.estado === 'hospitalizado'
             ? '<span class="inline-block bg-blue-100 text-blue-800 rounded px-2 py-1 text-xs font-semibold">Hospitalizado</span>'
