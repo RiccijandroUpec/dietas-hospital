@@ -13,17 +13,65 @@
             </a>
         </div>
 
-        <div class="bg-white rounded-lg shadow-md">
+        @php
+            $now = now();
+            $currentTime = $now->format('H:i');
+            $schedules = \App\Models\RegistrationSchedule::all();
+            $isAllowed = false;
+            
+            foreach ($schedules as $schedule) {
+                if ($schedule->isCurrentTimeAllowed()) {
+                    $isAllowed = true;
+                    break;
+                }
+            }
+        @endphp
+
+        @if(!$isAllowed)
+            <div class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg shadow-md">
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl">⛔</span>
+                    <div>
+                        <h3 class="font-bold text-red-900 text-lg">Fuera de Horario de Registro</h3>
+                        <p class="text-red-800 mt-1">
+                            No puedes registrar refrigerios en este momento. El registro está disponible solo durante los horarios configurados.
+                        </p>
+                        <div class="mt-3 p-3 bg-white rounded border border-red-200">
+                            <p class="text-sm text-gray-600 font-semibold">⏰ Horarios disponibles:</p>
+                            @php
+                                $schedules = \App\Models\RegistrationSchedule::orderBy('start_time')->get();
+                            @endphp
+                            @if($schedules->count() > 0)
+                                <ul class="mt-2 space-y-1">
+                                    @foreach($schedules as $schedule)
+                                        <li class="text-sm text-gray-700">
+                                            <span class="font-medium">{{ ucfirst($schedule->meal_type) }}:</span>
+                                            {{ \Carbon\Carbon::createFromFormat('H:i', $schedule->start_time)->format('H:i') }} - 
+                                            {{ \Carbon\Carbon::createFromFormat('H:i', $schedule->end_time)->format('H:i') }}
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @else
+                                <p class="text-sm text-gray-600 mt-2">No hay horarios configurados</p>
+                            @endif
+                        </div>
+                        <p class="text-red-700 text-sm mt-3 font-semibold">💡 Por favor, vuelve durante el horario permitido</p>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        <div class="bg-white rounded-lg shadow-md"{{ !$isAllowed ? ' style="opacity: 0.5; pointer-events: none;"' : '' }}>
             <div class="p-6">
                 @if($pacientes->isEmpty())
                     <div class="p-4 bg-yellow-50 border border-yellow-200 rounded">No hay pacientes hospitalizados disponibles.</div>
                 @else
-                <form action="{{ route('registro-refrigerios.store') }}" method="POST">
+                <form action="{{ route('registro-refrigerios.store') }}" method="POST" {{ !$isAllowed ? 'onsubmit="return false;"' : '' }}>
                     @csrf
                     <div class="mb-4">
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Paciente</label>
                         <div class="relative">
-                            <input type="text" id="buscador_paciente" class="w-full border rounded-lg px-3 py-2" placeholder="Nombre, apellido o cédula">
+                            <input type="text" id="buscador_paciente" class="w-full border rounded-lg px-3 py-2" placeholder="Nombre, apellido o cédula" {{ !$isAllowed ? 'disabled' : '' }}>
                             <div id="buscador_paciente_results" class="absolute z-10 mt-1 w-full bg-white border rounded-lg shadow max-h-60 overflow-auto"></div>
                             <select id="paciente_select" name="paciente_id" class="hidden">
                                 <option value="">-- Seleccione --</option>
@@ -46,7 +94,7 @@
                                     <label class="flex items-center cursor-pointer hover:bg-white p-2 rounded transition">
                                         <input type="checkbox" name="refrigerio_ids[]" value="{{ $r->id }}" 
                                             class="w-4 h-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
-                                            @if(in_array($r->id, (array)old('refrigerio_ids', []))) checked @endif>
+                                            @if(in_array($r->id, (array)old('refrigerio_ids', []))) checked @endif {{ !$isAllowed ? 'disabled' : '' }}>
                                         <span class="ml-3 text-gray-900">{{ $r->nombre }}</span>
                                         @if($r->descripcion)
                                             <span class="ml-2 text-xs text-gray-500">({{ Str::limit($r->descripcion, 50) }})</span>

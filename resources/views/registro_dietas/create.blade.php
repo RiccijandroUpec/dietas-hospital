@@ -8,6 +8,54 @@
                 <h2 class="font-semibold text-2xl text-gray-800 mb-2">📝 Registrar Dieta a Paciente</h2>
                 <p class="text-gray-600 text-sm mb-6">Solo pacientes hospitalizados pueden tener registros de dieta</p>
 
+                @php
+                    $now = now();
+                    $currentTime = $now->format('H:i');
+                    $schedules = \App\Models\RegistrationSchedule::all();
+                    $isAllowed = false;
+                    
+                    foreach ($schedules as $schedule) {
+                        if ($schedule->isCurrentTimeAllowed()) {
+                            $isAllowed = true;
+                            break;
+                        }
+                    }
+                @endphp
+
+                @if(!$isAllowed)
+                    <div class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg shadow-md">
+                        <div class="flex items-start gap-3">
+                            <span class="text-2xl">⛔</span>
+                            <div>
+                                <h3 class="font-bold text-red-900 text-lg">Fuera de Horario de Registro</h3>
+                                <p class="text-red-800 mt-1">
+                                    No puedes registrar dietas en este momento. El registro está disponible solo durante los horarios configurados.
+                                </p>
+                                <div class="mt-3 p-3 bg-white rounded border border-red-200">
+                                    <p class="text-sm text-gray-600 font-semibold">⏰ Horarios disponibles:</p>
+                                    @php
+                                        $schedules = \App\Models\RegistrationSchedule::orderBy('start_time')->get();
+                                    @endphp
+                                    @if($schedules->count() > 0)
+                                        <ul class="mt-2 space-y-1">
+                                            @foreach($schedules as $schedule)
+                                                <li class="text-sm text-gray-700">
+                                                    <span class="font-medium">{{ ucfirst($schedule->meal_type) }}:</span>
+                                                    {{ \Carbon\Carbon::createFromFormat('H:i', $schedule->start_time)->format('H:i') }} - 
+                                                    {{ \Carbon\Carbon::createFromFormat('H:i', $schedule->end_time)->format('H:i') }}
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    @else
+                                        <p class="text-sm text-gray-600 mt-2">No hay horarios configurados</p>
+                                    @endif
+                                </div>
+                                <p class="text-red-700 text-sm mt-3 font-semibold">💡 Por favor, vuelve durante el horario permitido</p>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
                 @if(session('error'))
                     <div class="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-md flex items-start">
                         <span class="mr-3">⚠️</span>
@@ -17,12 +65,12 @@
 
                 @if(auth()->check() && (auth()->user()->role === 'nutricionista' || auth()->user()->role === 'enfermero' || auth()->user()->role === 'admin'))
                     @if($pacientes->count() > 0)
-                        <form action="{{ route('registro-dietas.store') }}" method="POST">
+                        <form action="{{ route('registro-dietas.store') }}" method="POST" {{ !$isAllowed ? 'onsubmit="return false;"' : '' }}>
                             @csrf
-                            <div class="grid grid-cols-1 gap-4">
+                            <div class="grid grid-cols-1 gap-4" style="{{ !$isAllowed ? 'opacity: 0.5; pointer-events: none;' : '' }}">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">🔍 Buscar Paciente (Hospitalizado)</label>
-                                    <input type="text" id="buscador_paciente" placeholder="Nombre, apellido o cédula" class="mt-1 block w-full border-gray-300 rounded-md">
+                                    <input type="text" id="buscador_paciente" placeholder="Nombre, apellido o cédula" class="mt-1 block w-full border-gray-300 rounded-md" {{ !$isAllowed ? 'disabled' : '' }}>
                                     <div id="buscador_paciente_results" class="border border-gray-200 bg-white absolute z-10 w-96 max-h-64 overflow-y-auto rounded-md shadow-lg"></div>
                                     <select id="paciente_select" name="paciente_id" class="hidden">
                                         <option value="">-- Seleccione --</option>
