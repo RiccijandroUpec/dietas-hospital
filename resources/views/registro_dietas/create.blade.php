@@ -57,9 +57,12 @@
                 @endif
 
                 @if(session('error'))
-                    <div class="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-md flex items-start">
-                        <span class="mr-3">⚠️</span>
-                        <span>{{ session('error') }}</span>
+                    <div class="mb-4 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-lg flex items-start gap-3">
+                        <span class="text-2xl">❌</span>
+                        <div>
+                            <p class="font-semibold">Error</p>
+                            <p class="text-sm mt-1">{{ session('error') }}</p>
+                        </div>
                     </div>
                 @endif
 

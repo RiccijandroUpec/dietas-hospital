@@ -198,6 +198,13 @@ class RegistroDietaController extends Controller
             'es_tardia' => 'nullable|boolean',
         ]);
 
+        // Validar que la fecha no sea del pasado
+        $fechaRegistro = \Carbon\Carbon::parse($data['fecha']);
+        $hoy = now()->startOfDay();
+        if ($fechaRegistro < $hoy) {
+            return back()->with('error', '❌ No puedes registrar dietas de fechas pasadas. Solo se permite registrar del día actual en adelante.')->withInput();
+        }
+
         // Validar horario de registro
         $schedule = RegistrationSchedule::getByMealType($data['tipo_comida']);
         if ($schedule && !$schedule->allow_out_of_schedule && !$schedule->isCurrentTimeAllowed()) {

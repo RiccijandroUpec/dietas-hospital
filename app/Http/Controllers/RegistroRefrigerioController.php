@@ -101,6 +101,13 @@ class RegistroRefrigerioController extends Controller
             'observacion' => 'nullable|string',
         ]);
 
+        // Validar que la fecha no sea del pasado
+        $fechaRegistro = \Carbon\Carbon::parse($validated['fecha']);
+        $hoy = now()->startOfDay();
+        if ($fechaRegistro < $hoy) {
+            return back()->with('error', '❌ No puedes registrar refrigerios de fechas pasadas. Solo se permite registrar del día actual en adelante.')->withInput();
+        }
+
         // Validar horario de registro para refrigerio según el momento
         foreach ($validated['momentos'] as $momento) {
             $mealType = $momento === 'mañana' ? 'refrigerio_mañana' : 'refrigerio_tarde';

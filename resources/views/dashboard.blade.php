@@ -33,9 +33,9 @@
                         <div class="w-full lg:w-80 bg-white/10 border border-white/20 rounded-xl p-4 backdrop-blur">
                             <div class="text-xs uppercase tracking-wide text-blue-100 font-semibold">Hora actual</div>
                             <div class="mt-1 text-3xl font-bold" id="dashboardClock">{{ now()->setTimezone(config('app.timezone'))->format('H:i:s') }}</div>
-                            <div class="mt-3">
-                                <p class="text-xs text-blue-50 mb-2">Registros disponibles ahora</p>
-                                <div class="space-y-1.5 text-sm">
+                            <div class="mt-4">
+                                <p class="text-xs text-blue-50 mb-2 font-semibold">Activos ahora</p>
+                                <div class="grid grid-cols-3 gap-1.5">
                                     @php
                                         $now = now();
                                         $currentTime = $now->format('H:i');
@@ -63,24 +63,29 @@
                                                     'desayuno' => 'Desayuno',
                                                     'almuerzo' => 'Almuerzo',
                                                     'merienda' => 'Merienda',
-                                                    'refrigerio_mañana' => 'Refrigerio Mañana',
-                                                    'refrigerio_tarde' => 'Refrigerio Tarde',
+                                                    'refrigerio_mañana' => 'Mañana',
+                                                    'refrigerio_tarde' => 'Tarde',
                                                 ];
                                                 $remaining = $schedule->getRemainingMinutes();
+                                                $colors = [
+                                                    'desayuno' => 'from-amber-500 to-orange-400',
+                                                    'almuerzo' => 'from-green-500 to-emerald-400',
+                                                    'merienda' => 'from-purple-500 to-pink-400',
+                                                    'refrigerio_mañana' => 'from-yellow-500 to-amber-400',
+                                                    'refrigerio_tarde' => 'from-orange-500 to-red-400',
+                                                ];
                                             @endphp
-                                            <div class="flex items-center justify-between px-3 py-1.5 bg-white/20 rounded-lg">
-                                                <span class="font-medium">
-                                                    {{ $icons[$schedule->meal_type] ?? '📋' }} 
-                                                    {{ $names[$schedule->meal_type] ?? ucfirst($schedule->meal_type) }}
-                                                </span>
+                                            <div class="bg-gradient-to-br {{ $colors[$schedule->meal_type] ?? 'from-blue-500 to-blue-400' }} rounded p-1.5 flex flex-col items-center justify-center text-white shadow hover:shadow-lg transition-all hover:scale-110 cursor-pointer">
+                                                <span class="text-lg">{{ $icons[$schedule->meal_type] ?? '📋' }}</span>
+                                                <span class="text-xs font-bold text-center leading-tight mt-0.5">{{ $names[$schedule->meal_type] ?? ucfirst($schedule->meal_type) }}</span>
                                                 @if($remaining >= 0 && $remaining <= 30)
-                                                    <span class="text-xs text-yellow-200">{{ $remaining }}m</span>
+                                                    <span class="text-xs font-bold mt-0.5 bg-white/40 px-1 py-0 rounded text-white">{{ $remaining }}m</span>
                                                 @endif
                                             </div>
                                         @endforeach
                                     @else
-                                        <div class="px-3 py-2 bg-white/10 rounded-lg text-center">
-                                            <p class="text-blue-100 text-xs">⏸️ Fuera de horario de registro</p>
+                                        <div class="col-span-3 px-2 py-1.5 bg-white/20 rounded text-center border border-white/30">
+                                            <p class="text-blue-100 text-xs font-semibold">⏸️ Fuera horario</p>
                                         </div>
                                     @endif
                                 </div>
@@ -495,10 +500,11 @@
                 <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
                     <h4 class="font-bold text-blue-900 mb-2 flex items-center gap-2">
                         <span class="text-xl">✨</span>
-                        Nueva Funcionalidad - Historial de Cambios
+                        Nueva Funcionalidad - Camas Asignadas Gráficamente
                     </h4>
                     <p class="text-blue-800 text-sm">
-                        Ahora puedes ver el historial completo de actualizaciones haciendo clic en la columna "Actualizado por" en el listado de registros de refrigerios.
+                        Ahora puedes ver las camas asignadas a cada paciente directamente en su perfil, facilitando la gestión y visualización rápida de la información.
+                        asi mismo, puedes agregar un paciente a una cama desde la cama graficamente.
                     </p>
                 </div>
 
@@ -543,22 +549,20 @@
 </x-app-layout>
 
 <script>
-// Test directo - ejecutar inmediatamente
-console.log('Script cargado');
-console.log('Buscando modal...');
-const modal = document.getElementById('modalActualizaciones');
-console.log('Modal encontrado:', modal);
+// Modal de actualizaciones - mostrar solo UNA VEZ
+const actualizacionesVista = localStorage.getItem('actualizacionesVista');
 
-if (modal) {
-    console.log('Mostrando modal ahora...');
-    modal.classList.remove('hidden');
-} else {
-    console.error('ERROR: Modal no encontrado en el DOM');
+if (!actualizacionesVista) {
+    setTimeout(() => {
+        const modal = document.getElementById('modalActualizaciones');
+        if (modal) {
+            modal.classList.remove('hidden');
+        }
+    }, 500); // Pequeño delay para mejor experiencia
 }
 
 function cerrarModalActualizaciones() {
-    const fechaHoy = new Date().toDateString();
-    localStorage.setItem('actualizacionesVistaFecha', fechaHoy);
+    localStorage.setItem('actualizacionesVista', 'true');
     
     const modal = document.getElementById('modalActualizaciones');
     if (modal) {

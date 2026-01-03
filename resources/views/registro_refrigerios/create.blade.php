@@ -63,6 +63,16 @@
 
         <div class="bg-white rounded-lg shadow-md"{{ !$isAllowed ? ' style="opacity: 0.5; pointer-events: none;"' : '' }}>
             <div class="p-6">
+                @if(session('error'))
+                    <div class="mb-4 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-lg flex items-start gap-3">
+                        <span class="text-2xl">❌</span>
+                        <div>
+                            <p class="font-semibold">Error</p>
+                            <p class="text-sm mt-1">{{ session('error') }}</p>
+                        </div>
+                    </div>
+                @endif
+
                 @if($pacientes->isEmpty())
                     <div class="p-4 bg-yellow-50 border border-yellow-200 rounded">No hay pacientes hospitalizados disponibles.</div>
                 @else

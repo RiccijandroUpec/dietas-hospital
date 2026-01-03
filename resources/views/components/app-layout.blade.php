@@ -46,32 +46,62 @@
 
             /* Mejora de responsividad global */
             @media (max-width: 640px) {
-                /* Tablas compactas en móviles */
+                /* Tablas ultra compactas en móviles */
                 table {
-                    font-size: 0.75rem;
+                    font-size: 0.6rem !important;
                     width: 100%;
+                    table-layout: fixed;
                 }
                 table th,
                 table td {
-                    padding: 0.4rem 0.5rem !important;
+                    padding: 0.2rem 0.25rem !important;
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
+                    border-width: 0.5px !important;
                 }
-                table th { font-size: 0.65rem; }
+                table th { 
+                    font-size: 0.55rem !important;
+                    font-weight: 700;
+                    padding: 0.15rem 0.2rem !important;
+                }
+                tbody tr {
+                    height: auto;
+                }
+                tbody td {
+                    height: auto;
+                    padding: 0.15rem 0.2rem !important;
+                }
                 .overflow-x-auto {
                     overflow-x: auto;
                     -webkit-overflow-scrolling: touch;
+                    width: 100%;
                 }
                 /* Encabezados y tarjetas */
-                header .py-6 { padding-top: 1rem; padding-bottom: 1rem; }
-                h1, h2 { font-size: 1.25rem; }
-                h3 { font-size: 1.125rem; }
+                header .py-6 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+                h1, h2 { font-size: 1.1rem; }
+                h3 { font-size: 0.95rem; }
                 .sm\:rounded-lg { border-radius: 0.5rem; }
                 /* Grids apiladas */
-                .grid { gap: 0.75rem; }
-                .px-6 { padding-left: 1rem; padding-right: 1rem; }
-                .lg\:px-8 { padding-left: 1rem; padding-right: 1rem; }
+                .grid { gap: 0.5rem; }
+                .px-6 { padding-left: 0.75rem; padding-right: 0.75rem; }
+                .lg\:px-8 { padding-left: 0.75rem; padding-right: 0.75rem; }
+                /* Contenedor de tablas */
+                .bg-white.overflow-hidden.shadow-sm.sm\:rounded-lg {
+                    max-width: 100%;
+                }
+                /* Ocultar las columnas menos importantes */
+                /* Mostrar solo: Paciente, Fecha, Acciones */
+                table th:nth-child(2),
+                table td:nth-child(2),
+                table th:nth-child(4),
+                table td:nth-child(4),
+                table th:nth-child(5),
+                table td:nth-child(5),
+                table th:nth-child(6),
+                table td:nth-child(6) {
+                    display: none;
+                }
             }
         </style>
         {{ $header ?? '' }}
