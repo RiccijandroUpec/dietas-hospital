@@ -201,28 +201,28 @@
                                 '{{ addslashes(optional($base->updatedBy)->name ?? 'Sistema') }}',
                                 '{{ $base->updated_at->format('d/m/Y H:i') }}'
                             )" 
-                            class="text-left bg-gray-50 hover:bg-blue-50 rounded px-2 py-1 -mx-2 transition-colors w-full border border-gray-200"
+                            class="text-left bg-gradient-to-br from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 rounded-lg px-3 py-2.5 transition-all w-full border border-blue-200 hover:border-blue-300 shadow-sm"
                         >
-                            <div class="text-sm text-gray-900">{{ optional($base->updatedBy)->name ?? '—' }}</div>
-                            <div class="text-xs text-gray-500">{{ $base->updated_at->format('d/m/Y H:i') }}</div>
-                            <div class="text-blue-600 text-xs mt-1">📋 Ver historial completo</div>
+                            <div class="text-sm font-semibold text-blue-700">{{ optional($base->updatedBy)->name ?? '—' }}</div>
+                            <div class="text-xs text-blue-600">{{ $base->updated_at->format('d/m/Y H:i') }}</div>
+                            <div class="text-indigo-600 font-semibold text-xs mt-1.5">📋 Ver historial completo</div>
                         </button>
                     </div>
 
                     <!-- Acciones -->
                     <div class="flex flex-wrap gap-2">
-                        <a href="{{ route('registro-refrigerios.show', $base) }}" class="flex-1 text-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition">
+                        <a href="{{ route('registro-refrigerios.show', $base) }}" class="flex-1 text-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition shadow-sm">
                             👁️ Ver
                         </a>
                         @if(auth()->user()->role !== 'usuario')
-                            <a href="{{ route('registro-refrigerios.edit', $base) }}" class="flex-1 text-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition">
+                            <a href="{{ route('registro-refrigerios.edit', $base) }}" class="flex-1 text-center px-4 py-2 bg-green-500 hover:bg-green-600 text-white text-sm font-medium rounded-lg transition shadow-sm">
                                 ✏️ Editar
                             </a>
                         @endif
                         @if(auth()->user()->role === 'admin')
                             <form action="{{ route('registro-refrigerios.destroy', $base) }}" method="POST" class="flex-1" onsubmit="return confirm('¿Eliminar registro?')">
                                 @csrf @method('DELETE')
-                                <button class="w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition">🗑️ Eliminar</button>
+                                <button style="color: white !important;" class="w-full px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold rounded-lg transition shadow-sm">🗑️ Eliminar</button>
                             </form>
                         @endif
                     </div>

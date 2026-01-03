@@ -153,7 +153,7 @@
                                         @if(auth()->user()->role === 'admin' || auth()->user()->role === 'administrador')
                                             <form action="{{ route('tipos-dieta.destroy', $tipo) }}" method="POST" class="inline-block" onsubmit="return confirm('¿Eliminar este tipo de dieta?')">
                                                 @csrf @method('DELETE')
-                                                <button type="submit" class="px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-lg rounded-lg transition" title="Eliminar">🗑️</button>
+                                                <button type="submit" style="color: white !important;" class="px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-lg rounded-lg transition" title="Eliminar">🗑️</button>
                                             </form>
                                         @endif
                                     </div>

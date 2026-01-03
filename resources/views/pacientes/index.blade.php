@@ -283,7 +283,7 @@
                                         @if(auth()->check() && in_array(auth()->user()->role, ['administrador', 'admin']))
                                             <form action="{{ route('pacientes.destroy', $paciente) }}" method="POST" class="inline-block" onsubmit="return confirm('¿Eliminar este paciente?')">
                                                 @csrf @method('DELETE')
-                                                <button type="submit" class="px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-lg rounded-lg transition" title="Eliminar">🗑️</button>
+                                                <button type="submit" style="color: white !important;" class="px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-lg rounded-lg transition" title="Eliminar">🗑️</button>
                                             </form>
                                         @endif
                                     </div>

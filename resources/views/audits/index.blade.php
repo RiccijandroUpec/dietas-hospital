@@ -65,7 +65,8 @@
 
         <!-- Tabla de auditoría -->
         <div class="bg-white rounded-lg shadow-md overflow-hidden">
-            <div class="overflow-x-auto">
+            <!-- Vista Desktop (Tabla) -->
+            <div class="hidden md:block overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gradient-to-r from-blue-50 to-blue-100">
                         <tr>
@@ -133,6 +134,67 @@
                         @endforelse
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Vista Móvil (Tarjetas compactas) -->
+            <div class="md:hidden p-4 space-y-3">
+                @forelse($audits as $audit)
+                    @php
+                        $actionColors = [
+                            'create' => ['bg-green-100', 'text-green-800', 'border-green-500', '➕', 'Creación'],
+                            'update' => ['bg-blue-100', 'text-blue-800', 'border-blue-500', '✏️', 'Actualización'],
+                            'delete' => ['bg-red-100', 'text-red-800', 'border-red-500', '🗑️', 'Eliminación'],
+                            'login' => ['bg-purple-100', 'text-purple-800', 'border-purple-500', '🔐', 'Login'],
+                            'logout' => ['bg-yellow-100', 'text-yellow-800', 'border-yellow-500', '🚪', 'Logout'],
+                        ];
+                        $colors = $actionColors[$audit->action] ?? ['bg-gray-100', 'text-gray-800', 'border-gray-500', '•', ucfirst($audit->action)];
+                    @endphp
+                    <div class="bg-white rounded-lg shadow-md p-3 border-l-4 {{ $colors[2] }}">
+                        <!-- Header: Acción y Fecha -->
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="inline-block {{ $colors[0] }} {{ $colors[1] }} rounded-full px-3 py-1 text-xs font-bold">
+                                {{ $colors[3] }} {{ $colors[4] }}
+                            </span>
+                            <span class="text-xs text-gray-500">
+                                {{ $audit->created_at->format('d/m H:i') }}
+                            </span>
+                        </div>
+
+                        <!-- Descripción -->
+                        <div class="mb-2">
+                            <p class="text-sm text-gray-900 font-medium">{{ Str::limit($audit->description, 80) }}</p>
+                        </div>
+
+                        <!-- Usuario y Modelo -->
+                        <div class="flex items-center justify-between text-xs">
+                            <div class="flex items-center gap-1">
+                                <span class="text-gray-500">👤</span>
+                                <span class="text-gray-700 font-medium">{{ optional($audit->user)->name ?? 'Sistema' }}</span>
+                            </div>
+                            @if($audit->model_type)
+                                <span class="text-gray-500">
+                                    {{ $audit->model_type }}
+                                    @if($audit->model_id)
+                                        #{{ $audit->model_id }}
+                                    @endif
+                                </span>
+                            @endif
+                        </div>
+
+                        <!-- Botón Ver detalles -->
+                        <div class="mt-2 pt-2 border-t border-gray-100">
+                            <a href="{{ route('audits.show', $audit) }}" class="block text-center px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition" title="Ver detalles">
+                                👁️ Ver detalles
+                            </a>
+                        </div>
+                    </div>
+                @empty
+                    <div class="bg-white rounded-lg shadow-md p-8 text-center">
+                        <div class="text-6xl mb-4">📭</div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">No hay registros</h3>
+                        <p class="text-gray-600">No se encontraron registros de auditoría.</p>
+                    </div>
+                @endforelse
             </div>
 
             <!-- Paginación -->
